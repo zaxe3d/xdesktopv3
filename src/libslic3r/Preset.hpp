@@ -272,7 +272,7 @@ struct PresetConfigSubstitutions {
 };
 
 // Substitutions having been performed during parsing a set of configuration files, for example when starting up
-// PrusaSlicer and reading the user Print / Filament / Printer profiles.
+// XDesktop and reading the user Print / Filament / Printer profiles.
 using PresetsConfigSubstitutions = std::vector<PresetConfigSubstitutions>;
 
 // Collections of presets of the same type (one of the Print, Filament or Printer type).

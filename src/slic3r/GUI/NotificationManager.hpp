@@ -49,13 +49,13 @@ enum class NotificationType
 	Mouse3dDisconnected,
 //	Mouse3dConnected,
 //	NewPresetsAviable,
-	// Notification on the start of PrusaSlicer, when a new PrusaSlicer version is published.
-	// Contains a hyperlink to open a web browser pointing to the PrusaSlicer download location.
+	// Notification on the start of XDesktop, when a new XDesktop version is published.
+	// Contains a hyperlink to open a web browser pointing to the XDesktop download location.
 	NewAppAvailable,
 	// Like NewAppAvailable but with text and link for alpha / bet release
 	NewAlphaAvailable,
 	NewBetaAvailable,
-	// Notification on the start of PrusaSlicer, when updates of system profiles are detected.
+	// Notification on the start of XDesktop, when updates of system profiles are detected.
 	// Contains a hyperlink to execute installation of the new system profiles.
 	PresetUpdateAvailable,
 //	LoadingFailed,
@@ -773,7 +773,7 @@ private:
 	{NotificationType::ExportOngoing, NotificationLevel::RegularNotificationLevel, 0, _u8L("Exporting.") },
 			//{NotificationType::NewAppAvailable, NotificationLevel::ImportantNotificationLevel, 20,  _u8L("New version is available."),  _u8L("See Releases page."), [](wxEvtHandler* evnthndlr) {
 			//	wxGetApp().open_browser_with_warning_dialog("https://github.com/prusa3d/PrusaSlicer/releases"); return true; }},
-			//{NotificationType::NewAppAvailable, NotificationLevel::ImportantNotificationLevel, 20,  _u8L("New vesion of PrusaSlicer is available.",  _u8L("Download page.") },
+			//{NotificationType::NewAppAvailable, NotificationLevel::ImportantNotificationLevel, 20,  _u8L("New vesion of XDesktop is available.",  _u8L("Download page.") },
 			//{NotificationType::LoadingFailed, NotificationLevel::RegularNotificationLevel, 20,  _u8L("Loading of model has Failed") },
 			//{NotificationType::DeviceEjected, NotificationLevel::RegularNotificationLevel, 10,  _u8L("Removable device has been safely ejected")} // if we want changeble text (like here name of device), we need to do it as CustomNotification
 	};

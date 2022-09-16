@@ -202,6 +202,7 @@ set(_dep_list
     dep_Cereal
     dep_NLopt
     dep_OpenVDB
+    dep_OpenSSL # for md5 checksum
     dep_OpenCSG
     dep_CGAL
     dep_OCCT

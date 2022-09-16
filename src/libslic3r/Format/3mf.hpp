@@ -29,7 +29,7 @@ namespace Slic3r {
     class DynamicPrintConfig;
     struct ThumbnailData;
 
-    // Returns true if the 3mf file with the given filename is a PrusaSlicer project file (i.e. if it contains a config).
+    // Returns true if the 3mf file with the given filename is a XDesktop project file (i.e. if it contains a config).
     extern bool is_project_3mf(const std::string& filename);
 
     // Load the content of a 3mf file into the given model and preset bundle.

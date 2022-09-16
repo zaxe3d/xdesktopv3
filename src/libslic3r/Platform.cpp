@@ -32,7 +32,7 @@ void detect_platform()
             if (type == CPU_TYPE_X86) {
                 int proc_translated = 0;
                 size                = sizeof(proc_translated);
-                // Detect if native CPU is really X86 or PrusaSlicer runs through Rosetta.
+                // Detect if native CPU is really X86 or XDesktop runs through Rosetta.
                 if (sysctlbyname("sysctl.proc_translated", &proc_translated, &size, NULL, 0) == -1) {
                     if (errno == ENOENT) {
                         // Native CPU is X86, and property sysctl.proc_translated doesn't exist.
@@ -40,7 +40,7 @@ void detect_platform()
                         BOOST_LOG_TRIVIAL(info) << "Platform flavor: OSXOnX86";
                     }
                 } else if (proc_translated == 1) {
-                    // Native CPU is ARM and PrusaSlicer runs through Rosetta.
+                    // Native CPU is ARM and XDesktop runs through Rosetta.
                     s_platform_flavor = PlatformFlavor::OSXOnArm;
                     BOOST_LOG_TRIVIAL(info) << "Platform flavor: OSXOnArm";
                 } else {

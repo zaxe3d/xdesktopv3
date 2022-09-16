@@ -81,8 +81,8 @@ std::pair<std::string, bool> SlicingProcessCompletedEvent::format_error_message(
                               "be glad if you reported it."))) % SLIC3R_APP_NAME).str());
         error = std::string(errmsg.ToUTF8()) + "\n\n" + std::string(ex.what());
     } catch (const HardCrash &ex) {
-        error = GUI::format(_L("PrusaSlicer has encountered a fatal error: \"%1%\""), ex.what()) + "\n\n" +
-        		_u8L("Please save your project and restart PrusaSlicer. "
+        error = GUI::format(_L("XDesktop has encountered a fatal error: \"%1%\""), ex.what()) + "\n\n" +
+        		_u8L("Please save your project and restart XDesktop. "
                      "We would be glad if you reported the issue.");
     } catch (PlaceholderParserError &ex) {
 		error = ex.what();
@@ -107,6 +107,17 @@ BackgroundSlicingProcess::~BackgroundSlicingProcess()
 	this->stop();
 	this->join_background_thread();
 	boost::nowide::remove(m_temp_output_path.c_str());
+	boost::nowide::remove(m_zaxe_archive_path.c_str());
+}
+
+std::string BackgroundSlicingProcess::zaxe_archive_path() const
+{
+	return m_zaxe_archive_path;
+}
+
+const ZaxeArchive& BackgroundSlicingProcess::zaxe_archive() const
+{
+	return m_zaxe_archive;
 }
 
 bool BackgroundSlicingProcess::select_technology(PrinterTechnology tech)
@@ -160,6 +171,7 @@ void BackgroundSlicingProcess::process_fff()
 			prepare_upload();
 	    } else {
 			m_print->set_status(100, _utf8(L("Slicing complete")));
+			prepare_zaxe_file(); // prepare zaxe file then fire an event for it.
 	    }
 		this->set_step_done(bspsGCodeFinalize);
 	}
@@ -713,6 +725,21 @@ void BackgroundSlicingProcess::finalize_gcode()
 	}
 
 	m_print->set_status(100, (boost::format(_utf8(L("G-code file exported to %1%"))) % export_path).str());
+}
+
+void BackgroundSlicingProcess::prepare_zaxe_file()
+{
+	BOOST_LOG_TRIVIAL(info) << "Preparing Zaxe file...";
+	// get the new path ready.
+	boost::filesystem::path temp_path(wxStandardPaths::Get().GetTempDir().utf8_str().data());
+	boost::filesystem::path zip_path(temp_path);
+	zip_path /= (boost::format("%1%.zaxe") % boost::filesystem::path(m_print->output_filename("")).stem().string()).str();
+	m_zaxe_archive_path = zip_path.string();
+	// export stl.
+	GUI::wxGetApp().mainframe->m_plater->export_stl(false, false, true);
+	// Generate thumbnails. Get the sizes from config.
+	ThumbnailsList thumbnails = this->render_thumbnails(ThumbnailsParams{current_print()->full_print_config().option<ConfigOptionPoints>("thumbnails")->values, true, true, false, true});
+	m_zaxe_archive.export_print(m_zaxe_archive_path, thumbnails, *m_fff_print, m_temp_output_path); // output path for gcode itself and checksum.
 }
 
 // A print host upload job has been scheduled, enqueue it to the printhost job queue

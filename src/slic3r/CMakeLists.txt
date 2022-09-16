@@ -210,6 +210,10 @@ set(SLIC3R_GUI_SOURCES
     GUI/DesktopIntegrationDialog.hpp
     GUI/HintNotification.cpp
     GUI/HintNotification.hpp
+    GUI/NetworkMachineManager.hpp
+    GUI/NetworkMachineManager.cpp
+    GUI/Device.hpp
+    GUI/Device.cpp
     Utils/Http.cpp
     Utils/Http.hpp
     Utils/FixModelByWin10.cpp
@@ -241,6 +245,12 @@ set(SLIC3R_GUI_SOURCES
     Utils/TCPConsole.hpp
     Utils/MKS.cpp
     Utils/MKS.hpp
+    Utils/NetworkMachine.cpp
+    Utils/NetworkMachine.hpp
+    Utils/BroadcastReceiver.cpp
+    Utils/BroadcastReceiver.hpp
+    Utils/WebSocket.cpp
+    Utils/WebSocket.hpp
 )
 
 if (APPLE)

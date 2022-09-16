@@ -154,16 +154,16 @@ void PreferencesDialog::build(size_t selected_tab)
 
 #ifdef _WIN32
 		// Please keep in sync with ConfigWizard
-		def.label = L("Associate .3mf files to PrusaSlicer");
+		def.label = L("Associate .3mf files to XDesktop");
 		def.type = coBool;
-		def.tooltip = L("If enabled, sets PrusaSlicer as default application to open .3mf files.");
+		def.tooltip = L("If enabled, sets XDesktop as default application to open .3mf files.");
 		def.set_default_value(new ConfigOptionBool(app_config->get("associate_3mf") == "1"));
 		option = Option(def, "associate_3mf");
 		m_optgroup_general->append_single_option_line(option);
 
-		def.label = L("Associate .stl files to PrusaSlicer");
+		def.label = L("Associate .stl files to XDesktop");
 		def.type = coBool;
-		def.tooltip = L("If enabled, sets PrusaSlicer as default application to open .stl files.");
+		def.tooltip = L("If enabled, sets XDesktop as default application to open .stl files.");
 		def.set_default_value(new ConfigOptionBool(app_config->get("associate_stl") == "1"));
 		option = Option(def, "associate_stl");
 		m_optgroup_general->append_single_option_line(option);
@@ -205,13 +205,13 @@ void PreferencesDialog::build(size_t selected_tab)
 		m_optgroup_general->append_single_option_line(option);
 
 #if __APPLE__
-		def.label = L("Allow just a single PrusaSlicer instance");
+		def.label = L("Allow just a single XDesktop instance");
 		def.type = coBool;
 		def.tooltip = L("On OSX there is always only one instance of app running by default. However it is allowed to run multiple instances of same app from the command line. In such case this settings will allow only one instance.");
 #else
-		def.label = L("Allow just a single PrusaSlicer instance");
+		def.label = L("Allow just a single XDesktop instance");
 		def.type = coBool;
-		def.tooltip = L("If this is enabled, when starting PrusaSlicer and another instance of the same PrusaSlicer is already running, that instance will be reactivated instead.");
+		def.tooltip = L("If this is enabled, when starting XDesktop and another instance of the same XDesktop is already running, that instance will be reactivated instead.");
 #endif
 		def.set_default_value(new ConfigOptionBool{ app_config->has("single_instance") ? app_config->get("single_instance") == "1" : false });
 		option = Option(def, "single_instance");
@@ -222,7 +222,7 @@ void PreferencesDialog::build(size_t selected_tab)
 		def.label = L("Ask for unsaved changes in project");
 		def.type = coBool;
 		def.tooltip = L("Always ask for unsaved changes in project, when: \n"
-						"- Closing PrusaSlicer,\n"
+						"- Closing XDesktop,\n"
 						"- Loading or creating a new project");
 		def.set_default_value(new ConfigOptionBool{ app_config->get("default_action_on_dirty_project").empty() });
 		option = Option(def, "default_action_on_dirty_project");
@@ -233,7 +233,7 @@ void PreferencesDialog::build(size_t selected_tab)
 		def.label = L("Ask to save unsaved changes in presets when closing the application or when loading a new project");
 		def.type = coBool;
 		def.tooltip = L("Always ask for unsaved changes in presets, when: \n"
-						"- Closing PrusaSlicer while some presets are modified,\n"
+						"- Closing XDesktop while some presets are modified,\n"
 						"- Loading a new project while some presets are modified");
 		def.set_default_value(new ConfigOptionBool{ app_config->get("default_action_on_close_application") == "none" });
 		option = Option(def, "default_action_on_close_application");
@@ -255,9 +255,9 @@ void PreferencesDialog::build(size_t selected_tab)
 	}
 #ifdef _WIN32
 	else {
-		def.label = L("Associate .gcode files to PrusaSlicer G-code Viewer");
+		def.label = L("Associate .gcode files to XDesktop G-code Viewer");
 		def.type = coBool;
-		def.tooltip = L("If enabled, sets PrusaSlicer G-code Viewer as default application to open .gcode files.");
+		def.tooltip = L("If enabled, sets XDesktop G-code Viewer as default application to open .gcode files.");
 		def.set_default_value(new ConfigOptionBool(app_config->get("associate_gcode") == "1"));
 		option = Option(def, "associate_gcode");
 		m_optgroup_general->append_single_option_line(option);
@@ -286,7 +286,7 @@ void PreferencesDialog::build(size_t selected_tab)
 
 	def.label = L("Restore window position on start");
 	def.type = coBool;
-	def.tooltip = L("If enabled, PrusaSlicer will be open at the position it was closed");
+	def.tooltip = L("If enabled, XDesktop will be open at the position it was closed");
 	def.set_default_value(new ConfigOptionBool{ app_config->get("restore_win_position") == "1" });
 	option = Option(def, "restore_win_position");
 	m_optgroup_general->append_single_option_line(option);
@@ -381,7 +381,7 @@ void PreferencesDialog::build(size_t selected_tab)
 
 		def.label = L("Suppress to open hyperlink in browser");
 		def.type = coBool;
-		def.tooltip = L("If enabled, PrusaSlicer will not open hyperlinks in your browser.");
+		def.tooltip = L("If enabled, XDesktop will not open hyperlinks in your browser.");
 		//def.tooltip = ("If enabled, the descriptions of configuration parameters in settings tabs wouldn't work as hyperlinks. "
 		//	"If disabled, the descriptions of configuration parameters in settings tabs will work as hyperlinks.");
 		def.set_default_value(new ConfigOptionBool{ app_config->get("suppress_hyperlinks") == "1" });

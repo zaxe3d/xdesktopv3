@@ -2,9 +2,9 @@
 #define _libslic3r_h_
 
 #include "libslic3r_version.h"
-#define GCODEVIEWER_APP_NAME "PrusaSlicer G-code Viewer"
-#define GCODEVIEWER_APP_KEY  "PrusaSlicerGcodeViewer"
-#define GCODEVIEWER_BUILD_ID std::string("PrusaSlicer G-code Viewer-") + std::string(SLIC3R_VERSION) + std::string("-UNKNOWN")
+#define GCODEVIEWER_APP_NAME "XDesktop G-code Viewer"
+#define GCODEVIEWER_APP_KEY  "XDesktopGcodeViewer"
+#define GCODEVIEWER_BUILD_ID std::string("XDesktop G-code Viewer-") + std::string(SLIC3R_VERSION) + std::string("-UNKNOWN")
 
 // this needs to be included early for MSVC (listing it in Build.PL is not enough)
 #include <memory>
@@ -34,7 +34,7 @@
 #include "Semver.hpp"
 
 #if 1
-// Saves around 32% RAM after slicing step, 6.7% after G-code export (tested on PrusaSlicer 2.2.0 final).
+// Saves around 32% RAM after slicing step, 6.7% after G-code export (tested on XDesktop 2.2.0 final).
 using coord_t = int32_t;
 #else
 //FIXME At least FillRectilinear2 and std::boost Voronoi require coord_t to be 32bit.

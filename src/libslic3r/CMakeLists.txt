@@ -96,6 +96,8 @@ add_library(libslic3r STATIC
     Format/SL1.cpp
     Format/STEP.hpp
     Format/STEP.cpp
+    Format/ZaxeArchive.hpp
+    Format/ZaxeArchive.cpp
     GCode/ThumbnailData.cpp
     GCode/ThumbnailData.hpp
     GCode/Thumbnails.cpp

@@ -1453,7 +1453,7 @@ void GCode::_do_export(Print& print, GCodeOutputStream &file, ThumbnailsGenerato
     file.write(m_writer.postamble());
 
     // From now to the end of G-code, the G-code find / replace post-processor will be disabled.
-    // Thus the PrusaSlicer generated config will NOT be processed by the G-code post-processor, see GH issue #7952.
+    // Thus the XDesktop generated config will NOT be processed by the G-code post-processor, see GH issue #7952.
     file.find_replace_supress();
 
     // adds tags for time estimators
@@ -1479,7 +1479,7 @@ void GCode::_do_export(Print& print, GCodeOutputStream &file, ThumbnailsGenerato
     file.write_format(";%s\n", GCodeProcessor::reserved_tag(GCodeProcessor::ETags::Estimated_Printing_Time_Placeholder).c_str());
 
     // Append full config, delimited by two 'phony' configuration keys prusaslicer_config = begin and prusaslicer_config = end.
-    // The delimiters are structured as configuration key / value pairs to be parsable by older versions of PrusaSlicer G-code viewer.
+    // The delimiters are structured as configuration key / value pairs to be parsable by older versions of XDesktop G-code viewer.
     {
         file.write("\n; prusaslicer_config = begin\n");
         std::string full_config;

@@ -14,6 +14,7 @@
 #include "libslic3r/Format/SL1.hpp"
 #include "slic3r/Utils/PrintHost.hpp"
 #include "libslic3r/GCode/GCodeProcessor.hpp"
+#include "libslic3r/Format/ZaxeArchive.hpp"
 
 
 namespace boost { namespace filesystem { class path; } }
@@ -103,6 +104,9 @@ public:
 	// Activate either m_fff_print or m_sla_print.
 	// Return true if changed.
 	bool select_technology(PrinterTechnology tech);
+
+	std::string zaxe_archive_path() const;
+	const ZaxeArchive& zaxe_archive() const;
 
 	// Get the currently active printer technology.
 	PrinterTechnology   current_printer_technology() const;
@@ -219,6 +223,8 @@ private:
 	GCodeProcessorResult     *m_gcode_result 		 = nullptr;
 	// Callback function, used to write thumbnails into gcode.
 	ThumbnailsGeneratorCallback m_thumbnail_cb 	     = nullptr;
+	ZaxeArchive                 m_zaxe_archive;
+	std::string 		    m_zaxe_archive_path;
 	SL1Archive                  m_sla_archive;
 		// Temporary G-code, there is one defined for the BackgroundSlicingProcess, differentiated from the other processes by a process ID.
 	std::string 				m_temp_output_path;
@@ -263,6 +269,7 @@ private:
     // If the background processing stop was requested, throw CanceledException.
     void                throw_if_canceled() const { if (m_print->canceled()) throw CanceledException(); }
 	void				finalize_gcode();
+    void                prepare_zaxe_file();
     void                prepare_upload();
     // To be executed at the background thread.
 	ThumbnailsList		render_thumbnails(const ThumbnailsParams &params);

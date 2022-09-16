@@ -13,6 +13,8 @@
 #include "libslic3r/Preset.hpp"
 #include "libslic3r/BoundingBox.hpp"
 #include "libslic3r/GCode/GCodeProcessor.hpp"
+#include "libslic3r/Format/ZaxeArchive.hpp"
+#include "NetworkMachineManager.hpp"
 #include "Jobs/Job.hpp"
 #include "Search.hpp"
 
@@ -92,6 +94,7 @@ public:
     ObjectLayers*           obj_layers();
     wxScrolledWindow*       scrolled_panel();
     wxPanel*                presets_panel();
+    NetworkMachineManager*  machine_manager();
 
     ConfigOptionsGroup*     og_freq_chng_params(const bool is_fff);
     wxButton*               get_wiping_dialog_button();
@@ -216,8 +219,11 @@ public:
 
     void cut(size_t obj_idx, size_t instance_idx, coordf_t z, ModelObjectCutAttributes attributes);
 
+    std::string get_zaxe_code_path();
+    const ZaxeArchive& get_zaxe_archive() const;
+
     void export_gcode(bool prefer_removable);
-    void export_stl(bool extended = false, bool selection_only = false);
+    void export_stl(bool extended = false, bool selection_only = false, bool zaxe_file_temp_export = false);
     void export_amf();
     bool export_3mf(const boost::filesystem::path& output_path = boost::filesystem::path());
     void reload_from_disk();

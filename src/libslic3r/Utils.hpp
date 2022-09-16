@@ -343,6 +343,31 @@ inline std::string short_time(const std::string &time)
     return buffer;
 }
 
+// Returns the given time is seconds in format HHh:MMm:SSs
+inline std::string get_time_hms(const std::string &time)
+{
+    // Parse the dhms time format.
+    int days = 0;
+    int hours = 0;
+    int minutes = 0;
+    int seconds = 0;
+    if (time.find('d') != std::string::npos)
+        ::sscanf(time.c_str(), "%dd %dh %dm %ds", &days, &hours, &minutes, &seconds);
+    else if (time.find('h') != std::string::npos)
+        ::sscanf(time.c_str(), "%dh %dm %ds", &hours, &minutes, &seconds);
+    else if (time.find('m') != std::string::npos)
+        ::sscanf(time.c_str(), "%dm %ds", &minutes, &seconds);
+    else if (time.find('s') != std::string::npos)
+        ::sscanf(time.c_str(), "%ds", &seconds);
+
+    hours += days * 24; // eliminate days.
+
+    char buffer[64];
+    ::sprintf(buffer, "%02d:%02d:%02d", hours, minutes, seconds);
+
+    return buffer;
+}
+
 // Returns the given time is seconds in format DDd HHh MMm SSs
 inline std::string get_time_dhms(float time_in_secs)
 {
