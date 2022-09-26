@@ -35,7 +35,7 @@ void NetworkMachineManager::enablePrintNowButton(bool enable)
 void NetworkMachineManager::onBroadcastReceived(wxCommandEvent &event)
 {
     std::stringstream jsonStream;
-    jsonStream.str(std::string(event.GetString().mb_str())); // wxString to std::string
+    jsonStream.str(std::string(event.GetString().utf8_str().data())); // wxString to std::string
 
     boost::property_tree::ptree pt; // construct root obj.
     boost::property_tree::read_json(jsonStream, pt);
@@ -84,7 +84,7 @@ void NetworkMachineManager::onMachineClose(MachineEvent &event)
 
 void NetworkMachineManager::onMachineMessage(MachineNewMessageEvent &event)
 {
-    if (!event.nm) return;
+    if (!event.nm || m_deviceMap[event.nm->ip] == nullptr) return;
     if (event.event == "states_update") {
         m_deviceMap[event.nm->ip]->updateStates();
     } else if (event.event == "print_progress" ||

@@ -132,7 +132,8 @@ target_link_libraries(XDesktop libslic3r cereal)
 if (APPLE) # link openssl
     target_link_libraries(XDesktop crypto)
 else ()
-    target_link_libraries(XDesktop ssl)
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(XDesktop OpenSSL::Crypto) # link openssl
 endif ()
 
 if (APPLE)
@@ -183,7 +184,7 @@ if (WIN32)
     endif()
     target_compile_definitions(XDesktop_app_gui PRIVATE -DSLIC3R_WRAPPER_NOCONSOLE)
     add_dependencies(XDesktop_app_gui XDesktop)
-    set_target_properties(XDesktop_app_gui PROPERTIES OUTPUT_NAME "xdesktop-gui")
+    set_target_properties(XDesktop_app_gui PROPERTIES OUTPUT_NAME "XDesktop")
     target_link_libraries(XDesktop_app_gui PRIVATE boost_headeronly)
 
     add_executable(XDesktop_app_console XDesktop_app_msvc.cpp ${CMAKE_CURRENT_BINARY_DIR}/XDesktop.rc)

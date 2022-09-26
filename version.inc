@@ -7,5 +7,5 @@ set(SLIC3R_VERSION "3.0.0-beta")
 set(SLIC3R_BUILD_ID "XDesktop-${SLIC3R_VERSION}")
 # exe name of the slicer, should be lowercase and valid in all os
 set(SLIC3R_APP_CMD "xdesktop")
-set(SLIC3R_RC_VERSION "3.0.0")
-set(SLIC3R_RC_VERSION_DOTS "3.0.0")
+set(SLIC3R_RC_VERSION "3,0,0,0")
+set(SLIC3R_RC_VERSION_DOTS "3.0.0.0")

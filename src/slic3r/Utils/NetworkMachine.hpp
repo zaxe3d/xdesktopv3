@@ -109,6 +109,8 @@ public:
     void upload(const char *filename);
     void downloadAvatar();
 
+    void shutdown() { m_running = false; }
+
     string id; // unique id of the machine.
     string name; // name of the machine.
     string ip; // ip of the machine.
@@ -127,7 +129,7 @@ public:
     }
 private:
     progress_callback_t m_uploadProgressCallback;
-    ushort m_ftpPort = 9494;
+    USHORT m_ftpPort = 9494;
 
     // Websocket callbacks.
     void onWSConnect(); // Websocket connect callback.
@@ -141,6 +143,7 @@ private:
     Websocket* m_ws; // websocket
     wxBitmap m_avatar; // avatar image via FTP.
     boost::mutex m_avatarMtx; // allows read operations on m_avatar without locking.
+    bool m_running;
 };
 
 class NetworkMachineContainer : public std::enable_shared_from_this<NetworkMachineContainer>, public wxEvtHandler

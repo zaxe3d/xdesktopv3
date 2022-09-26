@@ -653,7 +653,7 @@ struct Sidebar::priv
     ObjectLayers        *object_layers{ nullptr };
     ObjectInfo *object_info;
     SlicedInfo *sliced_info;
-    NetworkMachineManager *machine_manager;
+    NetworkMachineManager *machine_manager{ nullptr };
 
     wxButton *btn_export_gcode;
     wxButton *btn_reslice;

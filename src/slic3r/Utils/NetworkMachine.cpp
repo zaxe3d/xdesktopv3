@@ -43,6 +43,7 @@ void NetworkMachine::onWSError(string message)
 void NetworkMachine::onWSRead(string message)
 {
     //BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine onReadWS: %1%") % message;
+    if (!m_running) return;
     stringstream jsonStream;
     jsonStream.str(message);
 
@@ -154,6 +155,8 @@ NetworkMachine::~NetworkMachine()
 {
     delete attr;
     delete states;
+    delete m_ws;
+    runnerThread.join();
 }
 
 void NetworkMachine::downloadAvatar()
@@ -223,6 +226,7 @@ void NetworkMachine::upload(const char *filename)
 NetworkMachineContainer::NetworkMachineContainer() {}
 
 NetworkMachineContainer::~NetworkMachineContainer() {
+    boost::lock_guard<boost::mutex> maplock(m_mtx);
     m_machineMap.clear(); // since the map holds shared_ptrs clear is enough?
 }
 
@@ -231,7 +235,6 @@ shared_ptr<NetworkMachine> NetworkMachineContainer::addMachine(string ip, int po
     boost::lock_guard<boost::mutex> maplock(m_mtx);
     // If we have it already with the same ip, - do nothing.
     if (m_machineMap.find(string(ip)) != m_machineMap.end()) return nullptr;
-
     BOOST_LOG_TRIVIAL(info) << boost::format("NetworkMachineContainer - Trying to connect machine: [%1% - %2%].") % name % ip;
     auto nm = make_shared<NetworkMachine>(ip, port, name, this);
     nm->runnerThread = boost::thread(&NetworkMachine::run, nm);
@@ -245,7 +248,7 @@ void NetworkMachineContainer::removeMachine(string ip)
 {
     if (m_machineMap.find(string(ip)) == m_machineMap.end()) return;
     boost::lock_guard<boost::mutex> maplock(m_mtx);
-    m_machineMap[ip]->runnerThread.join();
+    m_machineMap[ip]->shutdown();
     m_machineMap.erase(ip);
 }
 } // namespace Slic3r

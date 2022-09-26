@@ -49,7 +49,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_btnPause->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->pause(); }); });
 
     nm->setUploadProgressCallback([this](int progress) {
-        if (progress <= 0 || progress >= 100) updateStates();
+        if (progress <= 0 || progress >= 100) this->updateStates();
         this->updateProgress();
     });
     // End of actions
@@ -136,6 +136,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
 
 void Device::avatarReady()
 {
+    if (this->nm == nullptr) return;
     m_avatar->SetAvatar(this->nm->getAvatar());
 }
 

@@ -402,7 +402,8 @@ void AppConfig::save()
     {
         // Returns "undefined" if the thread naming functionality is not supported by the operating system.
         std::optional<std::string> current_thread_name = get_current_thread_name();
-        if (current_thread_name && *current_thread_name != "slic3r_main")
+        // current_thread_name becomes main when in VM.
+        if (current_thread_name && *current_thread_name != "main" && *current_thread_name != "slic3r_main")
             throw CriticalException("Calling AppConfig::save() from a worker thread!");
     }
 

@@ -68,5 +68,11 @@ void Websocket::send(string message)
     m_ws.write(net::buffer(message));
 }
 
-Websocket::~Websocket() { }
+Websocket::~Websocket()
+{
+    onReadSignal.disconnect_all_slots();
+    onConnectSignal.disconnect_all_slots();
+    onErrorSignal.disconnect_all_slots();
+    m_ws.close(close_reason());
+}
 } // namespace Slic3r

@@ -1,6 +1,7 @@
 #ifndef slic3r_Device_hpp_
 #define slic3r_Device_hpp_
 
+#include <wx/graphics.h>
 #include <wx/panel.h>
 #include <wx/statline.h>
 #include <wx/gauge.h>
