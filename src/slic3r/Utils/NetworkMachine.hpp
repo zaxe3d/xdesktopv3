@@ -129,7 +129,12 @@ public:
     }
 private:
     progress_callback_t m_uploadProgressCallback;
-    USHORT m_ftpPort = 9494;
+#ifdef _WIN32
+    USHORT
+#else
+    ushort
+#endif
+    m_ftpPort = 9494;
 
     // Websocket callbacks.
     void onWSConnect(); // Websocket connect callback.

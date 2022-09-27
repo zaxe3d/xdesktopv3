@@ -70,9 +70,5 @@ void Websocket::send(string message)
 
 Websocket::~Websocket()
 {
-    onReadSignal.disconnect_all_slots();
-    onConnectSignal.disconnect_all_slots();
-    onErrorSignal.disconnect_all_slots();
-    m_ws.close(close_reason());
 }
 } // namespace Slic3r

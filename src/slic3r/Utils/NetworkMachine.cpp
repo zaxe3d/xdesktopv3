@@ -24,6 +24,7 @@ void NetworkMachine::run()
     ws->addConnectEventHandler(boost::bind(&NetworkMachine::onWSConnect, this));
     ws->addErrorEventHandler(boost::bind(&NetworkMachine::onWSError, this, _1));
     m_ws = ws.get();
+    m_running = true;
     ws->run();
     ioc.run(); // Run the I/O service.
 }
@@ -35,6 +36,7 @@ void NetworkMachine::onWSConnect()
 void NetworkMachine::onWSError(string message)
 {
     BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - WS error: %1% on machine [%2% - %3%].") % message % name % ip;
+    if (!m_running) return;
     MachineEvent evt(EVT_MACHINE_CLOSE, this, wxID_ANY);
     evt.SetEventObject(this->m_evtHandler);
     wxPostEvent(this->m_evtHandler, evt);
@@ -155,34 +157,40 @@ NetworkMachine::~NetworkMachine()
 {
     delete attr;
     delete states;
-    delete m_ws;
-    runnerThread.join();
+    //delete m_ws;
+    if (runnerThread.joinable())
+        runnerThread.join();
 }
 
 void NetworkMachine::downloadAvatar()
 {
+    if (!m_running) return;
     boost::thread t([this] () {
-        wxFTP ftp;
-        if (!ftp.Connect(ip, m_ftpPort)) {
-            BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for downloading avatar.") % name % ip;
-            return;
-        }
-        if (ftp.GetError() != wxPROTO_NOERR) return;
-        wxInputStream *in = ftp.GetInputStream("snapshot.png");
-        if (!in)
-            BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't get avatar on machine [%1% - %2%].") % name % ip;
-        else {
-            boost::lock_guard<boost::mutex> avatarlock(m_avatarMtx);
-            m_avatar = wxBitmap(wxImage(*in, wxBITMAP_TYPE_PNG));
-            if (m_avatar.IsOk()) {
-                wxCommandEvent evt(EVT_MACHINE_AVATAR_READY, wxID_ANY);
-                evt.SetString(this->ip);
-                evt.SetEventObject(this->m_evtHandler);
-                wxPostEvent(this->m_evtHandler, evt);
+        try {
+            wxFTP ftp;
+            if (!ftp.Connect(ip, m_ftpPort)) {
+                BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for downloading avatar.") % name % ip;
+                return;
             }
-            delete in;
+            wxInputStream *in = ftp.GetInputStream("snapshot.png");
+            if (!in || ftp.Error())
+                BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't get avatar on machine [%1% - %2%].") % name % ip;
+            else {
+                boost::lock_guard<boost::mutex> avatarlock(m_avatarMtx);
+                m_avatar = wxBitmap(wxImage(*in, wxBITMAP_TYPE_PNG));
+                if (m_running && m_avatar.IsOk()) {
+                    wxCommandEvent evt(EVT_MACHINE_AVATAR_READY, wxID_ANY);
+                    evt.SetString(this->ip);
+                    evt.SetEventObject(this->m_evtHandler);
+                    wxPostEvent(this->m_evtHandler, evt);
+                }
+                delete in;
+            }
+            if (ftp.IsConnected())
+                ftp.Close();
+        } catch(exception const& ex) {
+            BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't get avatar on machine: [%1%].") % ex.what();
         }
-        //ftp.Close();
     });
     t.detach();
 }
@@ -227,7 +235,9 @@ NetworkMachineContainer::NetworkMachineContainer() {}
 
 NetworkMachineContainer::~NetworkMachineContainer() {
     boost::lock_guard<boost::mutex> maplock(m_mtx);
-    m_machineMap.clear(); // since the map holds shared_ptrs clear is enough?
+    for (auto& it : m_machineMap)
+        m_machineMap[it.first]->shutdown(); // shutdown each before clearing.
+    m_machineMap.clear();
 }
 
 shared_ptr<NetworkMachine> NetworkMachineContainer::addMachine(string ip, int port, string name)
@@ -246,8 +256,8 @@ shared_ptr<NetworkMachine> NetworkMachineContainer::addMachine(string ip, int po
 
 void NetworkMachineContainer::removeMachine(string ip)
 {
-    if (m_machineMap.find(string(ip)) == m_machineMap.end()) return;
     boost::lock_guard<boost::mutex> maplock(m_mtx);
+    if (m_machineMap.find(string(ip)) == m_machineMap.end()) return;
     m_machineMap[ip]->shutdown();
     m_machineMap.erase(ip);
 }
