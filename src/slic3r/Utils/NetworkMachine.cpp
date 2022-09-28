@@ -46,9 +46,9 @@ void NetworkMachine::onWSRead(string message)
 {
     //BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine onReadWS: %1%") % message;
     if (!m_running) return;
+
     stringstream jsonStream;
     jsonStream.str(message);
-
     ptree pt; // construct root obj.
     read_json(jsonStream, pt);
 

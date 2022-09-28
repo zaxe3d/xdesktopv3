@@ -76,7 +76,6 @@ void NetworkMachineManager::onMachineClose(MachineEvent &event)
     if (m_deviceMap.erase(event.nm->ip) == 0) return; // couldn't delete so don't continue...
     BOOST_LOG_TRIVIAL(info) << boost::format("NetworkMachineManager - Closing machine: [%1% - %2%].") % event.nm->name % event.nm->ip;
     this->m_networkMContainer->removeMachine(event.nm->ip);
-    m_deviceMap.erase(event.nm->ip);
     m_scrolledSizer->Layout();
     FitInside();
     Refresh();

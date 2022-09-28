@@ -935,7 +935,7 @@ Sidebar::Sidebar(Plater *parent)
                                       wxDefaultPosition, wxSize(-1, 30), wxTE_CENTER);
 
     wxFont label_font = wxGetApp().bold_font();
-    label_font.SetPointSize(18);
+    label_font.SetPointSize(14);
     mm_label->SetFont(label_font);
     p->machine_manager = new NetworkMachineManager(this);
 

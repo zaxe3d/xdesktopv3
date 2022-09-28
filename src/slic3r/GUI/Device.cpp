@@ -23,7 +23,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_bitPreheatDeactive(new wxBitmap())
 {
     SetSizer(m_mainSizer);
-    m_mainSizer->Add(m_deviceSizer, 0, wxEXPAND | wxRIGHT, 25); // only expand horizontally in vertical sizer.
+    m_mainSizer->Add(m_deviceSizer, 1, wxEXPAND | wxRIGHT, 25); // only expand horizontally in vertical sizer.
 
     // action buttons with bitmaps.
     wxBitmap bitSayHi;
@@ -57,6 +57,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
 
     wxFont normalFont = wxGetApp().normal_font();
     wxFont boldFont = wxGetApp().bold_font();
+    wxFont boldSmallFont = wxGetApp().bold_font();
     wxSizerFlags expandFlag(1);
     expandFlag.Expand();
 
@@ -64,7 +65,13 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     // UI modifications to model text. Upper case then plus => +
     string dM = to_upper_copy(nm->attr->deviceModel);
     boost::replace_all(dM, "PLUS", "+");
+#ifdef _WIN32
+    boldFont.SetPointSize(14);
+    boldSmallFont.SetPointSize(9);
+#else
     boldFont.SetPointSize(18);
+    boldSmallFont.SetPointSize(16);
+#endif
     m_avatar->SetFont(boldFont);
     wxString dMWx(dM);
     m_avatar->SetText(dMWx);
@@ -76,11 +83,10 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
 
     // Device name and action buttons start...
     wxBoxSizer* dnaabp = new wxBoxSizer(wxHORIZONTAL); // device name and action buttons
-    boldFont.SetPointSize(11);
     auto* txtDn = new wxStaticText(this, wxID_ANY, nm->name,
                                    wxDefaultPosition, wxSize(-1, 20),
                                    wxTE_LEFT);
-    txtDn->SetFont(boldFont);
+    txtDn->SetFont(boldSmallFont);
 
     auto* actionBtnsSizer = new wxBoxSizer(wxHORIZONTAL); // action buttons ie: hi.
     actionBtnsSizer->Add(m_btnPreheat);
@@ -97,9 +103,9 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     // status start...
     wxBoxSizer* sapp = new wxBoxSizer(wxHORIZONTAL); // status and progress line.
     m_txtStatus->SetForegroundColour("GREY");
-    m_txtStatus->SetFont(boldFont);
+    m_txtStatus->SetFont(boldSmallFont);
     m_txtProgress->SetForegroundColour("GREY");
-    m_txtProgress->SetFont(boldFont);
+    m_txtProgress->SetFont(boldSmallFont);
 
     sapp->Add(m_txtStatus, expandFlag.Left());
     sapp->Add(m_txtProgress, wxSizerFlags().Right());
@@ -127,7 +133,9 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     // Print now button end.
 
     // Bottom line. (separator)
-    m_mainSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 4), wxHORIZONTAL), expandFlag.Border(wxRIGHT, 20));
+    m_mainSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition,
+                                      wxSize(-1, 1), wxHORIZONTAL),
+                     0, wxALL | wxEXPAND);
 
     updateStates();
 
@@ -315,7 +323,7 @@ void RoundedPanel::OnPaint(wxPaintEvent& event)
     gc->SetBrush(bBrush);
     gc->DrawRoundedRectangle(rect.GetLeft(), rect.GetTop(), rect.GetWidth(), rect.GetHeight(), 10);
     if (m_avatar.IsOk()) {
-        gc->DrawBitmap(m_avatar, 2, 2, rect.GetWidth(), rect.GetHeight());
+        gc->DrawBitmap(m_avatar, 5, 5, rect.GetWidth() - 5, rect.GetHeight() - 5);
     } else {
         gc->SetFont(GetFont(), m_fgColour);
         gc->DrawText(m_label, (rect.GetWidth() / 2) - (m_label.size() * 4), (rect.GetHeight() / 2) - 8);
