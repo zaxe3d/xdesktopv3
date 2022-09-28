@@ -70,7 +70,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     boldSmallFont.SetPointSize(9);
 #else
     boldFont.SetPointSize(18);
-    boldSmallFont.SetPointSize(16);
+    boldSmallFont.SetPointSize(12);
 #endif
     m_avatar->SetFont(boldFont);
     wxString dMWx(dM);
@@ -133,9 +133,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     // Print now button end.
 
     // Bottom line. (separator)
-    m_mainSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition,
-                                      wxSize(-1, 1), wxHORIZONTAL),
-                     0, wxALL | wxEXPAND);
+    m_mainSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
 
     updateStates();
 
