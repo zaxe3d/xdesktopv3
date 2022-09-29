@@ -17,6 +17,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_progressBar(new CustomProgressBar(this, wxID_ANY, wxSize(-1, 5))),
     m_txtStatus(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_LEFT)),
     m_txtProgress(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
+    m_txtDeviceName(new wxStaticText(this, wxID_ANY, nm->name, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_btnPrintNow(new wxButton(this, wxID_ANY, _L("Print Now!"))),
     m_avatar(new RoundedPanel(this, wxID_ANY, "", wxSize(60, 60), wxColour(169, 169, 169), wxColour("WHITE"))),
     m_bitPreheatActive(new wxBitmap()),
@@ -83,10 +84,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
 
     // Device name and action buttons start...
     wxBoxSizer* dnaabp = new wxBoxSizer(wxHORIZONTAL); // device name and action buttons
-    auto* txtDn = new wxStaticText(this, wxID_ANY, nm->name,
-                                   wxDefaultPosition, wxSize(-1, 20),
-                                   wxTE_LEFT);
-    txtDn->SetFont(boldSmallFont);
+    m_txtDeviceName->SetFont(boldSmallFont);
 
     auto* actionBtnsSizer = new wxBoxSizer(wxHORIZONTAL); // action buttons ie: hi.
     actionBtnsSizer->Add(m_btnPreheat);
@@ -94,7 +92,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     actionBtnsSizer->Add(m_btnPause);
     actionBtnsSizer->Add(m_btnCancel);
     actionBtnsSizer->Add(m_btnExpandCollapse);
-    dnaabp->Add(txtDn, expandFlag.Left());
+    dnaabp->Add(m_txtDeviceName, expandFlag.Left());
     dnaabp->Add(actionBtnsSizer, wxSizerFlags().Right());
     m_rightSizer->AddSpacer(10);
     m_rightSizer->Add(dnaabp, 0, wxEXPAND); // only grow horizontally.
@@ -121,6 +119,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     // Print now button.
     m_rightSizer->Add(m_btnPrintNow, 0, wxTOP, -12);
     m_btnPrintNow->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) {
+        this->m_btnPrintNow->Enable(false);
         BOOST_LOG_TRIVIAL(info) << "Print now pressed on " << this->nm->name;
         const ZaxeArchive& archive = wxGetApp().plater()->get_zaxe_archive();
 
@@ -129,6 +128,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
         } else if (this->nm->attr->nozzle.compare(archive.get_info("nozzle_diameter")) != 0) {
             wxMessageBox(L("Currently installed nozzle on device doesn't match with this slice. Please reslice with the correct nozzle."), _L("Wrong nozzle type"), wxICON_ERROR);
         } else this->nm->upload(wxGetApp().plater()->get_zaxe_code_path().c_str());
+        this->m_btnPrintNow->Enable(true);
     });
     // Print now button end.
 
@@ -218,6 +218,11 @@ void Device::updateProgress()
     m_progressBar->SetValue(nm->progress);
     m_txtProgress->SetLabel("%" + std::to_string(nm->progress));
     m_mainSizer->Layout();
+}
+
+void Device::setName(const string &name)
+{
+    m_txtDeviceName->SetLabel(name);
 }
 
 Device::~Device()

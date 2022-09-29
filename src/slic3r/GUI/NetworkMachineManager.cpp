@@ -89,8 +89,10 @@ void NetworkMachineManager::onMachineMessage(MachineNewMessageEvent &event)
     } else if (event.event == "print_progress" ||
                event.event == "temperature_progress" ||
                event.event == "calibration_progress") {
-        m_deviceMap[event.nm->ip]->nm->progress = event.pt.get<float>("progress", 0);
+        event.nm->progress = event.pt.get<float>("progress", 0);
         m_deviceMap[event.nm->ip]->updateProgress();
+    } else if (event.event == "new_name") {
+        m_deviceMap[event.nm->ip]->setName(event.nm->name);
     }
 }
 

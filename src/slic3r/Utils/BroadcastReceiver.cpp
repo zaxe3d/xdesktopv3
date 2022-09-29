@@ -43,7 +43,7 @@ void BroadcastReceiver::onBroadcastReceivedEvent(wxSocketEvent& event)
                     BOOST_LOG_TRIVIAL(warning) << "BroadcastReceiver - Failed to receive data.";
                     return;
                 }
-                auto s = wxString::From8BitData(buf, n); // TODO use this on received event.
+                auto s = wxString::FromUTF8(buf, n); // TODO use this on received event.
                 //BOOST_LOG_TRIVIAL(debug) << boost::format("BroadcastReceiver - Received: %1%. from: %2%") % s % addr.IPAddress();
                 m_socket->Notify(true);
                 wxCommandEvent event(EVT_BROADCAST_RECEIVED);

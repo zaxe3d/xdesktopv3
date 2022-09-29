@@ -57,6 +57,7 @@ void NetworkMachine::onWSRead(string message)
         if (event == "ping" || event == "temperature_change") return; // ignore...
         //BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine event. [%1%:%2% - %3%]") % name % ip % event;
         if (event == "hello") {
+            //name = pt.get<string>("name", name); // already got this from broadcast receiver. might be good for static ip.
             attr->deviceModel = to_lower_copy(pt.get<string>("device_model", "x1"));
             attr->material = to_lower_copy(pt.get<string>("material", "zaxe_abs"));
             attr->nozzle = pt.get<string>("nozzle", "0.4");

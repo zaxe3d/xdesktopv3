@@ -51,6 +51,7 @@ public:
     wxString name;
     NetworkMachine* nm; // network machine.
 
+    void setName(const string &name);
     void updateStates();
     void updateProgress();
     void updateStatus();
@@ -73,6 +74,7 @@ private:
     wxButton* m_btnPrintNow; // print now button.
     wxStaticText* m_txtStatus; // status text.
     wxStaticText* m_txtProgress; // progress text.
+    wxStaticText* m_txtDeviceName; // device name text.
 
     RoundedPanel* m_avatar;
 
