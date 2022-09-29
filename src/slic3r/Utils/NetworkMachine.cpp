@@ -109,8 +109,8 @@ void NetworkMachine::onWSRead(string message)
             evt.SetEventObject(this->m_evtHandler);
             wxPostEvent(this->m_evtHandler, evt);
         }
-    } catch(exception const& ex) {
-        BOOST_LOG_TRIVIAL(warning) << boost::format("Cannot parse machine message json: [%1%].") % ex.what();
+    } catch(...) {
+        BOOST_LOG_TRIVIAL(warning) << "Cannot parse machine message json.";
     }
 }
 
@@ -178,7 +178,7 @@ void NetworkMachine::downloadAvatar()
             else {
                 boost::lock_guard<boost::mutex> avatarlock(m_avatarMtx);
                 m_avatar = wxBitmap(wxImage(*in, wxBITMAP_TYPE_PNG));
-                if (m_running && m_avatar.IsOk()) {
+                if (this->m_running && m_avatar.IsOk()) {
                     wxCommandEvent evt(EVT_MACHINE_AVATAR_READY, wxID_ANY);
                     evt.SetString(this->ip);
                     evt.SetEventObject(this->m_evtHandler);
@@ -186,10 +186,8 @@ void NetworkMachine::downloadAvatar()
                 }
                 delete in;
             }
-            if (ftp.IsConnected())
-                ftp.Close();
-        } catch(exception const& ex) {
-            BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't get avatar on machine: [%1%].") % ex.what();
+        } catch(...) {
+            BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't get avatar on machine.");
         }
     });
     t.detach();
