@@ -6147,7 +6147,8 @@ msgstr "Importiere STL/3MF/STEP/OBJ/AM&F"
 #: src/slic3r/GUI/KBShortcutsDialog.cpp:83
 msgid "Import STL/3MF/STEP/OBJ/AMF without config, keep plater"
 msgstr ""
-"Importiere STL/3MF/STEP/OBJ/AMF mit Konfigurationsdaten, Druckplatte beibehalten"
+"Importiere STL/3MF/STEP/OBJ/AMF mit Konfigurationsdaten, Druckplatte "
+"beibehalten"
 
 #: src/slic3r/GUI/Plater.cpp:5293
 msgid "Import config only"

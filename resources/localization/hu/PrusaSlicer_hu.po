@@ -5157,7 +5157,8 @@ msgstr "(Újra)szeletelés"
 #: src/slic3r/GUI/KBShortcutsDialog.cpp:83
 msgid "Import STL/3MF/STEP/OBJ/AMF without config, keep plater"
 msgstr ""
-"STL/OBJ/AMF/3MF/STEP Importálása konfiguráció nélkül, a tárgyasztal megtartásával"
+"STL/OBJ/AMF/3MF/STEP Importálása konfiguráció nélkül, a tárgyasztal "
+"megtartásával"
 
 #: src/slic3r/GUI/KBShortcutsDialog.cpp:84
 msgid "Import Config from ini/amf/3mf/gcode"
