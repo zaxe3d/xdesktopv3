@@ -161,37 +161,77 @@ NetworkMachine::~NetworkMachine()
     //delete m_ws;
     if (runnerThread.joinable())
         runnerThread.join();
+    if (ftpThread.joinable())
+        ftpThread.join();
 }
 
 void NetworkMachine::downloadAvatar()
 {
     if (!m_running) return;
-    boost::thread t([this] () {
-        try {
-            wxFTP ftp;
-            if (!ftp.Connect(ip, m_ftpPort)) {
-                BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for downloading avatar.") % name % ip;
-                return;
-            }
-            wxInputStream *in = ftp.GetInputStream("snapshot.png");
-            if (!in || ftp.Error())
-                BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't get avatar on machine [%1% - %2%].") % name % ip;
-            else {
-                boost::lock_guard<boost::mutex> avatarlock(m_avatarMtx);
-                m_avatar = wxBitmap(wxImage(*in, wxBITMAP_TYPE_PNG));
-                if (this->m_running && m_avatar.IsOk()) {
-                    wxCommandEvent evt(EVT_MACHINE_AVATAR_READY, wxID_ANY);
-                    evt.SetString(this->ip);
-                    evt.SetEventObject(this->m_evtHandler);
-                    wxPostEvent(this->m_evtHandler, evt);
-                }
-                delete in;
-            }
-        } catch(...) {
-            BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't get avatar on machine.");
-        }
-    });
-    t.detach();
+
+    ftpThread = boost::thread(&NetworkMachine::ftpRun, this);
+    ftpThread.detach();
+}
+
+struct response {
+    char *memory;
+    size_t size;
+};
+
+static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    size_t realsize = size * nmemb;
+    struct response *mem = static_cast<response*>(userp);
+
+    void *ptr = realloc(mem->memory, mem->size + realsize + 1);
+    if(!ptr) { /* out of memory! */
+        BOOST_LOG_TRIVIAL(warning) << "Networkmachine - not enough memory (realloc returned NULL)";
+        return 0;
+    }
+
+    mem->memory = static_cast<char*>(ptr);
+    memcpy(&(mem->memory[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memory[mem->size] = 0;
+
+    return realsize;
+}
+
+void NetworkMachine::ftpRun()
+{
+    CURL *curl;
+    CURLcode res;
+    struct response chunk = { .memory = nullptr, .size = 0 };
+
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    curl = curl_easy_init();
+
+    if (!curl) return;
+
+    std::string url = "ftp://" + ip + ":" + std::to_string(m_ftpPort) + "/snapshot.png";
+    ::curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    ::curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
+    ::curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void*>(&chunk));
+    //::curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    res = curl_easy_perform(curl);
+    ::curl_easy_cleanup(curl);
+
+    if (CURLE_OK != res) {
+        BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for downloading avatar.") % name % ip;
+        return;
+    }
+
+    wxMemoryInputStream s (chunk.memory, chunk.size);
+    m_avatar = wxBitmap(wxImage(s, wxBITMAP_TYPE_PNG));
+
+    if (this->m_running && m_avatar.IsOk()) {
+        wxCommandEvent evt(EVT_MACHINE_AVATAR_READY, wxID_ANY);
+        evt.SetString(this->ip);
+        evt.SetEventObject(this->m_evtHandler);
+        wxPostEvent(this->m_evtHandler, evt);
+    }
+
+    curl_global_cleanup();
 }
 
 void NetworkMachine::upload(const char *filename)

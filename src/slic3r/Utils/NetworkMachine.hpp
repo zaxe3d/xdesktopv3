@@ -11,7 +11,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
-
+#include <curl/curl.h>
 #include <wx/protocol/ftp.h>
 
 using namespace std;
@@ -99,6 +99,7 @@ public:
     ~NetworkMachine();
 
     void run(); // start network machine by connecting to ws.
+    void ftpRun(); // start downloading avatar in another thread.
 
     // Actions
     void sayHi();
@@ -121,6 +122,7 @@ public:
     MachineAttributes* attr; // attributes,
     MachineStates* states; // states,
     boost::thread runnerThread;
+    boost::thread ftpThread;
     typedef std::function<void(int percent)>  progress_callback_t;
     void setUploadProgressCallback(progress_callback_t cb) { m_uploadProgressCallback = cb; }
     wxBitmap& getAvatar() {

@@ -448,7 +448,7 @@ ConfigWizardPage::ConfigWizardPage(ConfigWizard *parent, wxString title, wxStrin
     SetSizer(sizer);
 
     // There is strange layout on Linux with GTK3, 
-    // see https://github.com/zaxe3d/PrusaSlicer/issues/5103 and https://github.com/zaxe3d/PrusaSlicer/issues/4861
+    // see https://github.com/prusa3d/PrusaSlicer/issues/5103 and https://github.com/prusa3d/PrusaSlicer/issues/4861
     // So, non-active pages will be hidden later, on wxEVT_SHOW, after completed Layout() for all pages 
     if (!wxLinux_gtk3)
         this->Hide();

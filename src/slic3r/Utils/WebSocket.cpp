@@ -48,14 +48,20 @@ void Websocket::run()
 
 void Websocket::onRead(beast::error_code ec, size_t bytesTransferred)
 {
-    if (ec == websocket::error::closed) return;
-    if (ec) onErrorSignal(ec.message());
-    else {
-        auto message = beast::buffers_to_string(m_buffer.data());
-        m_buffer.consume(bytesTransferred); // remove the data that was read.
-        //BOOST_LOG_TRIVIAL(debug) << "Websocket - onMachineMessage: " << message;
-        onReadSignal(message);
-        m_ws.async_read(m_buffer, beast::bind_front_handler(&Websocket::onRead, shared_from_this()));
+    try {
+        if (ec == websocket::error::closed) return;
+        if (ec) onErrorSignal(ec.message());
+        else {
+            auto message = beast::buffers_to_string(m_buffer.data());
+            m_buffer.consume(bytesTransferred); // remove the data that was read.
+            //BOOST_LOG_TRIVIAL(debug) << "Websocket - onMachineMessage: " << message;
+            onReadSignal(message);
+            m_ws.async_read(m_buffer, beast::bind_front_handler(&Websocket::onRead, shared_from_this()));
+        }
+    } catch(beast::error_code e) {
+        onErrorSignal(e.message());
+    } catch (...) {
+        onErrorSignal("Unknown websocket error.");
     }
 }
 
