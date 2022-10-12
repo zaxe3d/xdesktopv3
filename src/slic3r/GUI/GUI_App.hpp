@@ -68,6 +68,8 @@ enum FileType
 
     FT_SL1,
 
+    FT_ZAXE,
+
     FT_SIZE,
 };
 

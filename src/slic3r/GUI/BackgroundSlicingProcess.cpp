@@ -163,7 +163,9 @@ void BackgroundSlicingProcess::process_fff()
 	wxQueueEvent(GUI::wxGetApp().mainframe->m_plater, evt.Clone());
 	m_fff_print->export_gcode(m_temp_output_path, m_gcode_result, [this](const ThumbnailsParams& params) { return this->render_thumbnails(params); });
 	if (this->set_step_started(bspsGCodeFinalize)) {
-	    if (! m_export_path.empty()) {
+		if (GUI::wxGetApp().preset_bundle->printers.is_selected_preset_zaxe())
+			prepare_zaxe_file(); // prepare zaxe file then fire an event for it.
+		if (! m_export_path.empty()) {
 			wxQueueEvent(GUI::wxGetApp().mainframe->m_plater, new wxCommandEvent(m_event_export_began_id));
 			finalize_gcode();
 	    } else if (! m_upload_job.empty()) {
@@ -171,7 +173,6 @@ void BackgroundSlicingProcess::process_fff()
 			prepare_upload();
 	    } else {
 			m_print->set_status(100, _utf8(L("Slicing complete")));
-			prepare_zaxe_file(); // prepare zaxe file then fire an event for it.
 	    }
 		this->set_step_done(bspsGCodeFinalize);
 	}
@@ -693,7 +694,10 @@ void BackgroundSlicingProcess::finalize_gcode()
 	int copy_ret_val = CopyFileResult::SUCCESS;
 	try
 	{
-		copy_ret_val = copy_file(output_path, export_path, error_message, m_export_path_on_removable_media);
+		string o_path = GUI::wxGetApp().preset_bundle->printers.is_selected_preset_zaxe()
+			? m_zaxe_archive_path
+			: output_path;
+		copy_ret_val = copy_file(o_path, export_path, error_message, m_export_path_on_removable_media);
 		remove_post_processed_temp_file();
 	}
 	catch (...)

@@ -2885,6 +2885,7 @@ wxString Plater::priv::get_export_file(GUI::FileType file_type, bool zaxe_file_t
         case FT_AMF:
         case FT_3MF:
         case FT_GCODE:
+        case FT_ZAXE:
         case FT_OBJ:
             wildcard = file_wildcards(file_type);
         break;
@@ -5798,13 +5799,15 @@ void Plater::export_gcode(bool prefer_removable)
 			start_dir = appconfig.get_last_output_dir(default_output_file.parent_path().string(), false);
 	}
 
+    const bool isZaxe = wxGetApp().preset_bundle->printers.is_selected_preset_zaxe();
+
     fs::path output_path;
     {
     	std::string ext = default_output_file.extension().string();
-        wxFileDialog dlg(this, (printer_technology() == ptFFF) ? _L("Save G-code file as:") : _L("Save SL1 / SL1S file as:"),
+        wxFileDialog dlg(this, (printer_technology() == ptFFF) ? (isZaxe ? _L("Save Zaxe file as:") : _L("Save G-code file as:")) : _L("Save SL1 / SL1S file as:"),
             start_dir,
             from_path(default_output_file.filename()),
-            GUI::file_wildcards((printer_technology() == ptFFF) ? FT_GCODE : FT_SL1, ext),
+            GUI::file_wildcards((printer_technology() == ptFFF) ? (isZaxe ? FT_ZAXE : FT_GCODE): FT_SL1, ext),
             wxFD_SAVE | wxFD_OVERWRITE_PROMPT
         );
         if (dlg.ShowModal() == wxID_OK) {
@@ -6587,8 +6590,9 @@ bool Plater::set_printer_technology(PrinterTechnology printer_technology)
         }
     }
 
-    p->label_btn_export = printer_technology == ptFFF ? L("Export G-code") : L("Export");
-    p->label_btn_send   = printer_technology == ptFFF ? L("Send G-code")   : L("Send to printer");
+    const bool isZaxe = wxGetApp().preset_bundle->printers.is_selected_preset_zaxe();
+    p->label_btn_export = printer_technology == ptFFF && !isZaxe ?  L("Export G-code") : L("Export");
+    p->label_btn_send   = printer_technology == ptFFF && !isZaxe ? L("Send G-code") : L("Send to printer");
 
     if (wxGetApp().mainframe != nullptr)
         wxGetApp().mainframe->update_menubar();
