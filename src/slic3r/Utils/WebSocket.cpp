@@ -39,7 +39,7 @@ void Websocket::run()
 
         // start reading...
         m_ws.async_read(m_buffer, beast::bind_front_handler(&Websocket::onRead, shared_from_this()));
-    } catch(beast::error_code e) {
+    } catch (boost::system::error_code e) {
         onErrorSignal(e.message());
     } catch (...) {
         onErrorSignal("Unknown websocket error.");
