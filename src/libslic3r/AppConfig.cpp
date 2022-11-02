@@ -178,7 +178,7 @@ void AppConfig::set_defaults()
         set("restore_win_position", "1");       // allowed values - "1", "0", "crashed_at_..."
 
     if (get("show_hints").empty())
-        set("show_hints", "1");
+        set("show_hints", "0");
 
     if (get("allow_ip_resolve").empty())
         set("allow_ip_resolve", "1");

@@ -4,6 +4,7 @@
 #include "GUI_App.hpp"
 #include "Plater.hpp" // for export_zaxe_code
 #include "MsgDialog.hpp" // for RichMessageDialog
+#include "libslic3r/PresetBundle.hpp"
 
 namespace Slic3r {
 namespace GUI {
@@ -13,18 +14,30 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     nm(nm),
     m_mainSizer(new wxBoxSizer(wxVERTICAL)), // vertical sizer (device sizer - horizontal line (seperator).
     m_deviceSizer(new wxBoxSizer(wxHORIZONTAL)), // horizontal sizer (avatar | right pane).)
+    m_expansionPanel(new wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)),
+    m_expansionSizer(new wxBoxSizer(wxVERTICAL)), // vertical sizer (filament | printing time etc.)
     m_rightSizer(new wxBoxSizer(wxVERTICAL)), // vertical right pane. (name - status - progress bar).
     m_progressBar(new CustomProgressBar(this, wxID_ANY, wxSize(-1, 5))),
     m_txtStatus(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_LEFT)),
     m_txtProgress(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
     m_txtDeviceName(new wxStaticText(this, wxID_ANY, nm->name, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, _L("Material: ") + nm->attr->material, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + nm->attr->nozzle + "mm", wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + nm->attr->printingFile, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_btnPrintNow(new wxButton(this, wxID_ANY, _L("Print Now!"))),
     m_avatar(new RoundedPanel(this, wxID_ANY, "", wxSize(60, 60), wxColour(169, 169, 169), wxColour("WHITE"))),
     m_bitPreheatActive(new wxBitmap()),
-    m_bitPreheatDeactive(new wxBitmap())
+    m_bitPreheatDeactive(new wxBitmap()),
+    m_bitCollapsed(new wxBitmap()),
+    m_bitExpanded(new wxBitmap()),
+    m_isExpanded(false)
 {
     SetSizer(m_mainSizer);
     m_mainSizer->Add(m_deviceSizer, 1, wxEXPAND | wxRIGHT, 25); // only expand horizontally in vertical sizer.
+
+    m_expansionPanel->SetSizer(m_expansionSizer);
+    m_expansionSizer->Hide(m_expansionPanel);
 
     // action buttons with bitmaps.
     wxBitmap bitSayHi;
@@ -39,9 +52,9 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     wxBitmap bitCancel;
     bitCancel.LoadFile(Slic3r::resources_dir() + "/icons/device/stop.png", wxBITMAP_TYPE_PNG);
     m_btnCancel = new wxBitmapButton(this, wxID_ANY, bitCancel, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
-    wxBitmap bitExpCol;
-    bitExpCol.LoadFile(Slic3r::resources_dir() + "/icons/device/expand.png", wxBITMAP_TYPE_PNG);
-    m_btnExpandCollapse = new wxBitmapButton(this, wxID_ANY, bitExpCol, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+    m_bitExpanded->LoadFile(Slic3r::resources_dir() + "/icons/device/collapse.png", wxBITMAP_TYPE_PNG);
+    m_bitCollapsed->LoadFile(Slic3r::resources_dir() + "/icons/device/expand.png", wxBITMAP_TYPE_PNG);
+    m_btnExpandCollapse = new wxBitmapButton(this, wxID_ANY, *m_bitCollapsed, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
 
     // Actions
     m_btnSayHi->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->nm->sayHi(); });
@@ -123,7 +136,9 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
         BOOST_LOG_TRIVIAL(info) << "Print now pressed on " << this->nm->name;
         const ZaxeArchive& archive = wxGetApp().plater()->get_zaxe_archive();
 
-        if (this->nm->attr->material.compare(archive.get_info("material")) != 0) {
+        if (GUI::wxGetApp().preset_bundle->printers.get_selected_preset().name.find(to_upper_copy(this->nm->attr->deviceModel)) == std::string::npos) {
+            wxMessageBox(L("Device model does NOT match. Please reslice with the correct model."), _L("Wrong device model"), wxICON_ERROR);
+        } else if (this->nm->attr->material.compare(archive.get_info("material")) != 0) {
             wxMessageBox(L("Materials don't match with this device. Please reslice with the correct material."), _L("Wrong material type"), wxICON_ERROR);
         } else if (this->nm->attr->nozzle.compare(archive.get_info("nozzle_diameter")) != 0) {
             wxMessageBox(L("Currently installed nozzle on device doesn't match with this slice. Please reslice with the correct nozzle."), _L("Wrong nozzle type"), wxICON_ERROR);
@@ -131,6 +146,40 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
         this->m_btnPrintNow->Enable(true);
     });
     // Print now button end.
+    m_btnExpandCollapse->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) {
+        if (m_isExpanded) {
+            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT));
+            m_expansionSizer->ShowItems(false);
+        } else {
+            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 75 : 50)));
+            m_expansionSizer->ShowItems(true);
+            if (!this->nm->states->printing) {
+                // hide m_txtFileName and its bottom border
+                m_expansionSizer->Hide((size_t)0);
+                m_expansionSizer->Hide((size_t)1);
+            }
+        }
+        m_expansionSizer->Layout();
+        GetParent()->Layout();
+        GetParent()->FitInside();
+        m_isExpanded = !m_isExpanded;
+        m_btnExpandCollapse->SetBitmapLabel(*(m_isExpanded
+                                              ? m_bitExpanded
+                                              : m_bitCollapsed));
+    });
+
+    // inside the expansion panel.
+    m_expansionSizer->Add(m_txtFileName, 0, wxBOTTOM, -5);
+    m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
+    m_expansionSizer->Add(m_txtDeviceMaterial, 0, wxBOTTOM, -5);
+    m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
+    m_expansionSizer->Add(m_txtDeviceNozzleDiameter, 0, wxBOTTOM, -5);
+    m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
+    m_expansionSizer->Add(m_txtDeviceIP, 0, wxBOTTOM, -5);
+    m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
+    m_expansionSizer->ShowItems(false);
+    m_mainSizer->Add(m_expansionSizer, 1, wxEXPAND | wxLEFT, m_avatar->GetSize().GetWidth() + 14); // only expand horizontally in vertical sizer.
+    // end of expansion panel contents.
 
     // Bottom line. (separator)
     m_mainSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
@@ -207,7 +256,19 @@ void Device::updateStates()
         if (nm->states->paused)
             m_btnPause->Hide();
         else m_btnPause->Show();
+        if (m_isExpanded) {
+            // show m_txtFileName and its bottom border.
+            m_expansionSizer->Show((size_t)0);
+            m_expansionSizer->Show((size_t)1);
+        }
+    } else if (m_isExpanded) {
+        // hide m_txtFileName and its bottom border
+        m_expansionSizer->Hide((size_t)0);
+        m_expansionSizer->Hide((size_t)1);
     }
+
+    if (m_isExpanded)
+        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 75 : 50)));
 
     m_rightSizer->Layout();
     updateStatus();
@@ -223,6 +284,11 @@ void Device::updateProgress()
 void Device::setName(const string &name)
 {
     m_txtDeviceName->SetLabel(name);
+}
+
+void Device::setFileStart()
+{
+    m_txtFileName->SetLabel(nm->attr->printingFile);
 }
 
 Device::~Device()

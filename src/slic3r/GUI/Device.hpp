@@ -52,6 +52,7 @@ public:
     NetworkMachine* nm; // network machine.
 
     void setName(const string &name);
+    void setFileStart();
     void updateStates();
     void updateProgress();
     void updateStatus();
@@ -61,7 +62,9 @@ public:
 private:
     void confirm(std::function<void()> cb);
     wxSizer* m_mainSizer; // vertical sizer (device sizer - horizontal line (seperator).
-    wxSizer* m_deviceSizer;  // horizontal sizer (avatar | right pane)).
+    wxSizer* m_deviceSizer; // horizontal sizer (avatar | right pane)).
+    wxSizer* m_expansionSizer; // vertical sizer (filament | printing time etc.)
+    wxPanel* m_expansionPanel; // panel (filament | printing time etc.)
     wxSizer* m_rightSizer; // vertical right pane. (name - status - progress bar).
 
     CustomProgressBar* m_progressBar; // progress bar.
@@ -75,11 +78,20 @@ private:
     wxStaticText* m_txtStatus; // status text.
     wxStaticText* m_txtProgress; // progress text.
     wxStaticText* m_txtDeviceName; // device name text.
+    wxStaticText* m_txtDeviceIP; // device IP text.
+    wxStaticText* m_txtDeviceMaterial; // device material text.
+    wxStaticText* m_txtDeviceNozzleDiameter; // device nozzle text.
+    wxStaticText* m_txtFileName; // file name text.
+    wxStaticText* m_txtFileTime; // file elapsed time / estimated time text.
 
     RoundedPanel* m_avatar;
 
     wxBitmap* m_bitPreheatActive;
     wxBitmap* m_bitPreheatDeactive;
+    wxBitmap* m_bitExpanded;
+    wxBitmap* m_bitCollapsed;
+
+    bool m_isExpanded;
 };
 } // namespace GUI
 } // namespace Slic3r

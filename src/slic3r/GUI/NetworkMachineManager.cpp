@@ -93,6 +93,8 @@ void NetworkMachineManager::onMachineMessage(MachineNewMessageEvent &event)
         m_deviceMap[event.nm->ip]->updateProgress();
     } else if (event.event == "new_name") {
         m_deviceMap[event.nm->ip]->setName(event.nm->name);
+    } else if (event.event == "start_print") {
+        m_deviceMap[event.nm->ip]->setFileStart();
     }
 }
 
