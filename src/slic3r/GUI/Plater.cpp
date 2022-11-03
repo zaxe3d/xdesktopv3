@@ -5803,7 +5803,7 @@ void Plater::export_gcode(bool prefer_removable)
 
     fs::path output_path;
     {
-        std::string ext = isZaxe ? ".zaxe" : default_output_file.extension().string();
+        std::string ext = isZaxe ? ".zaxe" : (printer_technology() == ptFFF ? ".gcode" : default_output_file.extension().string());
         wxFileDialog dlg(this, (printer_technology() == ptFFF) ? (isZaxe ? _L("Save Zaxe file as:") : _L("Save G-code file as:")) : _L("Save SL1 / SL1S file as:"),
             start_dir,
             from_path(default_output_file.stem()),

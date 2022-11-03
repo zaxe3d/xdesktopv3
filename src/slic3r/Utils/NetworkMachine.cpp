@@ -1,5 +1,7 @@
 #include "NetworkMachine.hpp"
 
+namespace fs = boost::filesystem;
+
 namespace Slic3r {
 wxDEFINE_EVENT(EVT_MACHINE_OPEN, MachineEvent);
 wxDEFINE_EVENT(EVT_MACHINE_CLOSE, MachineEvent);
@@ -63,6 +65,7 @@ void NetworkMachine::onWSRead(string message)
             attr->nozzle = pt.get<string>("nozzle", "0.4");
             attr->hasSnapshot = contains(attr->deviceModel, 'z');
             attr->isLite = attr->deviceModel.find("lite") != string::npos || attr->deviceModel == "x3";
+            attr->isNoneTLS = attr->deviceModel.find("z3") != string::npos || attr->isLite;
             // printing
             attr->printingFile = pt.get<string>("filename", "");
             attr->elapsedTime = pt.get<float>("elapsed_time", 0);
@@ -260,40 +263,76 @@ void NetworkMachine::ftpRun()
 #endif
 }
 
+size_t file_read_cb(char *buffer, size_t size, size_t nitems, void *userp)
+{
+    auto stream = reinterpret_cast<fs::ifstream*>(userp);
+
+    try {
+        stream->read(buffer, size * nitems);
+    } catch (const std::exception &) {
+        return CURL_READFUNC_ABORT;
+    }
+    return stream->gcount();
+}
+
+int xfercb(void *userp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
+{
+    if (ultotal <= 0.0) return 0;
+
+    auto self = static_cast<NetworkMachine*>(userp);
+
+    int up = (int)(((double)ulnow / (double)ultotal) * 100);
+    self->m_uploadProgressCallback(up);
+    return 0;
+}
+
 void NetworkMachine::upload(const char *filename)
 {
-    wxFTP ftp;
-    ftp.SetUser("zaxe");
-    ftp.SetPassword("zaxe");
+    CURL *curl;
+    CURLcode res;
 
-    if (!ftp.Connect(ip, m_ftpPort)) {
-        BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for uploading file.") % name % ip;
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    curl = curl_easy_init();
+
+    if (!curl) return;
+    fs::path path = fs::path(filename);
+    boost::system::error_code ec;
+    boost::uintmax_t filesize = file_size(path, ec);
+    std::unique_ptr<fs::ifstream> putFile;
+
+    m_uploadProgressCallback(0); // reset
+    states->uploading = true;
+    if (!ec) {
+        putFile = std::make_unique<fs::ifstream>(path);
+        ::curl_easy_setopt(curl, CURLOPT_READDATA, (void *) (putFile.get()));
+        ::curl_easy_setopt(curl, CURLOPT_INFILESIZE, filesize);
+    }
+
+    std::string url = "ftp://" + ip + ":" + std::to_string(m_ftpPort) + "/" + path.filename().string();
+    ::curl_easy_setopt(curl, CURLOPT_USERNAME, "zaxe");
+    ::curl_easy_setopt(curl, CURLOPT_PASSWORD, "zaxe");
+    ::curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    ::curl_easy_setopt(curl, CURLOPT_READFUNCTION, file_read_cb);
+    ::curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+    ::curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    ::curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xfercb);
+	::curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, static_cast<void*>(this));
+    //::curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    if ( ! attr->isNoneTLS) {
+        ::curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
+        ::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        ::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    }
+    res = curl_easy_perform(curl);
+    ::curl_easy_cleanup(curl);
+
+    states->uploading = false;
+    if (CURLE_OK != res) {
+        BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for uploading print.") % name % ip;
         return;
     }
-    wxOutputStream *out = ftp.GetOutputStream(boost::filesystem::path(filename).filename().string());
-    wxFile file = wxFile(filename, wxFile::read);
-    char* data = new char[file.Length()];
-    file.Read(data, file.Length());
-    wxLongLong_t bufferSize = 8192;
-    wxLongLong_t sent = 0;
-    states->uploading = true;
-    if (m_uploadProgressCallback) {
-        progress = 0;
-        m_uploadProgressCallback(progress); // reset.
-    }
-    while (sent < file.Length()) {
-        out->Write(&data[sent], std::min(bufferSize, file.Length() - sent));
-        sent += out->LastWrite();
-        if (m_uploadProgressCallback) {
-            progress = 100 * sent / file.Length();
-            m_uploadProgressCallback(progress);
-        }
-    }
-    states->uploading = false;
-    delete out;
-    delete [] data;
-    file.Close();
-    ftp.Close();
+
+    curl_global_cleanup();
 }
 
 NetworkMachineContainer::NetworkMachineContainer() {}

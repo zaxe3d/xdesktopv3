@@ -101,6 +101,9 @@ public:
     void run(); // start network machine by connecting to ws.
     void ftpRun(); // start downloading avatar in another thread.
 
+    typedef std::function<void(int percent)>  progress_callback_t;
+    progress_callback_t m_uploadProgressCallback;
+
     // Actions
     void sayHi();
     void togglePreheat();
@@ -123,14 +126,12 @@ public:
     MachineStates* states; // states,
     boost::thread runnerThread;
     boost::thread ftpThread;
-    typedef std::function<void(int percent)>  progress_callback_t;
     void setUploadProgressCallback(progress_callback_t cb) { m_uploadProgressCallback = cb; }
     wxBitmap& getAvatar() {
         boost::lock_guard<boost::mutex> avatarlock(m_avatarMtx);
         return m_avatar;
     }
 private:
-    progress_callback_t m_uploadProgressCallback;
 #ifdef _WIN32
     USHORT
 #else
