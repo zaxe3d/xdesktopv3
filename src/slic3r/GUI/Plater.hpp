@@ -302,6 +302,9 @@ public:
     const DynamicPrintConfig * config() const;
     bool                set_printer_technology(PrinterTechnology printer_technology);
 
+    // see if we need a zaxe file according to technology and selected printer model on config change.
+    void check_and_set_zaxe_file();
+
     void copy_selection_to_clipboard();
     void paste_from_clipboard();
     void search(bool plater_is_active);

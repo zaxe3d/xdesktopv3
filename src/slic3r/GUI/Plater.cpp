@@ -5803,10 +5803,10 @@ void Plater::export_gcode(bool prefer_removable)
 
     fs::path output_path;
     {
-    	std::string ext = default_output_file.extension().string();
+        std::string ext = isZaxe ? ".zaxe" : default_output_file.extension().string();
         wxFileDialog dlg(this, (printer_technology() == ptFFF) ? (isZaxe ? _L("Save Zaxe file as:") : _L("Save G-code file as:")) : _L("Save SL1 / SL1S file as:"),
             start_dir,
-            from_path(default_output_file.filename()),
+            from_path(default_output_file.stem()),
             GUI::file_wildcards((printer_technology() == ptFFF) ? (isZaxe ? FT_ZAXE : FT_GCODE): FT_SL1, ext),
             wxFD_SAVE | wxFD_OVERWRITE_PROMPT
         );
@@ -6382,6 +6382,7 @@ void Plater::on_config_change(const DynamicPrintConfig &config)
         }
         else if (opt_key == "printer_model") {
             p->reset_gcode_toolpaths();
+            this->check_and_set_zaxe_file();
             // update to force bed selection(for texturing)
             bed_shape_changed = true;
             update_scheduled = true;
@@ -6574,6 +6575,13 @@ PrinterTechnology Plater::printer_technology() const
 
 const DynamicPrintConfig * Plater::config() const { return p->config; }
 
+void Plater::check_and_set_zaxe_file()
+{
+    const bool isZaxe = wxGetApp().preset_bundle->printers.is_selected_preset_zaxe();
+    p->label_btn_export = p->printer_technology == ptFFF && !isZaxe ?  L("Export G-code") : L("Export");
+    p->label_btn_send   = p->printer_technology == ptFFF && !isZaxe ? L("Send G-code") : L("Send to printer");
+}
+
 bool Plater::set_printer_technology(PrinterTechnology printer_technology)
 {
     p->printer_technology = printer_technology;
@@ -6590,9 +6598,7 @@ bool Plater::set_printer_technology(PrinterTechnology printer_technology)
         }
     }
 
-    const bool isZaxe = wxGetApp().preset_bundle->printers.is_selected_preset_zaxe();
-    p->label_btn_export = printer_technology == ptFFF && !isZaxe ?  L("Export G-code") : L("Export");
-    p->label_btn_send   = printer_technology == ptFFF && !isZaxe ? L("Send G-code") : L("Send to printer");
+    check_and_set_zaxe_file(); // see if we need a zaxe file according to technology and selected printer model.
 
     if (wxGetApp().mainframe != nullptr)
         wxGetApp().mainframe->update_menubar();
