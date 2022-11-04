@@ -12,7 +12,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 #include <curl/curl.h>
-#include <wx/protocol/ftp.h>
 
 using namespace std;
 using namespace boost::algorithm;

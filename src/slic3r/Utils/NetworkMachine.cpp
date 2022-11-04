@@ -1,4 +1,5 @@
 #include "NetworkMachine.hpp"
+#include <libslic3r/Utils.hpp>
 
 namespace fs = boost::filesystem;
 
@@ -202,34 +203,9 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
 
 void NetworkMachine::ftpRun()
 {
-#ifdef _WIN32
-    try {
-        wxFTP ftp;
-        if (!ftp.Connect(ip, m_ftpPort)) {
-            BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for downloading avatar.") % name % ip;
-            return;
-        }
-        wxInputStream *in = ftp.GetInputStream("snapshot.png");
-        if (!in || ftp.Error())
-            BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't get avatar on machine [%1% - %2%].") % name % ip;
-        else {
-            boost::lock_guard<boost::mutex> avatarlock(m_avatarMtx);
-            m_avatar = wxBitmap(wxImage(*in, wxBITMAP_TYPE_PNG));
-            if (this->m_running && m_avatar.IsOk()) {
-                wxCommandEvent evt(EVT_MACHINE_AVATAR_READY, wxID_ANY);
-                evt.SetString(this->ip);
-                evt.SetEventObject(this->m_evtHandler);
-                wxPostEvent(this->m_evtHandler, evt);
-            }
-            delete in;
-        }
-    } catch (...) {
-        BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't get avatar on machine.");
-    }
-#else
     CURL *curl;
     CURLcode res;
-    struct response chunk = { .memory = nullptr, .size = 0 };
+    struct response chunk;
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
@@ -260,7 +236,6 @@ void NetworkMachine::ftpRun()
     }
 
     curl_global_cleanup();
-#endif
 }
 
 size_t file_read_cb(char *buffer, size_t size, size_t nitems, void *userp)
@@ -315,9 +290,10 @@ void NetworkMachine::upload(const char *filename)
     ::curl_easy_setopt(curl, CURLOPT_READFUNCTION, file_read_cb);
     ::curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
     ::curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    ::curl_easy_setopt(curl, CURLOPT_VERBOSE, get_logging_level() >= 5);
     ::curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xfercb);
-	::curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, static_cast<void*>(this));
-    //::curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    ::curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, static_cast<void *>(this));
+
     if ( ! attr->isNoneTLS) {
         ::curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
         ::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
@@ -325,7 +301,7 @@ void NetworkMachine::upload(const char *filename)
     }
     res = curl_easy_perform(curl);
     ::curl_easy_cleanup(curl);
-
+    putFile.reset();
     states->uploading = false;
     if (CURLE_OK != res) {
         BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for uploading print.") % name % ip;
