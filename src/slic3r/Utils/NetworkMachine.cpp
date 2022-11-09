@@ -70,7 +70,8 @@ void NetworkMachine::onWSRead(string message)
             // printing
             attr->printingFile = pt.get<string>("filename", "");
             attr->elapsedTime = pt.get<float>("elapsed_time", 0);
-            attr->estimatedTime = time(nullptr) - attr->elapsedTime;
+            attr->estimatedTime = pt.get<string>("estimated_time", "");
+            attr->startTime = wxDateTime::Now().GetTicks() - attr->elapsedTime;
             if (!attr->isLite) {
                 attr->hasPin = to_lower_copy(pt.get<string>("has_pin", "false")) == "true";
                 attr->hasNFCSpool = to_lower_copy(pt.get<string>("has_nfc_spool", "false")) == "true";
@@ -99,7 +100,8 @@ void NetworkMachine::onWSRead(string message)
         if (event == "start_print") {
             attr->printingFile = pt.get<string>("filename", "");
             attr->elapsedTime = pt.get<float>("elapsed_time", 0);
-            attr->estimatedTime = time(nullptr) - attr->elapsedTime;
+            attr->startTime = wxDateTime::Now().GetTicks() - attr->elapsedTime;
+            attr->estimatedTime = pt.get<string>("estimated_time", "");
         }
         if (event == "spool_data_change") {
             attr->hasNFCSpool = to_lower_copy(pt.get<string>("has_nfc_spool", "false")) == "true";

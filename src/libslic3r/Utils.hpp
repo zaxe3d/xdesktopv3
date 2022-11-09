@@ -368,6 +368,20 @@ inline std::string get_time_hms(const std::string &time)
     return buffer;
 }
 
+// Returns the given time in seconds in format HHh MMm SSs
+inline std::string get_time_hms(float time_in_secs)
+{
+    int hours = (int)(time_in_secs / 3600.0f);
+    time_in_secs -= (float)hours * 3600.0f;
+    int minutes = (int)(time_in_secs / 60.0f);
+    time_in_secs -= (float)minutes * 60.0f;
+
+    char buffer[64];
+    ::sprintf(buffer, "%02d:%02d:%02d", hours, minutes, (int)time_in_secs);
+
+    return buffer;
+}
+
 // Returns the given time is seconds in format DDd HHh MMm SSs
 inline std::string get_time_dhms(float time_in_secs)
 {

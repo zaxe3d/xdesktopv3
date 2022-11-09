@@ -9405,6 +9405,26 @@ msgstr "%s moda geç"
 msgid "Current mode is %s"
 msgstr "Geçerli mod %s"
 
+#: src/slic3r/GUI/Device.cpp:25
+msgid "Material: "
+msgstr "Materyal: "
+
+#: src/slic3r/GUI/Device.cpp:26
+msgid "Nozzle: "
+msgstr "Nozül: "
+
+#: src/slic3r/GUI/Device.cpp:27
+msgid "IP Address: "
+msgstr "IP Adresi: "
+
+#: src/slic3r/GUI/Device.cpp:28 src/slic3r/GUI/Device.cpp:326
+msgid "Elapsed / Estimated time: "
+msgstr "Geçen / Tahmini süre: "
+
+#: src/slic3r/GUI/Device.cpp:29
+msgid "File: "
+msgstr "Dosya: "
+
 #: src/slic3r/GUI/Device.cpp:21
 msgid "Print Now!"
 msgstr "Baskı Al!"

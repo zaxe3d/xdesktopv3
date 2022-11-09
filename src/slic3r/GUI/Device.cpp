@@ -5,6 +5,7 @@
 #include "Plater.hpp" // for export_zaxe_code
 #include "MsgDialog.hpp" // for RichMessageDialog
 #include "libslic3r/PresetBundle.hpp"
+#include "libslic3r/Utils.hpp"
 
 namespace Slic3r {
 namespace GUI {
@@ -21,9 +22,10 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_txtStatus(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_LEFT)),
     m_txtProgress(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
     m_txtDeviceName(new wxStaticText(this, wxID_ANY, nm->name, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, _L("Material: ") + nm->attr->material, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + nm->attr->nozzle + "mm", wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, _L("Material: ") + NetworkMachineManager::MaterialName(nm->attr->material), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtFileTime(new wxStaticText(this, wxID_ANY, _L("Elapsed / Estimated time: ") + get_time_hms(std::to_string(nm->attr->startTime)) + " / " + nm->attr->estimatedTime, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + nm->attr->printingFile, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_btnPrintNow(new wxButton(this, wxID_ANY, _L("Print Now!"))),
     m_avatar(new RoundedPanel(this, wxID_ANY, "", wxSize(60, 60), wxColour(169, 169, 169), wxColour("WHITE"))),
@@ -31,6 +33,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_bitPreheatDeactive(new wxBitmap()),
     m_bitCollapsed(new wxBitmap()),
     m_bitExpanded(new wxBitmap()),
+    m_timer(new wxTimer()),
     m_isExpanded(false)
 {
     SetSizer(m_mainSizer);
@@ -61,6 +64,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_btnPreheat->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->nm->togglePreheat(); });
     m_btnCancel->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->cancel(); }); });
     m_btnPause->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->pause(); }); });
+    m_timer->Bind(wxEVT_TIMER, [this](wxTimerEvent &evt) { this->onTimer(evt); });
 
     nm->setUploadProgressCallback([this](int progress) {
         if (progress <= 0 || progress >= 100) this->updateStates();
@@ -151,12 +155,12 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
             SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT));
             m_expansionSizer->ShowItems(false);
         } else {
-            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 75 : 50)));
+            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 75 : 45)));
             m_expansionSizer->ShowItems(true);
             if (!this->nm->states->printing) {
-                // hide m_txtFileName and its bottom border
-                m_expansionSizer->Hide((size_t)0);
-                m_expansionSizer->Hide((size_t)1);
+                // hide m_txtFileName and duration and their bottom borders.
+                for (int i = 0; i < 4; i++)
+                    m_expansionSizer->Hide((size_t)i);
             }
         }
         m_expansionSizer->Layout();
@@ -171,14 +175,15 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     // inside the expansion panel.
     m_expansionSizer->Add(m_txtFileName, 0, wxBOTTOM, -5);
     m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
+    m_expansionSizer->Add(m_txtFileTime, 0, wxBOTTOM, -5);
+    m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
     m_expansionSizer->Add(m_txtDeviceMaterial, 0, wxBOTTOM, -5);
     m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
     m_expansionSizer->Add(m_txtDeviceNozzleDiameter, 0, wxBOTTOM, -5);
     m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
     m_expansionSizer->Add(m_txtDeviceIP, 0, wxBOTTOM, -5);
-    m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
     m_expansionSizer->ShowItems(false);
-    m_mainSizer->Add(m_expansionSizer, 1, wxEXPAND | wxLEFT, m_avatar->GetSize().GetWidth() + 14); // only expand horizontally in vertical sizer.
+    m_mainSizer->Add(m_expansionSizer, 0, wxLEFT, m_avatar->GetSize().GetWidth() + 14); // only expand horizontally in vertical sizer.
     // end of expansion panel contents.
 
     // Bottom line. (separator)
@@ -207,6 +212,8 @@ void Device::updateStatus()
     } else if (nm->states->printing) {
         statusTxt = _L("Printing...");
         m_progressBar->SetColour(wxColor(0, 155, 223));
+        if (!m_timer->IsRunning())
+            m_timer->Start(1000);
     } else if (nm->states->heating) {
         statusTxt = _L("Heating...");
         m_progressBar->SetColour(wxColor(255, 153, 102));
@@ -221,6 +228,9 @@ void Device::updateStatus()
             nm->downloadAvatar(); // this fires EVT_MACHINE_AVATAR_READY when it's ready.
         } else m_avatar->Clear(); // clear the last image.
     }
+
+    if (!nm->states->printing && m_timer->IsRunning()) // stop when done.
+        m_timer->Stop();
 
     m_btnPreheat->SetBitmapLabel(*(nm->states->preheat
                                     ? m_bitPreheatActive
@@ -257,18 +267,22 @@ void Device::updateStates()
             m_btnPause->Hide();
         else m_btnPause->Show();
         if (m_isExpanded) {
-            // show m_txtFileName and its bottom border.
-            m_expansionSizer->Show((size_t)0);
-            m_expansionSizer->Show((size_t)1);
+            // show m_txtFileName and duration and their bottom borders.
+            for (int i = 0; i < 4; i++)
+                m_expansionSizer->Show((size_t)i);
         }
     } else if (m_isExpanded) {
-        // hide m_txtFileName and its bottom border
-        m_expansionSizer->Hide((size_t)0);
-        m_expansionSizer->Hide((size_t)1);
+        // hide m_txtFileName and duration and their bottom borders.
+        for (int i = 0; i < 4; i++)
+            m_expansionSizer->Hide((size_t)i);
     }
 
-    if (m_isExpanded)
-        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 75 : 50)));
+    if (m_isExpanded) {
+        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 75 : 45)));
+        m_expansionSizer->Layout();
+        GetParent()->Layout();
+        GetParent()->FitInside();
+    }
 
     m_rightSizer->Layout();
     updateStatus();
@@ -294,6 +308,7 @@ void Device::setFileStart()
 Device::~Device()
 {
     if (this->GetParent() == NULL) return;
+    if (m_timer->IsRunning()) m_timer->Stop();
     m_rightSizer->Clear(true); // Also destroys children.
     m_deviceSizer->Clear(true);
     m_mainSizer->Clear(true);
@@ -304,6 +319,13 @@ Device::~Device()
 void Device::enablePrintNowButton(bool enable)
 {
     m_btnPrintNow->Enable(enable);
+}
+
+void Device::onTimer(wxTimerEvent& event)
+{
+    m_txtFileTime->SetLabel(_L("Elapsed / Estimated time: ") +
+        get_time_hms(wxDateTime::Now().GetTicks() - this->nm->attr->startTime) +
+        " / " + nm->attr->estimatedTime);
 }
 
 void Device::confirm(function<void()> cb)

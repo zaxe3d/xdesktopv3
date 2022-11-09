@@ -23,6 +23,22 @@ public:
 
     void enablePrintNowButton(bool enable);
 
+    static inline std::map<string, string> materialMap = {
+        { "zaxe_abs", "Zaxe ABS" },
+        { "zaxe_pla", "Zaxe PLA" },
+        { "zaxe_flex", "Zaxe FLEX" },
+        { "zaxe_petg", "Zaxe PETG" },
+        { "custom", "Custom" }
+    };
+    static string MaterialName(string& key)
+    {
+        try {
+            return materialMap.at(key);
+        } catch (...) {
+            return key;
+        }
+    };
+
 private:
     // slots
     void onBroadcastReceived(wxCommandEvent &event);

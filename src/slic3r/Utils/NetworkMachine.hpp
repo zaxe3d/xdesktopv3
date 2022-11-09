@@ -85,7 +85,7 @@ struct MachineAttributes // attributes.
     bool isNoneTLS;
     bool snapshotURL;
     float elapsedTime;
-    float estimatedTime;
+    string estimatedTime;
     int startTime;
     int filamentRemaining;
     int firmwareVersion;

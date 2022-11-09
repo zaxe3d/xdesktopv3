@@ -59,7 +59,10 @@ public:
     void avatarReady();
 
     void enablePrintNowButton(bool enable);
+
+    void onTimer(wxTimerEvent& event);
 private:
+    wxTimer* m_timer; // elapsed timer.
     void confirm(std::function<void()> cb);
     wxSizer* m_mainSizer; // vertical sizer (device sizer - horizontal line (seperator).
     wxSizer* m_deviceSizer; // horizontal sizer (avatar | right pane)).
@@ -83,6 +86,7 @@ private:
     wxStaticText* m_txtDeviceNozzleDiameter; // device nozzle text.
     wxStaticText* m_txtFileName; // file name text.
     wxStaticText* m_txtFileTime; // file elapsed time / estimated time text.
+    wxStaticText* m_txtElapsedTime; // file elapsed time.
 
     RoundedPanel* m_avatar;
 
