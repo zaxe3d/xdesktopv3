@@ -151,7 +151,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
             SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT));
             m_expansionSizer->ShowItems(false);
         } else {
-            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 75 : 45)));
+            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 100 : 60)));
             m_expansionSizer->ShowItems(true);
             if (!this->nm->states->printing) {
                 // hide m_txtFileName and duration and their bottom borders.
@@ -169,17 +169,17 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     });
 
     // inside the expansion panel.
-    m_expansionSizer->Add(m_txtFileName, 0, wxBOTTOM, -5);
+    m_expansionSizer->Add(m_txtFileName, 0, wxBOTTOM);
     m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
-    m_expansionSizer->Add(m_txtFileTime, 0, wxBOTTOM, -5);
+    m_expansionSizer->Add(m_txtFileTime, 0, wxBOTTOM);
     m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
-    m_expansionSizer->Add(m_txtDeviceMaterial, 0, wxBOTTOM, -5);
+    m_expansionSizer->Add(m_txtDeviceMaterial, 0, wxBOTTOM);
     m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
-    m_expansionSizer->Add(m_txtDeviceNozzleDiameter, 0, wxBOTTOM, -5);
+    m_expansionSizer->Add(m_txtDeviceNozzleDiameter, 0, wxBOTTOM);
     m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
-    m_expansionSizer->Add(m_txtDeviceIP, 0, wxBOTTOM, -5);
+    m_expansionSizer->Add(m_txtDeviceIP, 0, wxBOTTOM);
     m_expansionSizer->ShowItems(false);
-    m_mainSizer->Add(m_expansionSizer, 0, wxLEFT, m_avatar->GetSize().GetWidth() + 14); // only expand horizontally in vertical sizer.
+    m_mainSizer->Add(m_expansionSizer, 0, wxEXPAND | wxLEFT, m_avatar->GetSize().GetWidth() + 14); // only expand horizontally in vertical sizer.
     // end of expansion panel contents.
 
     // Bottom line. (separator)
@@ -274,7 +274,7 @@ void Device::updateStates()
     }
 
     if (m_isExpanded) {
-        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 75 : 45)));
+        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 100 : 60)));
         m_expansionSizer->Layout();
         GetParent()->Layout();
         GetParent()->FitInside();

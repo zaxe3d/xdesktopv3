@@ -32,11 +32,10 @@ public:
     };
     static string MaterialName(string& key)
     {
-        try {
-            return materialMap.at(key);
-        } catch (...) {
-            return key;
-        }
+        map<string, string>::iterator iter = materialMap.find(key);
+        if (iter != materialMap.end())
+            return iter->second;
+        return key;
     };
 
 private:

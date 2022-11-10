@@ -14,10 +14,10 @@ void Websocket::run()
         beast::error_code ec;
         // Look up the domain name
         auto const results = m_resolver.resolve(m_host, std::to_string(m_port), ec);
-        if (ec) throw ec;
+        if (ec) return onErrorSignal(ec.message());
         // Make the connection on the IP address we get from a lookup
         beast::get_lowest_layer(m_ws).connect(results, ec);
-        if (ec) throw ec;
+        if (ec) return onErrorSignal(ec.message());
         beast::get_lowest_layer(m_ws).expires_never();
         // Set suggested timeout settings for the websocket
         m_ws.set_option(websocket::stream_base::timeout::suggested(beast::role_type::client));
@@ -26,7 +26,7 @@ void Websocket::run()
                             string(BOOST_BEAST_VERSION_STRING) +
                             " websocket-xdesktop"); }));
         m_ws.handshake(m_host, "/", ec); // Perform the websocket handshake
-        if (ec) throw ec;
+        if (ec) return onErrorSignal(ec.message());
 
         onConnectSignal(); // signal connected.
 
@@ -39,8 +39,6 @@ void Websocket::run()
 
         // start reading...
         m_ws.async_read(m_buffer, beast::bind_front_handler(&Websocket::onRead, shared_from_this()));
-    } catch (boost::system::error_code e) {
-        onErrorSignal(e.message());
     } catch (...) {
         onErrorSignal("Unknown websocket error.");
     }
