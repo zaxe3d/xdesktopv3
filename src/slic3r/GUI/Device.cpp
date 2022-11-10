@@ -15,7 +15,6 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     nm(nm),
     m_mainSizer(new wxBoxSizer(wxVERTICAL)), // vertical sizer (device sizer - horizontal line (seperator).
     m_deviceSizer(new wxBoxSizer(wxHORIZONTAL)), // horizontal sizer (avatar | right pane).)
-    m_expansionPanel(new wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)),
     m_expansionSizer(new wxBoxSizer(wxVERTICAL)), // vertical sizer (filament | printing time etc.)
     m_rightSizer(new wxBoxSizer(wxVERTICAL)), // vertical right pane. (name - status - progress bar).
     m_progressBar(new CustomProgressBar(this, wxID_ANY, wxSize(-1, 5))),
@@ -38,9 +37,6 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
 {
     SetSizer(m_mainSizer);
     m_mainSizer->Add(m_deviceSizer, 1, wxEXPAND | wxRIGHT, 25); // only expand horizontally in vertical sizer.
-
-    m_expansionPanel->SetSizer(m_expansionSizer);
-    m_expansionSizer->Hide(m_expansionPanel);
 
     // action buttons with bitmaps.
     wxBitmap bitSayHi;

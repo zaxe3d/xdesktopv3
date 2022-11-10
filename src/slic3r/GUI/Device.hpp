@@ -67,7 +67,6 @@ private:
     wxSizer* m_mainSizer; // vertical sizer (device sizer - horizontal line (seperator).
     wxSizer* m_deviceSizer; // horizontal sizer (avatar | right pane)).
     wxSizer* m_expansionSizer; // vertical sizer (filament | printing time etc.)
-    wxPanel* m_expansionPanel; // panel (filament | printing time etc.)
     wxSizer* m_rightSizer; // vertical right pane. (name - status - progress bar).
 
     CustomProgressBar* m_progressBar; // progress bar.
