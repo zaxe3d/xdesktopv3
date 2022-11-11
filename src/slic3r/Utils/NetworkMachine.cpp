@@ -207,7 +207,11 @@ void NetworkMachine::ftpRun()
 {
     CURL *curl;
     CURLcode res;
+#ifdef _WIN32
     struct response chunk;
+#else
+    struct response chunk = { .memory = nullptr, .size = 0 };
+#endif
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
