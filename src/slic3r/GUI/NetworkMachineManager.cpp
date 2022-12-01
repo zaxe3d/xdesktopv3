@@ -27,8 +27,10 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent) :
 void NetworkMachineManager::enablePrintNowButton(bool enable)
 {
     if (enable == m_printNowButtonEnabled) return;
-    for (auto& it : m_deviceMap)
+    for (auto& it : m_deviceMap) {
+        if (m_deviceMap[it.first] == nullptr) continue;
         m_deviceMap[it.first]->enablePrintNowButton(enable);
+    }
     m_printNowButtonEnabled = enable;
 }
 
