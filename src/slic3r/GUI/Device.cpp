@@ -142,7 +142,12 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
             wxMessageBox(L("Materials don't match with this device. Please reslice with the correct material."), _L("Wrong material type"), wxICON_ERROR);
         } else if (this->nm->attr->nozzle.compare(archive.get_info("nozzle_diameter")) != 0) {
             wxMessageBox(L("Currently installed nozzle on device doesn't match with this slice. Please reslice with the correct nozzle."), _L("Wrong nozzle type"), wxICON_ERROR);
-        } else this->nm->upload(wxGetApp().plater()->get_zaxe_code_path().c_str());
+        } else {
+            std::thread t([&]() {
+                this->nm->upload(wxGetApp().plater()->get_zaxe_code_path().c_str());
+            });
+            t.detach(); // crusial. otherwise blocks main thread.
+        }
         this->m_btnPrintNow->Enable(true);
     });
     // Print now button end.
@@ -289,6 +294,7 @@ void Device::updateProgress()
     m_progressBar->SetValue(nm->progress);
     m_txtProgress->SetLabel("%" + std::to_string(nm->progress));
     m_mainSizer->Layout();
+    GetParent()->Refresh(); // crusial otherwise doesn't show upload progress...
 }
 
 void Device::setName(const string &name)

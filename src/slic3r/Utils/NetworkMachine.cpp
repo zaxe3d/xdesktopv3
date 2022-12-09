@@ -262,8 +262,11 @@ int xfercb(void *userp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal
 
     auto self = static_cast<NetworkMachine*>(userp);
 
-    int up = (int)(((double)ulnow / (double)ultotal) * 100);
-    self->m_uploadProgressCallback(up);
+    int progress = (int)(((double)ulnow / (double)ultotal) * 100);
+    if (progress != self->progress && self->m_uploadProgressCallback != nullptr) {
+        self->progress = progress;
+        self->m_uploadProgressCallback(self->progress);
+    }
     return 0;
 }
 
@@ -281,15 +284,19 @@ void NetworkMachine::upload(const char *filename)
     boost::uintmax_t filesize = file_size(path, ec);
     std::unique_ptr<fs::ifstream> putFile;
 
-    m_uploadProgressCallback(0); // reset
     states->uploading = true;
+    progress = 0;
+    m_uploadProgressCallback(progress); // reset
     if (!ec) {
         putFile = std::make_unique<fs::ifstream>(path);
         ::curl_easy_setopt(curl, CURLOPT_READDATA, (void *) (putFile.get()));
         ::curl_easy_setopt(curl, CURLOPT_INFILESIZE, filesize);
     }
 
-    std::string url = "ftp://" + ip + ":" + std::to_string(m_ftpPort) + "/" + path.filename().string();
+    std::string pFilename = path.filename().string();
+    char *encodedFilename = ::curl_easy_escape(curl, pFilename.c_str(), pFilename.length());
+    std::string url = "ftp://" + ip + ":" + std::to_string(m_ftpPort) + "/" + std::string(encodedFilename);
+
     ::curl_easy_setopt(curl, CURLOPT_USERNAME, "zaxe");
     ::curl_easy_setopt(curl, CURLOPT_PASSWORD, "zaxe");
     ::curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -304,8 +311,11 @@ void NetworkMachine::upload(const char *filename)
         ::curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
         ::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
         ::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    } else {
+        ::curl_easy_setopt(curl, CURLOPT_FTP_USE_EPSV, 0L);
     }
     res = curl_easy_perform(curl);
+    ::curl_free(encodedFilename);
     ::curl_easy_cleanup(curl);
     putFile.reset();
     states->uploading = false;
