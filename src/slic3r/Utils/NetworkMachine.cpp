@@ -138,7 +138,7 @@ void NetworkMachine::pause()
 
 void NetworkMachine::resume()
 {
-    request("pause");
+    request("resume");
 }
 
 void NetworkMachine::togglePreheat()

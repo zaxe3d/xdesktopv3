@@ -24,8 +24,9 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, _L("Material: ") + NetworkMachineManager::MaterialName(nm->attr->material), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtBedOccupiedMessage(new wxStaticText(this, wxID_ANY, _L("Please take your print!"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtFileTime(new wxStaticText(this, wxID_ANY, _L("Elapsed / Estimated time: ") + get_time_hms(std::to_string(nm->attr->startTime)) + " / " + nm->attr->estimatedTime, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + nm->attr->printingFile, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_btnPrintNow(new wxButton(this, wxID_ANY, _L("Print Now!"))),
     m_avatar(new RoundedPanel(this, wxID_ANY, "", wxSize(60, 60), wxColour(169, 169, 169), wxColour("WHITE"))),
     m_bitPreheatActive(new wxBitmap()),
@@ -33,7 +34,8 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_bitCollapsed(new wxBitmap()),
     m_bitExpanded(new wxBitmap()),
     m_timer(new wxTimer()),
-    m_isExpanded(false)
+    m_isExpanded(false),
+    m_pausedSeconds(0)
 {
     SetSizer(m_mainSizer);
     m_mainSizer->Add(m_deviceSizer, 1, wxEXPAND | wxRIGHT, 25); // only expand horizontally in vertical sizer.
@@ -48,6 +50,9 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     wxBitmap bitPause;
     bitPause.LoadFile(Slic3r::resources_dir() + "/icons/device/pause.png", wxBITMAP_TYPE_PNG);
     m_btnPause = new wxBitmapButton(this, wxID_ANY, bitPause, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+    wxBitmap bitResume;
+    bitResume.LoadFile(Slic3r::resources_dir() + "/icons/device/resume.png", wxBITMAP_TYPE_PNG);
+    m_btnResume = new wxBitmapButton(this, wxID_ANY, bitResume, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
     wxBitmap bitCancel;
     bitCancel.LoadFile(Slic3r::resources_dir() + "/icons/device/stop.png", wxBITMAP_TYPE_PNG);
     m_btnCancel = new wxBitmapButton(this, wxID_ANY, bitCancel, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
@@ -60,6 +65,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_btnPreheat->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->nm->togglePreheat(); });
     m_btnCancel->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->cancel(); }); });
     m_btnPause->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->pause(); }); });
+    m_btnResume->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->resume(); }); });
     m_timer->Bind(wxEVT_TIMER, [this](wxTimerEvent &evt) { this->onTimer(evt); });
 
     nm->setUploadProgressCallback([this](int progress) {
@@ -70,6 +76,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     // action buttons end.
 
     wxFont normalFont = wxGetApp().normal_font();
+    wxFont xsmallFont = wxGetApp().normal_font();
     wxFont boldFont = wxGetApp().bold_font();
     wxFont boldSmallFont = wxGetApp().bold_font();
     wxSizerFlags expandFlag(1);
@@ -82,9 +89,11 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
 #ifdef _WIN32
     boldFont.SetPointSize(14);
     boldSmallFont.SetPointSize(9);
+    xsmallFont.SetPointSize(7);
 #else
     boldFont.SetPointSize(18);
     boldSmallFont.SetPointSize(12);
+    xsmallFont.SetPointSize(10);
 #endif
     m_avatar->SetFont(boldFont);
     wxString dMWx(dM);
@@ -103,6 +112,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     actionBtnsSizer->Add(m_btnPreheat);
     actionBtnsSizer->Add(m_btnSayHi);
     actionBtnsSizer->Add(m_btnPause);
+    actionBtnsSizer->Add(m_btnResume);
     actionBtnsSizer->Add(m_btnCancel);
     actionBtnsSizer->Add(m_btnExpandCollapse);
     dnaabp->Add(m_txtDeviceName, expandFlag.Left());
@@ -129,6 +139,11 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_rightSizer->Add(m_progressBar, 0, wxEXPAND); // expand horizontally in vertical box.
     // Progress end...
 
+    // Bed occupied message
+    m_txtBedOccupiedMessage->SetForegroundColour(DEVICE_COLOR_SUCCESS);
+    m_txtBedOccupiedMessage->SetFont(xsmallFont);
+    m_rightSizer->Add(m_txtBedOccupiedMessage, 0, wxTOP, -1);
+    // Bed occupied message end...
     // Print now button.
     m_rightSizer->Add(m_btnPrintNow, 0, wxTOP, -12);
     m_btnPrintNow->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) {
@@ -204,28 +219,30 @@ void Device::avatarReady()
 void Device::updateStatus()
 {
     wxString statusTxt = "";
-    if (nm->states->uploading) {
-        statusTxt = _L("Uploading...");
-        m_progressBar->SetColour(*wxGREEN);
-    } else if (nm->states->paused) {
-        statusTxt = _L("Paused...");
-        m_progressBar->SetColour(wxColour(0, 155, 223));
-    } else if (nm->states->printing) {
-        statusTxt = _L("Printing...");
-        m_progressBar->SetColour(wxColor(0, 155, 223));
-        if (!m_timer->IsRunning())
-            m_timer->Start(1000);
+    if (nm->states->bedOccupied) {
+        statusTxt = _L("Bed is occupied...");
     } else if (nm->states->heating) {
         statusTxt = _L("Heating...");
-        m_progressBar->SetColour(wxColor(255, 153, 102));
+        m_progressBar->SetColour(DEVICE_COLOR_DANGER);
+    } else if (nm->states->uploading) {
+        statusTxt = _L("Uploading...");
+        m_progressBar->SetColour(DEVICE_COLOR_UPLOADING);
+    } else if (nm->states->paused) {
+        statusTxt = _L("Paused...");
+        m_progressBar->SetColour(DEVICE_COLOR_ZAXE_BLUE);
+    } else if (nm->states->printing) {
+        statusTxt = _L("Printing...");
+        m_progressBar->SetColour(DEVICE_COLOR_ZAXE_BLUE);
+        if (!m_timer->IsRunning())
+            m_timer->Start(1000);
     } else if (nm->states->calibrating) {
         statusTxt = _L("Calibrating...");
-        m_progressBar->SetColour(wxColor(255, 165, 0));
+        m_progressBar->SetColour(DEVICE_COLOR_ORANGE);
     }
     m_txtStatus->SetLabel(statusTxt);
 
     if (nm->attr->hasSnapshot) { // if has snapshot and need to show the avatar start downloading...
-        if(nm->states->heating || nm->states->printing || nm->states->calibrating) {
+        if(nm->states->heating || nm->states->printing || nm->states->calibrating || nm->states->bedOccupied) {
             nm->downloadAvatar(); // this fires EVT_MACHINE_AVATAR_READY when it's ready.
         } else m_avatar->Clear(); // clear the last image.
     }
@@ -250,23 +267,41 @@ void Device::updateStates()
         m_btnSayHi->Hide();
         m_btnPreheat->Hide();
         m_btnPrintNow->Hide();
-        if (!nm->states->uploading)
+        m_btnResume->Hide();
+        m_btnPause->Hide();
+        m_txtBedOccupiedMessage->Hide();
+        if (nm->states->printing) {
+            if (nm->states->paused) {
+                m_btnResume->Show();
+                m_btnPause->Hide();
+            } else if (!nm->states->heating) {
+                m_btnResume->Hide();
+                m_btnPause->Show();
+            }
+        } else if (!nm->states->uploading) {
             m_btnCancel->Show();
+        }
         updateProgress();
     } else {
         m_btnPause->Hide();
+        m_btnResume->Hide();
         m_btnCancel->Hide();
         m_progressBar->Hide();
         m_txtProgress->Hide();
-        m_btnSayHi->Show();
-        m_btnPreheat->Show();
-        m_btnPrintNow->Show();
+        if (nm->states->bedOccupied) {
+            m_txtBedOccupiedMessage->Show();
+            m_btnPrintNow->Hide();
+            m_btnSayHi->Hide();
+            m_btnPreheat->Hide();
+        } else {
+            m_btnSayHi->Show();
+            m_btnPreheat->Show();
+            m_btnPrintNow->Show();
+            m_txtBedOccupiedMessage->Hide();
+        }
     }
 
     if (nm->states->printing) {
-        if (nm->states->paused)
-            m_btnPause->Hide();
-        else m_btnPause->Show();
         if (m_isExpanded) {
             // show m_txtFileName and duration and their bottom borders.
             for (int i = 0; i < 4; i++)
@@ -304,7 +339,8 @@ void Device::setName(const string &name)
 
 void Device::setFileStart()
 {
-    m_txtFileName->SetLabel(nm->attr->printingFile);
+    m_txtFileName->SetLabel(nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS));
+    m_pausedSeconds = 0; // reset
 }
 
 Device::~Device()
@@ -326,8 +362,12 @@ void Device::enablePrintNowButton(bool enable)
 void Device::onTimer(wxTimerEvent& event)
 {
     m_txtFileTime->SetLabel(_L("Elapsed / Estimated time: ") +
-        get_time_hms(wxDateTime::Now().GetTicks() - this->nm->attr->startTime) +
-        " / " + nm->attr->estimatedTime);
+        get_time_hms(
+            wxDateTime::Now().GetTicks() -
+            this->nm->attr->startTime -
+            // make it look paused by incrementing and subtracting from the counter.
+            (nm->states->paused ? m_pausedSeconds++ : m_pausedSeconds))
+        + " / " + nm->attr->estimatedTime);
 }
 
 void Device::confirm(function<void()> cb)

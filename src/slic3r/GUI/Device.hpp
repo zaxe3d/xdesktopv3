@@ -11,7 +11,14 @@
 
 namespace Slic3r {
 namespace GUI {
+
 #define DEVICE_HEIGHT 80
+#define DEVICE_FILENAME_MAX_NUM_CHARS 40
+#define DEVICE_COLOR_ZAXE_BLUE wxColor(0, 155, 223)
+#define DEVICE_COLOR_ORANGE wxColor(255, 165, 0)
+#define DEVICE_COLOR_DANGER wxColor(255, 0, 0)
+#define DEVICE_COLOR_SUCCESS wxColor(0, 155, 223)
+#define DEVICE_COLOR_UPLOADING *wxGREEN
 
 class RoundedPanel: public wxPanel
 {
@@ -85,7 +92,7 @@ private:
     wxStaticText* m_txtDeviceNozzleDiameter; // device nozzle text.
     wxStaticText* m_txtFileName; // file name text.
     wxStaticText* m_txtFileTime; // file elapsed time / estimated time text.
-    wxStaticText* m_txtElapsedTime; // file elapsed time.
+    wxStaticText* m_txtBedOccupiedMessage; // bed occuppied message under status text.
 
     RoundedPanel* m_avatar;
 
@@ -95,6 +102,8 @@ private:
     wxBitmap* m_bitCollapsed;
 
     bool m_isExpanded;
+
+    int m_pausedSeconds;
 };
 } // namespace GUI
 } // namespace Slic3r
