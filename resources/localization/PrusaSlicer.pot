@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-09 11:34+0300\n"
+"POT-Creation-Date: 2022-12-16 16:34+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -9247,19 +9247,23 @@ msgstr ""
 msgid "Current mode is %s"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:25
+#: src/slic3r/GUI/Device.cpp:24
 msgid "Material: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:26
+#: src/slic3r/GUI/Device.cpp:25
 msgid "Nozzle: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:27
+#: src/slic3r/GUI/Device.cpp:26
 msgid "IP Address: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:28 src/slic3r/GUI/Device.cpp:326
+#: src/slic3r/GUI/Device.cpp:27
+msgid "Please take your print!"
+msgstr ""
+
+#: src/slic3r/GUI/Device.cpp:28 src/slic3r/GUI/Device.cpp:364
 msgid "Elapsed / Estimated time: "
 msgstr ""
 
@@ -9271,67 +9275,71 @@ msgstr ""
 msgid "Print Now!"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:144
+#: src/slic3r/GUI/Device.cpp:155
 msgid "Device model does NOT match. Please reslice with the correct model."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:144
+#: src/slic3r/GUI/Device.cpp:155
 msgid "Wrong device model"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:146
+#: src/slic3r/GUI/Device.cpp:157
 msgid ""
 "Materials don't match with this device. Please reslice with the correct "
 "material."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:146
+#: src/slic3r/GUI/Device.cpp:157
 msgid "Wrong material type"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:148
+#: src/slic3r/GUI/Device.cpp:159
 msgid ""
 "Currently installed nozzle on device doesn't match with this slice. Please "
 "reslice with the correct nozzle."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:148
+#: src/slic3r/GUI/Device.cpp:159
 msgid "Wrong nozzle type"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:207
-msgid "Uploading..."
+#: src/slic3r/GUI/Device.cpp:223
+msgid "Bed is occupied..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:210
-msgid "Paused..."
-msgstr ""
-
-#: src/slic3r/GUI/Device.cpp:213
-msgid "Printing..."
-msgstr ""
-
-#: src/slic3r/GUI/Device.cpp:218
+#: src/slic3r/GUI/Device.cpp:225
 msgid "Heating..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:221
+#: src/slic3r/GUI/Device.cpp:228
+msgid "Uploading..."
+msgstr ""
+
+#: src/slic3r/GUI/Device.cpp:231
+msgid "Paused..."
+msgstr ""
+
+#: src/slic3r/GUI/Device.cpp:234
+msgid "Printing..."
+msgstr ""
+
+#: src/slic3r/GUI/Device.cpp:239
 msgid "Calibrating..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:333
+#: src/slic3r/GUI/Device.cpp:375
 msgid "Are you sure?"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:333
+#: src/slic3r/GUI/Device.cpp:375
 msgid "XDesktop: Confirmation"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:334
+#: src/slic3r/GUI/Device.cpp:376
 msgid "Yes"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:334
+#: src/slic3r/GUI/Device.cpp:376
 msgid "No"
 msgstr ""
 
