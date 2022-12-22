@@ -739,11 +739,14 @@ void BackgroundSlicingProcess::prepare_zaxe_file()
 	boost::filesystem::path zip_path(temp_path);
 	zip_path /= (boost::format("%1%.zaxe") % boost::filesystem::path(m_print->output_filename("")).stem().string()).str();
 	m_zaxe_archive_path = zip_path.string();
-	// export stl.
-	GUI::wxGetApp().mainframe->m_plater->export_stl(false, false, true);
-	// Generate thumbnails. Get the sizes from config.
-	ThumbnailsList thumbnails = this->render_thumbnails(ThumbnailsParams{current_print()->full_print_config().option<ConfigOptionPoints>("thumbnails")->values, true, true, false, true});
-	m_zaxe_archive.export_print(m_zaxe_archive_path, thumbnails, *m_fff_print, m_temp_output_path); // output path for gcode itself and checksum.
+	std::string model = GUI::wxGetApp().preset_bundle->printers.get_selected_preset().name;
+	if (is_there(model, {"Z1", "Z2", "Z3"})) {
+		if (is_there(model, {"Z2", "Z3"})) // export stl if model is Z2 or Z3.
+			GUI::wxGetApp().mainframe->m_plater->export_stl(false, false, true);
+		// Generate thumbnails. Get the sizes from config.
+		ThumbnailsList thumbnails = this->render_thumbnails(ThumbnailsParams{current_print()->full_print_config().option<ConfigOptionPoints>("thumbnails")->values, true, true, false, true});
+		m_zaxe_archive.export_print(m_zaxe_archive_path, thumbnails, *m_fff_print, m_temp_output_path); // output path for gcode itself and checksum.
+	} else m_zaxe_archive.export_print(m_zaxe_archive_path, {}, *m_fff_print, m_temp_output_path); // output path for gcode itself and checksum.
 }
 
 // A print host upload job has been scheduled, enqueue it to the printhost job queue

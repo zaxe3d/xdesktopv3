@@ -303,6 +303,15 @@ public:
     void reset() { closure = Closure(); }
 };
 
+// Returns true if needle is in the haystack
+inline bool is_there(const std::string &haystack, const std::vector<std::string> &needles)
+{
+    for (auto &needle : needles)
+        if (haystack.find(needle) != std::string::npos)
+            return true;
+    return false;
+}
+
 // Shorten the dhms time by removing the seconds, rounding the dhm to full minutes
 // and removing spaces.
 inline std::string short_time(const std::string &time)

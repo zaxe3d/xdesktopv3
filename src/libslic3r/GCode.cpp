@@ -1122,11 +1122,14 @@ void GCode::_do_export(Print& print, GCodeOutputStream &file, ThumbnailsGenerato
     if (const auto [thumbnails, thumbnails_format] = std::make_pair(
             print.full_print_config().option<ConfigOptionPoints>("thumbnails"),
             print.full_print_config().option<ConfigOptionEnum<GCodeThumbnailsFormat>>("thumbnails_format"));
-        thumbnails)
-        GCodeThumbnails::export_thumbnails_to_file(
-            thumbnail_cb, thumbnails->values, thumbnails_format ? thumbnails_format->value : GCodeThumbnailsFormat::PNG,
-            [&file](const char* sz) { file.write(sz); },
-            [&print]() { print.throw_if_canceled(); });
+        thumbnails) {
+        // If Zaxe do NOT put thumnbnail within gcode. Since we already have it in archive.
+        if ( ! is_there(*print.full_print_config().option<ConfigOptionString>("printer_notes"), {"Zaxe"}))
+            GCodeThumbnails::export_thumbnails_to_file(
+                thumbnail_cb, thumbnails->values, thumbnails_format ? thumbnails_format->value : GCodeThumbnailsFormat::PNG,
+                [&file](const char* sz) { file.write(sz); },
+                [&print]() { print.throw_if_canceled(); });
+    }
 
     // Write notes (content of the Print Settings tab -> Notes)
     {

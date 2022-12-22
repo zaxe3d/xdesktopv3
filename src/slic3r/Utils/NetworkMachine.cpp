@@ -64,9 +64,9 @@ void NetworkMachine::onWSRead(string message)
             attr->deviceModel = to_lower_copy(pt.get<string>("device_model", "x1"));
             attr->material = to_lower_copy(pt.get<string>("material", "zaxe_abs"));
             attr->nozzle = pt.get<string>("nozzle", "0.4");
-            attr->hasSnapshot = contains(attr->deviceModel, 'z');
-            attr->isLite = attr->deviceModel.find("lite") != string::npos || attr->deviceModel == "x3";
-            attr->isNoneTLS = attr->deviceModel.find("z3") != string::npos || attr->isLite;
+            attr->hasSnapshot = is_there(attr->deviceModel, {"z1", "z2", "z3"});
+            attr->isLite = is_there(attr->deviceModel, {"lite", "x3"});
+            attr->isNoneTLS = is_there(attr->deviceModel, {"z2", "z3"}) || attr->isLite;
             // printing
             attr->printingFile = pt.get<string>("filename", "");
             attr->elapsedTime = pt.get<float>("elapsed_time", 0);

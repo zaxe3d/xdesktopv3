@@ -111,12 +111,13 @@ void ZaxeArchive::export_print(const string archive_path, ThumbnailsList thumbna
         zipper.add_entry("data.zaxe_code");
         zipper << gcode;
         // add model stl
-        string model_path = (temp_path.parent_path() / "model.stl").string();
-        ifstream::pos_type fileSize = read_binary_into_buffer(model_path.c_str(), bytes);
-        zipper.add_entry("model.stl", bytes.data(), fileSize);
+        if (is_there(m_infoconf["model"], {"Z2", "Z3"})) { // export stl only if model is Z2 or Z3.
+            string model_path = (temp_path.parent_path() / "model.stl").string();
+            ifstream::pos_type fileSize = read_binary_into_buffer(model_path.c_str(), bytes);
+            zipper.add_entry("model.stl", bytes.data(), fileSize);
+        }
         for (const ThumbnailData& data : thumbnails)
             if (data.is_valid()) write_thumbnail(zipper, data);
-        //BOOST_LOG_TRIVIAL(debug) << to_json(m_infoconf);
         zipper.finalize();
         BOOST_LOG_TRIVIAL(info) << "Zaxe file generated successfully to: " << zipper.get_filename();
     } catch(std::exception& e) {
