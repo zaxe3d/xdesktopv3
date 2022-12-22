@@ -5899,6 +5899,8 @@ void Plater::export_stl(bool extended, bool selection_only, bool zaxe_file_temp_
             for (const ModelObject* o : p->model.objects) {
                 mesh.merge(mesh_to_export(*o, -1));
             }
+            if (zaxe_file_temp_export) // center to model not the plate if within Zaxe file.
+                mesh.translate(Vec3f{-p->bed.build_volume().bed_center()[0],-p->bed.build_volume().bed_center()[1],0});
         }
     }
     else {
