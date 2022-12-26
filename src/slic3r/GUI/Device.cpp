@@ -151,7 +151,9 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
         BOOST_LOG_TRIVIAL(info) << "Print now pressed on " << this->nm->name;
         const ZaxeArchive& archive = wxGetApp().plater()->get_zaxe_archive();
 
-        if (GUI::wxGetApp().preset_bundle->printers.get_selected_preset().name.find(to_upper_copy(this->nm->attr->deviceModel)) == std::string::npos) {
+        string dM = to_upper_copy(this->nm->attr->deviceModel);
+        boost::replace_all(dM, "PLUS", "+");
+        if (GUI::wxGetApp().preset_bundle->printers.get_selected_preset().name.find(dM) == std::string::npos) {
             wxMessageBox(L("Device model does NOT match. Please reslice with the correct model."), _L("Wrong device model"), wxICON_ERROR);
         } else if (this->nm->attr->material.compare(archive.get_info("material")) != 0) {
             wxMessageBox(L("Materials don't match with this device. Please reslice with the correct material."), _L("Wrong material type"), wxICON_ERROR);
