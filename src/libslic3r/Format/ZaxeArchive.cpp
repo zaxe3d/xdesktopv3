@@ -17,7 +17,7 @@ std::string to_json(const ConfMap &m)
     return std::regex_replace(ss.str(), reg, "$1");
 }
 
-std::string get_cfg_value(const DynamicPrintConfig &cfg, const std::string &key, const std::string &default_val = "", const bool only_first_occurence = false)
+std::string get_cfg_value(const DynamicPrintConfig &cfg, const std::string &key, const std::string &default_val = "", const bool only_first_occurence = false, const char delimeter = ',')
 {
     std::string ret = default_val; // start with default.
     if (cfg.has(key)) {
@@ -25,7 +25,7 @@ std::string get_cfg_value(const DynamicPrintConfig &cfg, const std::string &key,
         if (opt) ret = opt->serialize();
         if (ret.empty()) ret = default_val; // again to default when empty.
         if (only_first_occurence) {
-            const auto colon_idx = ret.find_first_of(";");
+            const auto colon_idx = ret.find_first_of(delimeter);
             if (std::string::npos != colon_idx) {
                 return ret.substr(0, colon_idx); // return first occurence.
             }
@@ -146,7 +146,7 @@ void ZaxeArchive::generate_info_file(ConfMap &m, const Print &print)
     m["layer_height"]           = get_cfg_value(cfg, "layer_height");
     m["infill_density"]         = fill_density.replace(fill_density.find("%"), 1, "");
     m["support_angle"]          = get_cfg_value(cfg, "support_material_angle");
-    m["material"]               = get_cfg_value(cfg, "filament_notes", "0", true); // FIXME change this to filament code later.
+    m["material"]               = get_cfg_value(cfg, "filament_notes", "0", true, ';'); // FIXME change this to filament code later.
     m["model"]                  = get_cfg_value(cfg, "printer_model");
     m["printer_profile"]        = get_cfg_value(cfg, "printer_settings_id");
     m["filament_used"]          = std::to_string(stats.total_used_filament);
