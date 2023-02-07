@@ -288,7 +288,7 @@ void NetworkMachine::upload(const char *filename)
     progress = 0;
     m_uploadProgressCallback(progress); // reset
     if (!ec) {
-        putFile = std::make_unique<fs::ifstream>(path);
+        putFile = std::make_unique<fs::ifstream>(path, ios_base::binary);
         ::curl_easy_setopt(curl, CURLOPT_READDATA, (void *) (putFile.get()));
         ::curl_easy_setopt(curl, CURLOPT_INFILESIZE, filesize);
     }
