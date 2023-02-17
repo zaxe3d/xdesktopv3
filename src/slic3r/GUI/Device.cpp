@@ -283,6 +283,7 @@ void Device::updateStates()
                 m_btnResume->Hide();
                 m_btnPause->Show();
             }
+            m_btnCancel->Show();
         }
         if (!nm->states->uploading) {
             m_btnCancel->Show();
