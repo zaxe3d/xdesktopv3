@@ -270,7 +270,7 @@ int xfercb(void *userp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal
     return 0;
 }
 
-void NetworkMachine::upload(const char *filename)
+void NetworkMachine::upload(const char *filename, const char *uploadAs)
 {
     CURL *curl;
     CURLcode res;
@@ -288,12 +288,12 @@ void NetworkMachine::upload(const char *filename)
     progress = 0;
     m_uploadProgressCallback(progress); // reset
     if (!ec) {
-        putFile = std::make_unique<fs::ifstream>(path, ios_base::binary);
+        putFile = std::make_unique<fs::ifstream>(path, ios_base::in | ios_base::binary);
         ::curl_easy_setopt(curl, CURLOPT_READDATA, (void *) (putFile.get()));
         ::curl_easy_setopt(curl, CURLOPT_INFILESIZE, filesize);
     }
 
-    std::string pFilename = path.filename().string();
+    std::string pFilename = *uploadAs ? uploadAs : path.filename().string();
     char *encodedFilename = ::curl_easy_escape(curl, pFilename.c_str(), pFilename.length());
     std::string url = "ftp://" + ip + ":" + std::to_string(m_ftpPort) + "/" + std::string(encodedFilename);
 

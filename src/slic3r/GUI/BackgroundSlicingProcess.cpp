@@ -115,6 +115,11 @@ std::string BackgroundSlicingProcess::zaxe_archive_path() const
 	return m_zaxe_archive_path;
 }
 
+std::string BackgroundSlicingProcess::gcode_path() const
+{
+	return m_temp_output_path;
+}
+
 const ZaxeArchive& BackgroundSlicingProcess::zaxe_archive() const
 {
 	return m_zaxe_archive;
@@ -140,6 +145,11 @@ bool BackgroundSlicingProcess::select_technology(PrinterTechnology tech)
 PrinterTechnology BackgroundSlicingProcess::current_printer_technology() const
 {
 	return m_print->technology();
+}
+
+std::string BackgroundSlicingProcess::output_filename()
+{
+	return m_print->output_filename("");
 }
 
 std::string BackgroundSlicingProcess::output_filepath_for_project(const boost::filesystem::path &project_path)

@@ -1906,6 +1906,7 @@ struct Plater::priv
 	}
     void export_gcode(fs::path output_path, bool output_path_on_removable_media, PrintHostJob upload_job);
     std::string get_zaxe_code_path();
+    std::string get_gcode_path();
     const ZaxeArchive& get_zaxe_archive() const;
     void reload_from_disk();
     bool replace_volume_with_stl(int object_idx, int volume_idx, const fs::path& new_path, const wxString& snapshot = "");
@@ -1974,6 +1975,7 @@ struct Plater::priv
 
     void bring_instance_forward() const;
 
+    wxString get_filename();
     // returns the path to project file with the given extension (none if extension == wxEmptyString)
     // extension should contain the leading dot, i.e.: ".3mf"
     wxString get_project_filename(const wxString& extension = wxEmptyString) const;
@@ -3401,6 +3403,11 @@ bool Plater::priv::restart_background_process(unsigned int state)
     return false;
 }
 
+std::string Plater::priv::get_gcode_path()
+{
+    return  background_process.gcode_path();
+}
+
 std::string Plater::priv::get_zaxe_code_path()
 {
     return  background_process.zaxe_archive_path();
@@ -4408,6 +4415,11 @@ ThumbnailsList Plater::priv::generate_thumbnails(const ThumbnailsParams& params,
             thumbnails.pop_back();
     }
     return thumbnails;
+}
+
+wxString Plater::priv::get_filename()
+{
+    return this->background_process.output_filename();
 }
 
 wxString Plater::priv::get_project_filename(const wxString& extension) const
@@ -6506,6 +6518,11 @@ std::vector<std::string> Plater::get_colors_for_color_print(const GCodeProcessor
     return colors;
 }
 
+wxString Plater::get_filename()
+{
+    return p->get_filename();
+}
+
 wxString Plater::get_project_filename(const wxString& extension) const
 {
     return p->get_project_filename(extension);
@@ -6974,6 +6991,7 @@ void Plater::clear_undo_redo_stack_main() { p->undo_redo_stack_main().clear(); }
 void Plater::enter_gizmos_stack() { p->enter_gizmos_stack(); }
 void Plater::leave_gizmos_stack() { p->leave_gizmos_stack(); }
 bool Plater::inside_snapshot_capture() { return p->inside_snapshot_capture(); }
+std::string Plater::get_gcode_path() { return p->get_gcode_path(); }
 std::string Plater::get_zaxe_code_path() { return p->get_zaxe_code_path(); }
 const ZaxeArchive& Plater::get_zaxe_archive() const { return p->get_zaxe_archive(); };
 

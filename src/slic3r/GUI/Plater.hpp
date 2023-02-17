@@ -219,6 +219,7 @@ public:
 
     void cut(size_t obj_idx, size_t instance_idx, coordf_t z, ModelObjectCutAttributes attributes);
 
+    std::string get_gcode_path();
     std::string get_zaxe_code_path();
     const ZaxeArchive& get_zaxe_archive() const;
 
@@ -279,6 +280,7 @@ public:
     void update_menus();
     void show_action_buttons(const bool is_ready_to_slice) const;
 
+    wxString get_filename();
     wxString get_project_filename(const wxString& extension = wxEmptyString) const;
     void set_project_filename(const wxString& filename);
 

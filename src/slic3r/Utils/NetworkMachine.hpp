@@ -109,7 +109,7 @@ public:
     void cancel();
     void pause();
     void resume();
-    void upload(const char *filename);
+    void upload(const char *filename, const char *uploadAs = "");
     void downloadAvatar();
 
     void shutdown() { m_running = false; }

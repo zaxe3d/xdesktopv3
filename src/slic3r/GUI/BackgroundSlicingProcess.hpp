@@ -106,6 +106,7 @@ public:
 	bool select_technology(PrinterTechnology tech);
 
 	std::string zaxe_archive_path() const;
+	std::string gcode_path() const;
 	const ZaxeArchive& zaxe_archive() const;
 
 	// Get the currently active printer technology.
@@ -114,7 +115,9 @@ public:
 	const PrintBase*    current_print() const { return m_print; }
 	const Print* 		fff_print() const { return m_fff_print; }
 	const SLAPrint* 	sla_print() const { return m_sla_print; }
-    // Take the project path (if provided), extract the name of the project, run it through the macro processor and save it next to the project file.
+
+	std::string         output_filename();
+	// Take the project path (if provided), extract the name of the project, run it through the macro processor and save it next to the project file.
     // If the project_path is empty, just run output_filepath().
 	std::string 		output_filepath_for_project(const boost::filesystem::path &project_path);
 

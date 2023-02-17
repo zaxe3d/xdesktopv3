@@ -22,7 +22,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_txtProgress(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
     m_txtDeviceName(new wxStaticText(this, wxID_ANY, nm->name, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, _L("Material: ") + NetworkMachineManager::MaterialName(nm->attr->material), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "-" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtBedOccupiedMessage(new wxStaticText(this, wxID_ANY, _L("Please take your print!"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtFileTime(new wxStaticText(this, wxID_ANY, _L("Elapsed / Estimated time: ") + get_time_hms(std::to_string(nm->attr->startTime)) + " / " + nm->attr->estimatedTime, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
@@ -155,13 +155,16 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
         boost::replace_all(dM, "PLUS", "+");
         if (GUI::wxGetApp().preset_bundle->printers.get_selected_preset().name.find(dM) == std::string::npos) {
             wxMessageBox(L("Device model does NOT match. Please reslice with the correct model."), _L("Wrong device model"), wxICON_ERROR);
-        } else if (this->nm->attr->material.compare(archive.get_info("material")) != 0) {
+        } else if (!this->nm->attr->isLite && this->nm->attr->material.compare(archive.get_info("material")) != 0) {
             wxMessageBox(L("Materials don't match with this device. Please reslice with the correct material."), _L("Wrong material type"), wxICON_ERROR);
-        } else if (this->nm->attr->nozzle.compare(archive.get_info("nozzle_diameter")) != 0) {
+        } else if (!this->nm->attr->isLite && this->nm->attr->nozzle.compare(archive.get_info("nozzle_diameter")) != 0) {
             wxMessageBox(L("Currently installed nozzle on device doesn't match with this slice. Please reslice with the correct nozzle."), _L("Wrong nozzle type"), wxICON_ERROR);
         } else {
             std::thread t([&]() {
-                this->nm->upload(wxGetApp().plater()->get_zaxe_code_path().c_str());
+                if (this->nm->attr->isLite) {
+                    this->nm->upload(wxGetApp().plater()->get_gcode_path().c_str(),
+                                     translate_chars(wxGetApp().plater()->get_filename().ToStdString()).c_str());
+                } else this->nm->upload(wxGetApp().plater()->get_zaxe_code_path().c_str());
             });
             t.detach(); // crusial. otherwise blocks main thread.
         }
@@ -226,17 +229,17 @@ void Device::updateStatus()
     } else if (nm->states->heating) {
         statusTxt = _L("Heating...");
         m_progressBar->SetColour(DEVICE_COLOR_DANGER);
+    } else if (nm->states->printing) {
+        statusTxt = _L("Printing...");
+        m_progressBar->SetColour(DEVICE_COLOR_ZAXE_BLUE);
+        if (!m_timer->IsRunning())
+            m_timer->Start(1000);
     } else if (nm->states->uploading) {
         statusTxt = _L("Uploading...");
         m_progressBar->SetColour(DEVICE_COLOR_UPLOADING);
     } else if (nm->states->paused) {
         statusTxt = _L("Paused...");
         m_progressBar->SetColour(DEVICE_COLOR_ZAXE_BLUE);
-    } else if (nm->states->printing) {
-        statusTxt = _L("Printing...");
-        m_progressBar->SetColour(DEVICE_COLOR_ZAXE_BLUE);
-        if (!m_timer->IsRunning())
-            m_timer->Start(1000);
     } else if (nm->states->calibrating) {
         statusTxt = _L("Calibrating...");
         m_progressBar->SetColour(DEVICE_COLOR_ORANGE);
@@ -280,7 +283,8 @@ void Device::updateStates()
                 m_btnResume->Hide();
                 m_btnPause->Show();
             }
-        } else if (!nm->states->uploading) {
+        }
+        if (!nm->states->uploading) {
             m_btnCancel->Show();
         }
         updateProgress();
