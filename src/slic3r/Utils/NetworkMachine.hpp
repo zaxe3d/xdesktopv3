@@ -82,6 +82,7 @@ struct MachineAttributes // attributes.
     bool hasNFCSpool;
     bool hasSnapshot;
     bool isLite;
+    bool isHttp;
     bool isNoneTLS;
     bool snapshotURL;
     float elapsedTime;
@@ -132,11 +133,12 @@ public:
     }
 private:
 #ifdef _WIN32
-    USHORT
+    USHORT m_httpPort = 80;
+    USHORT m_ftpPort = 9494;
 #else
-    ushort
+    ushort m_httpPort = 80;
+    ushort m_ftpPort = 9494;
 #endif
-    m_ftpPort = 9494;
 
     // Websocket callbacks.
     void onWSConnect(); // Websocket connect callback.

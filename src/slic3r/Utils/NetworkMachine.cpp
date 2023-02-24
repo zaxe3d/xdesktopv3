@@ -66,6 +66,7 @@ void NetworkMachine::onWSRead(string message)
             attr->nozzle = pt.get<string>("nozzle", "0.4");
             attr->hasSnapshot = is_there(attr->deviceModel, {"z1", "z2", "z3"});
             attr->isLite = is_there(attr->deviceModel, {"lite", "x3"});
+            attr->isHttp = pt.get<string>("protocol", "") == "http";
             attr->isNoneTLS = is_there(attr->deviceModel, {"z2", "z3"}) || attr->isLite;
             // printing
             attr->printingFile = pt.get<string>("filename", "");
@@ -295,10 +296,19 @@ void NetworkMachine::upload(const char *filename, const char *uploadAs)
 
     std::string pFilename = *uploadAs ? uploadAs : path.filename().string();
     char *encodedFilename = ::curl_easy_escape(curl, pFilename.c_str(), pFilename.length());
-    std::string url = "ftp://" + ip + ":" + std::to_string(m_ftpPort) + "/" + std::string(encodedFilename);
+    std::string url;
 
-    ::curl_easy_setopt(curl, CURLOPT_USERNAME, "zaxe");
-    ::curl_easy_setopt(curl, CURLOPT_PASSWORD, "zaxe");
+    if (attr->isHttp) {
+        url = "http://" + ip + ":" + std::to_string(m_httpPort);
+        ::curl_easy_setopt(curl, CURLOPT_POST, 1L);
+        ::curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        ::curl_easy_setopt(curl, CURLOPT_POSTREDIR, CURL_REDIR_POST_ALL);
+        // maybe set headers with the filename?
+    } else {
+        url = "ftp://" + ip + ":" + std::to_string(m_ftpPort) + "/" + std::string(encodedFilename);
+        ::curl_easy_setopt(curl, CURLOPT_USERNAME, "zaxe");
+        ::curl_easy_setopt(curl, CURLOPT_PASSWORD, "zaxe");
+    }
     ::curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     ::curl_easy_setopt(curl, CURLOPT_READFUNCTION, file_read_cb);
     ::curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
