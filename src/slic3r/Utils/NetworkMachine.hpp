@@ -110,6 +110,8 @@ public:
     void cancel();
     void pause();
     void resume();
+    void uploadHTTP(const char *filename, const char *uploadAs = "");
+    void uploadFTP(const char *filename, const char *uploadAs = "");
     void upload(const char *filename, const char *uploadAs = "");
     void downloadAvatar();
 

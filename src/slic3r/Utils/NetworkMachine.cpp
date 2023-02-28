@@ -1,5 +1,6 @@
 #include "NetworkMachine.hpp"
 #include <libslic3r/Utils.hpp>
+#include "Http.hpp"
 
 namespace fs = boost::filesystem;
 
@@ -271,7 +272,24 @@ int xfercb(void *userp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal
     return 0;
 }
 
-void NetworkMachine::upload(const char *filename, const char *uploadAs)
+void NetworkMachine::uploadHTTP(const char *filename, const char *uploadAs)
+{
+    std::string url = "http://" + ip + "/upload.cgi:" + std::to_string(m_httpPort);
+    states->uploading = true;
+    auto http = Http::post(std::move(url));
+    http.form_add_file("file", filename, uploadAs)
+        .on_complete([&](std::string body, unsigned status) {states->uploading = false;})
+        .on_error([&](std::string body, std::string error, unsigned status) {
+            states->uploading = false;
+            BOOST_LOG_TRIVIAL(error) << boost::format("%1%: Error uploading file: %2%, HTTP %3%, body: `%4%`") % name % error % status % body;
+        })
+        .on_progress([&](Http::Progress progress, bool &cancel) {
+            xfercb(static_cast<void *>(this), progress.dltotal, progress.dlnow, progress.ultotal, progress.ulnow);
+        })
+        .perform_sync();
+}
+
+void NetworkMachine::uploadFTP(const char *filename, const char *uploadAs)
 {
     CURL *curl;
     CURLcode res;
@@ -296,19 +314,10 @@ void NetworkMachine::upload(const char *filename, const char *uploadAs)
 
     std::string pFilename = *uploadAs ? uploadAs : path.filename().string();
     char *encodedFilename = ::curl_easy_escape(curl, pFilename.c_str(), pFilename.length());
-    std::string url;
 
-    if (attr->isHttp) {
-        url = "http://" + ip + ":" + std::to_string(m_httpPort);
-        ::curl_easy_setopt(curl, CURLOPT_POST, 1L);
-        ::curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        ::curl_easy_setopt(curl, CURLOPT_POSTREDIR, CURL_REDIR_POST_ALL);
-        // maybe set headers with the filename?
-    } else {
-        url = "ftp://" + ip + ":" + std::to_string(m_ftpPort) + "/" + std::string(encodedFilename);
-        ::curl_easy_setopt(curl, CURLOPT_USERNAME, "zaxe");
-        ::curl_easy_setopt(curl, CURLOPT_PASSWORD, "zaxe");
-    }
+    std::string url = "ftp://" + ip + ":" + std::to_string(m_ftpPort) + "/" + std::string(encodedFilename);
+    ::curl_easy_setopt(curl, CURLOPT_USERNAME, "zaxe");
+    ::curl_easy_setopt(curl, CURLOPT_PASSWORD, "zaxe");
     ::curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     ::curl_easy_setopt(curl, CURLOPT_READFUNCTION, file_read_cb);
     ::curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
@@ -335,6 +344,15 @@ void NetworkMachine::upload(const char *filename, const char *uploadAs)
     }
 
     curl_global_cleanup();
+}
+
+void NetworkMachine::upload(const char *filename, const char *uploadAs)
+{
+    if (attr->isHttp) {
+        uploadHTTP(filename, uploadAs);
+    } else {
+        uploadFTP(filename, uploadAs);
+    }
 }
 
 NetworkMachineContainer::NetworkMachineContainer() {}
