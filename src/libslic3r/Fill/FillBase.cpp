@@ -21,6 +21,8 @@
 #include "FillAdaptive.hpp"
 #include "FillLightning.hpp"
 
+#include <boost/log/trivial.hpp>
+
 // #define INFILL_DEBUG_OUTPUT
 
 namespace Slic3r {
@@ -35,6 +37,7 @@ Fill* Fill::new_from_type(const InfillPattern type)
     case ipRectilinear:         return new FillRectilinear();
     case ipAlignedRectilinear:  return new FillAlignedRectilinear();
     case ipMonotonic:           return new FillMonotonic();
+    case ipMonotonicLines:      return new FillMonotonicLines();
     case ipLine:                return new FillLine();
     case ipGrid:                return new FillGrid();
     case ipTriangles:           return new FillTriangles();
@@ -129,8 +132,8 @@ std::pair<float, Point> Fill::_infill_direction(const Surface *surface) const
     float out_angle = this->angle;
 
 	if (out_angle == FLT_MAX) {
-		//FIXME Vojtech: Add a warning?
-        printf("Using undefined infill angle\n");
+        assert(false);
+        BOOST_LOG_TRIVIAL(error) << "Using undefined infill angle";
         out_angle = 0.f;
     }
 
