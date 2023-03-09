@@ -58,7 +58,7 @@
 // Shows an imgui dialog containing the matrices of the selected volumes
 #define ENABLE_WORLD_COORDINATE_DEBUG (0 && ENABLE_WORLD_COORDINATE)
 // Enable alternative version of file_wildcards()
-#define ENABLE_ALTERNATIVE_FILE_WILDCARDS_GENERATOR (1 && ENABLE_2_6_0_ALPHA1)
+#define ENABLE_ALTERNATIVE_FILE_WILDCARDS_GENERATOR (0 && ENABLE_2_6_0_ALPHA1)
 
 
 #endif // _prusaslicer_technologies_h_

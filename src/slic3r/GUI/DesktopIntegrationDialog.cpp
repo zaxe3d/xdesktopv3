@@ -210,7 +210,7 @@ bool DesktopIntegrationDialog::is_integrated()
     if (path.empty())
         return false;
 
-    // confirmation that PrusaSlicer.desktop exists
+    // confirmation that XDesktop.desktop exists
     struct stat buffer;   
     return (stat (path.c_str(), &buffer) == 0);
 }
@@ -290,11 +290,11 @@ void DesktopIntegrationDialog::perform_desktop_integration()
     // slicer icon
     // iterate thru target_candidates to find icons folder
     for (size_t i = 0; i < target_candidates.size(); ++i) {
-        // Copy icon PrusaSlicer.png from resources_dir()/icons to target_dir_icons/icons/
+        // Copy icon XDesktop.png from resources_dir()/icons to target_dir_icons/icons/
         if (contains_path_dir(target_candidates[i], "icons")) {
             target_dir_icons = target_candidates[i];
-            std::string icon_path = GUI::format("%1%/icons/PrusaSlicer.png",resources_dir());
-            std::string dest_path = GUI::format("%1%/icons/%2%PrusaSlicer%3%.png", target_dir_icons, icon_theme_path, version_suffix);
+            std::string icon_path = GUI::format("%1%/icons/XDesktop.png",resources_dir());
+            std::string dest_path = GUI::format("%1%/icons/%2%XDesktop%3%.png", target_dir_icons, icon_theme_path, version_suffix);
             if (copy_icon(icon_path, dest_path))
                 break; // success
             else
@@ -306,8 +306,8 @@ void DesktopIntegrationDialog::perform_desktop_integration()
               create_path(boost::nowide::narrow(wxFileName::GetHomeDir()), ".local/share/icons" + icon_theme_dirs);
               // copy icon
              target_dir_icons = GUI::format("%1%/.local/share",wxFileName::GetHomeDir());
-              std::string icon_path = GUI::format("%1%/icons/PrusaSlicer.png",resources_dir());
-              std::string dest_path = GUI::format("%1%/icons/%2%PrusaSlicer%3%.png", target_dir_icons, icon_theme_path, version_suffix);
+              std::string icon_path = GUI::format("%1%/icons/XDesktop.png",resources_dir());
+              std::string dest_path = GUI::format("%1%/icons/%2%XDesktop%3%.png", target_dir_icons, icon_theme_path, version_suffix);
              if (!contains_path_dir(target_dir_icons, "icons") 
                 || !copy_icon(icon_path, dest_path)) {
                 // every attempt failed - icon wont be present
@@ -316,19 +316,19 @@ void DesktopIntegrationDialog::perform_desktop_integration()
         }
     }
     if(target_dir_icons.empty()) {
-        BOOST_LOG_TRIVIAL(error) << "Copying PrusaSlicer icon to icons directory failed.";
+        BOOST_LOG_TRIVIAL(error) << "Copying XDesktop icon to icons directory failed.";
     } else 
     	// save path to icon
-        app_config->set("desktop_integration_icon_slicer_path", GUI::format("%1%/icons/%2%PrusaSlicer%3%.png", target_dir_icons, icon_theme_path, version_suffix));
+        app_config->set("desktop_integration_icon_slicer_path", GUI::format("%1%/icons/%2%XDesktop%3%.png", target_dir_icons, icon_theme_path, version_suffix));
 
     // desktop file
     // iterate thru target_candidates to find applications folder
 
     std::string desktop_file = GUI::format(
         "[Desktop Entry]\n"
-        "Name=PrusaSlicer%1%\n"
+        "Name=XDesktop%1%\n"
         "GenericName=3D Printing Software\n"
-        "Icon=PrusaSlicer%2%\n"
+        "Icon=XDesktop%2%\n"
         "Exec=\"%3%\" %%F\n"
         "Terminal=false\n"
         "Type=Application\n"
@@ -343,15 +343,15 @@ void DesktopIntegrationDialog::perform_desktop_integration()
         if (contains_path_dir(target_candidates[i], "applications")) {
             target_dir_desktop = target_candidates[i];
             // Write slicer desktop file
-            std::string path = GUI::format("%1%/applications/PrusaSlicer%2%.desktop", target_dir_desktop, version_suffix);
+            std::string path = GUI::format("%1%/applications/XDesktop%2%.desktop", target_dir_desktop, version_suffix);
             if (create_desktop_file(path, desktop_file)) {
                 candidate_found = true;
-                BOOST_LOG_TRIVIAL(debug) << "PrusaSlicer.desktop file installation success.";
+                BOOST_LOG_TRIVIAL(debug) << "XDesktop.desktop file installation success.";
                 break;
             }
             else {
                 // write failed - try another path
-                BOOST_LOG_TRIVIAL(debug) << "Attempt to PrusaSlicer.desktop file installation failed. failed path: " << target_candidates[i];
+                BOOST_LOG_TRIVIAL(debug) << "Attempt to XDesktop.desktop file installation failed. failed path: " << target_candidates[i];
                 target_dir_desktop.clear();
             }
         }
@@ -362,7 +362,7 @@ void DesktopIntegrationDialog::perform_desktop_integration()
         create_path(boost::nowide::narrow(wxFileName::GetHomeDir()), ".local/share/applications");
         // create desktop file
         target_dir_desktop = GUI::format("%1%/.local/share", wxFileName::GetHomeDir());
-        std::string path = GUI::format("%1%/applications/PrusaSlicer%2%.desktop", target_dir_desktop, version_suffix);
+        std::string path = GUI::format("%1%/applications/XDesktop%2%.desktop", target_dir_desktop, version_suffix);
         if (contains_path_dir(target_dir_desktop, "applications")) {
             if (!create_desktop_file(path, desktop_file)) {
                 // Desktop file not written - end desktop integration
@@ -384,7 +384,7 @@ void DesktopIntegrationDialog::perform_desktop_integration()
         return;
     }
     // save path to desktop file
-    app_config->set("desktop_integration_app_path", GUI::format("%1%/applications/PrusaSlicer%2%.desktop", target_dir_desktop, version_suffix));
+    app_config->set("desktop_integration_app_path", GUI::format("%1%/applications/XDesktop%2%.desktop", target_dir_desktop, version_suffix));
 
     // Repeat for Gcode viewer - use same paths as for slicer files
     // Do NOT add gcode viewer desktop file on ChromeOS
@@ -392,8 +392,8 @@ void DesktopIntegrationDialog::perform_desktop_integration()
         // Icon
         if (!target_dir_icons.empty())
         {
-            std::string icon_path = GUI::format("%1%/icons/PrusaSlicer-gcodeviewer_192px.png",resources_dir());
-            std::string dest_path = GUI::format("%1%/icons/%2%PrusaSlicer-gcodeviewer%3%.png", target_dir_icons, icon_theme_path, version_suffix);
+            std::string icon_path = GUI::format("%1%/icons/XDesktop-gcodeviewer_192px.png",resources_dir());
+            std::string dest_path = GUI::format("%1%/icons/%2%XDesktop-gcodeviewer%3%.png", target_dir_icons, icon_theme_path, version_suffix);
             if (copy_icon(icon_path, dest_path))
                 // save path to icon
                 app_config->set("desktop_integration_icon_viewer_path", dest_path);
@@ -406,7 +406,7 @@ void DesktopIntegrationDialog::perform_desktop_integration()
             "[Desktop Entry]\n"
             "Name=Prusa Gcode Viewer%1%\n"
             "GenericName=3D Printing Software\n"
-            "Icon=PrusaSlicer-gcodeviewer%2%\n"
+            "Icon=XDesktop-gcodeviewer%2%\n"
             "Exec=\"%3%\" --gcodeviewer %%F\n"
             "Terminal=false\n"
             "Type=Application\n"
@@ -414,13 +414,13 @@ void DesktopIntegrationDialog::perform_desktop_integration()
             "Categories=Graphics;3DGraphics;\n"
             "Keywords=3D;Printing;Slicer;\n"
             "StartupNotify=false\n", name_suffix, version_suffix, excutable_path);
-        std::string desktop_path = GUI::format("%1%/applications/PrusaSlicerGcodeViewer%2%.desktop", target_dir_desktop, version_suffix);
+        std::string desktop_path = GUI::format("%1%/applications/XDesktopGcodeViewer%2%.desktop", target_dir_desktop, version_suffix);
         if (create_desktop_file(desktop_path, desktop_file_viewer))
             // save path to desktop file
             app_config->set("desktop_integration_app_viewer_path", desktop_path);
         else {
             BOOST_LOG_TRIVIAL(error) << "Performing desktop integration failed - could not create Gcodeviewer desktop file";
-            show_error(nullptr, _L("Performing desktop integration failed - could not create Gcodeviewer desktop file. PrusaSlicer desktop file was probably created successfully."));
+            show_error(nullptr, _L("Performing desktop integration failed - could not create Gcodeviewer desktop file. XDesktop desktop file was probably created successfully."));
         }
     }
     wxGetApp().plater()->get_notification_manager()->push_notification(NotificationType::DesktopIntegrationSuccess);
@@ -533,7 +533,7 @@ void DesktopIntegrationDialog::perform_downloader_desktop_integration()
 
     std::string desktop_file_downloader = GUI::format(
         "[Desktop Entry]\n"
-        "Name=PrusaSlicer URL Protocol%1%\n"
+        "Name=XDesktop URL Protocol%1%\n"
         "Exec=\"%2%\" --single-instance %%u\n"
         "Terminal=false\n"
         "Type=Application\n"
@@ -543,12 +543,12 @@ void DesktopIntegrationDialog::perform_downloader_desktop_integration()
         , name_suffix, excutable_path);
 
     // desktop file for downloader as part of main app
-    std::string desktop_path = GUI::format("%1%/applications/PrusaSlicerURLProtocol%2%.desktop", target_dir_desktop, version_suffix);
+    std::string desktop_path = GUI::format("%1%/applications/XDesktopURLProtocol%2%.desktop", target_dir_desktop, version_suffix);
     if (create_desktop_file(desktop_path, desktop_file_downloader)) {
         // save path to desktop file
         app_config->set("desktop_integration_URL_path", desktop_path);
         // finish registration on mime type
-        std::string command = GUI::format("xdg-mime default PrusaSlicerURLProtocol%1%.desktop x-scheme-handler/prusaslicer", version_suffix);
+        std::string command = GUI::format("xdg-mime default XDesktopURLProtocol%1%.desktop x-scheme-handler/prusaslicer", version_suffix);
         BOOST_LOG_TRIVIAL(debug) << "system command: " << command;
         int r = system(command.c_str());
         BOOST_LOG_TRIVIAL(debug) << "system result: " << r;
@@ -560,16 +560,16 @@ void DesktopIntegrationDialog::perform_downloader_desktop_integration()
         if (contains_path_dir(target_candidates[i], "applications")) {
             target_dir_desktop = target_candidates[i];
             // Write slicer desktop file
-            std::string path = GUI::format("%1%/applications/PrusaSlicerURLProtocol%2%.desktop", target_dir_desktop, version_suffix);
+            std::string path = GUI::format("%1%/applications/XDesktopURLProtocol%2%.desktop", target_dir_desktop, version_suffix);
             if (create_desktop_file(path, desktop_file_downloader)) {
                 app_config->set("desktop_integration_URL_path", path);
                 candidate_found = true;
-                BOOST_LOG_TRIVIAL(debug) << "PrusaSlicerURLProtocol.desktop file installation success.";
+                BOOST_LOG_TRIVIAL(debug) << "XDesktopURLProtocol.desktop file installation success.";
                 break;
             }
             else {
                 // write failed - try another path
-                BOOST_LOG_TRIVIAL(debug) << "Attempt to PrusaSlicerURLProtocol.desktop file installation failed. failed path: " << target_candidates[i];
+                BOOST_LOG_TRIVIAL(debug) << "Attempt to XDesktopURLProtocol.desktop file installation failed. failed path: " << target_candidates[i];
                 target_dir_desktop.clear();
             }
         }
@@ -580,7 +580,7 @@ void DesktopIntegrationDialog::perform_downloader_desktop_integration()
         create_path(boost::nowide::narrow(wxFileName::GetHomeDir()), ".local/share/applications");
         // create desktop file
         target_dir_desktop = GUI::format("%1%/.local/share", wxFileName::GetHomeDir());
-        std::string path = GUI::format("%1%/applications/PrusaSlicerURLProtocol%2%.desktop", target_dir_desktop, version_suffix);
+        std::string path = GUI::format("%1%/applications/XDesktopURLProtocol%2%.desktop", target_dir_desktop, version_suffix);
         if (contains_path_dir(target_dir_desktop, "applications")) {
             if (!create_desktop_file(path, desktop_file_downloader)) {
                 // Desktop file not written - end desktop integration
@@ -604,7 +604,7 @@ void DesktopIntegrationDialog::perform_downloader_desktop_integration()
     }
 
     // finish registration on mime type
-    std::string command = GUI::format("xdg-mime default PrusaSlicerURLProtocol%1%.desktop x-scheme-handler/prusaslicer", version_suffix);
+    std::string command = GUI::format("xdg-mime default XDesktopURLProtocol%1%.desktop x-scheme-handler/prusaslicer", version_suffix);
     BOOST_LOG_TRIVIAL(debug) << "system command: " << command;
     int r = system(command.c_str());
     BOOST_LOG_TRIVIAL(debug) << "system result: " << r;

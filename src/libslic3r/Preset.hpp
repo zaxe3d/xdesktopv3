@@ -276,7 +276,7 @@ struct PresetConfigSubstitutions {
 };
 
 // Substitutions having been performed during parsing a set of configuration files, for example when starting up
-// PrusaSlicer and reading the user Print / Filament / Printer profiles.
+// XDesktop and reading the user Print / Filament / Printer profiles.
 using PresetsConfigSubstitutions = std::vector<PresetConfigSubstitutions>;
 
 // Collections of presets of the same type (one of the Print, Filament or Printer type).
@@ -366,6 +366,12 @@ public:
     size_t          get_selected_idx()    const { return m_idx_selected; }
     // Returns the name of the selected preset, or an empty string if no preset is selected.
     std::string     get_selected_preset_name() const { return (m_idx_selected == size_t(-1)) ? std::string() : this->get_selected_preset().name; }
+    bool            is_selected_preset_zaxe() const {
+        std::string pname = get_selected_preset_name();
+        return pname.find("Zaxe") != std::string::npos &&
+               pname.find("X3") == std::string::npos &&
+               pname.find("lite") == std::string::npos;
+    }
     // For the current edited preset, return the parent preset if there is one.
     // If there is no parent preset, nullptr is returned.
     // The parent preset may be a system preset or a user preset, which will be

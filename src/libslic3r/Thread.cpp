@@ -220,7 +220,7 @@ void name_tbb_thread_pool_threads_set_locale()
 		return;
 	initialized = true;
 
-	// see GH issue #5661 PrusaSlicer hangs on Linux when run with non standard task affinity
+	// see GH issue #5661 XDesktop hangs on Linux when run with non standard task affinity
 	// TBB will respect the task affinity mask on Linux and spawn less threads than std::thread::hardware_concurrency().
 //	const size_t nthreads_hw = std::thread::hardware_concurrency();
 	const size_t nthreads_hw = tbb::this_task_arena::max_concurrency();

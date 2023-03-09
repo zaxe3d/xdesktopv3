@@ -86,6 +86,7 @@ src/slic3r/GUI/UnsavedChangesDialog.cpp
 src/slic3r/GUI/UpdateDialogs.cpp
 src/slic3r/GUI/WipeTowerDialog.cpp
 src/slic3r/GUI/wxExtensions.cpp
+src/slic3r/GUI/Device.cpp
 src/slic3r/Utils/AstroBox.cpp
 src/slic3r/Utils/Duet.cpp
 src/slic3r/Utils/FixModelByWin10.cpp

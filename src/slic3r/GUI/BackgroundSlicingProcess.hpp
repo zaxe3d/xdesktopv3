@@ -13,6 +13,7 @@
 #include "libslic3r/GCode/ThumbnailData.hpp"
 #include "slic3r/Utils/PrintHost.hpp"
 #include "libslic3r/GCode/GCodeProcessor.hpp"
+#include "libslic3r/Format/ZaxeArchive.hpp"
 
 
 namespace boost { namespace filesystem { class path; } }
@@ -103,12 +104,17 @@ public:
 	// Return true if changed.
 	bool select_technology(PrinterTechnology tech);
 
+	std::string zaxe_archive_path() const;
+	std::string gcode_path() const;
+	const ZaxeArchive& zaxe_archive() const;
+
 	// Get the currently active printer technology.
 	PrinterTechnology   current_printer_technology() const;
 	// Get the current print. It is either m_fff_print or m_sla_print.
 	const PrintBase*    current_print() const { return m_print; }
 	const Print* 		fff_print() const { return m_fff_print; }
 	const SLAPrint* 	sla_print() const { return m_sla_print; }
+	std::string         output_filename();
     // Take the project path (if provided), extract the name of the project, run it through the macro processor and save it next to the project file.
     // If the project_path is empty, just run output_filepath().
 	std::string 		output_filepath_for_project(const boost::filesystem::path &project_path);
@@ -220,6 +226,8 @@ private:
     ThumbnailsGeneratorCallback m_thumbnail_cb 	     = nullptr;
     // Temporary G-code, there is one defined for the BackgroundSlicingProcess,
     // differentiated from the other processes by a process ID.
+	ZaxeArchive                 m_zaxe_archive;
+	std::string 		    m_zaxe_archive_path;
 	std::string 				m_temp_output_path;
 	// Output path provided by the user. The output path may be set even if the slicing is running,
 	// but once set, it cannot be re-set.
@@ -262,6 +270,7 @@ private:
     // If the background processing stop was requested, throw CanceledException.
     void                throw_if_canceled() const { if (m_print->canceled()) throw CanceledException(); }
 	void				finalize_gcode();
+    void                prepare_zaxe_file();
     void                prepare_upload();
     // To be executed at the background thread.
 	ThumbnailsList		render_thumbnails(const ThumbnailsParams &params);

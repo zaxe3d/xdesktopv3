@@ -73,6 +73,8 @@ enum FileType
 
     FT_SL1,
 
+    FT_ZAXE,
+
     FT_SIZE,
 };
 
@@ -182,7 +184,7 @@ public:
     bool is_editor() const { return m_app_mode == EAppMode::Editor; }
     bool is_gcode_viewer() const { return m_app_mode == EAppMode::GCodeViewer; }
     bool is_recreating_gui() const { return m_is_recreating_gui; }
-    std::string logo_name() const { return is_editor() ? "PrusaSlicer" : "PrusaSlicer-gcodeviewer"; }
+    std::string logo_name() const { return is_editor() ? "XDesktop" : "XDesktop-gcodeviewer"; }
 
     // To be called after the GUI is fully built up.
     // Process command line parameters cached in this->init_params,
@@ -365,7 +367,7 @@ public:
 #endif // __WXMSW__
 
 
-    // URL download - PrusaSlicer gets system call to open prusaslicer:// URL which should contain address of download
+    // URL download - XDesktop gets system call to open prusaslicer:// URL which should contain address of download
     void            start_download(std::string url);
 
 private:

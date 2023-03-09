@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=PrusaSlicer
+Name=XDesktop
 GenericName=3D Printing Software
-Icon=PrusaSlicer
+Icon=XDesktop
 Exec=prusa-slicer %F
 Terminal=false
 Type=Application

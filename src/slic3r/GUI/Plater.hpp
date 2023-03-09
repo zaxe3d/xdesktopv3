@@ -13,6 +13,8 @@
 #include "libslic3r/Preset.hpp"
 #include "libslic3r/BoundingBox.hpp"
 #include "libslic3r/GCode/GCodeProcessor.hpp"
+#include "libslic3r/Format/ZaxeArchive.hpp"
+#include "NetworkMachineManager.hpp"
 #include "Jobs/Job.hpp"
 #include "Jobs/Worker.hpp"
 #include "Search.hpp"
@@ -95,6 +97,7 @@ public:
     ObjectLayers*           obj_layers();
     wxScrolledWindow*       scrolled_panel();
     wxPanel*                presets_panel();
+    NetworkMachineManager*  machine_manager();
 
     ConfigOptionsGroup*     og_freq_chng_params(const bool is_fff);
     wxButton*               get_wiping_dialog_button();
@@ -260,8 +263,12 @@ public:
 
     void cut(size_t obj_idx, size_t instance_idx, const Transform3d& cut_matrix, ModelObjectCutAttributes attributes);
 
+    std::string get_gcode_path();
+    std::string get_zaxe_code_path();
+    const ZaxeArchive& get_zaxe_archive() const;
+
     void export_gcode(bool prefer_removable);
-    void export_stl_obj(bool extended = false, bool selection_only = false);
+    void export_stl_obj(bool extended = false, bool selection_only = false, bool zaxe_file_temp_export = false);
     void export_amf();
     bool export_3mf(const boost::filesystem::path& output_path = boost::filesystem::path());
     void reload_from_disk();
@@ -317,6 +324,7 @@ public:
     void show_action_buttons(const bool is_ready_to_slice) const;
     void show_action_buttons() const;
 
+    wxString get_filename();
     wxString get_project_filename(const wxString& extension = wxEmptyString) const;
     void set_project_filename(const wxString& filename);
 
@@ -338,6 +346,9 @@ public:
     PrinterTechnology   printer_technology() const;
     const DynamicPrintConfig * config() const;
     bool                set_printer_technology(PrinterTechnology printer_technology);
+
+    // see if we need a zaxe file according to technology and selected printer model on config change.
+    void check_and_set_zaxe_file();
 
     void copy_selection_to_clipboard();
     void paste_from_clipboard();

@@ -70,13 +70,13 @@ struct Bundle
 	VendorProfile* vendor_profile{ nullptr };
 	//bool is_in_resources{ false };
     BundleLocation location;
-	bool is_prusa_bundle{ false };
+	bool is_zaxe_bundle{ false };
 
 	Bundle() = default;
 	Bundle(Bundle&& other);
 
 	// Returns false if not loaded. Reason for that is logged as boost::log error.
-	bool load(fs::path source_path, BundleLocation location, bool is_prusa_bundle = false);
+	bool load(fs::path source_path, BundleLocation location, bool is_zaxe_bundle = false);
 
 	const std::string& vendor_id() const { return vendor_profile->id; }
 };
@@ -85,8 +85,8 @@ struct BundleMap : std::map<std::string /* = vendor ID */, Bundle>
 {
 	static BundleMap load();
 
-	Bundle& prusa_bundle();
-	const Bundle& prusa_bundle() const;
+	Bundle& zaxe_bundle();
+	const Bundle& zaxe_bundle() const;
 };
 
 struct Materials;

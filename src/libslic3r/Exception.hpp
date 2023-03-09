@@ -5,7 +5,7 @@
 
 namespace Slic3r {
 
-// PrusaSlicer's own exception hierarchy is derived from std::runtime_error.
+// XDesktop's own exception hierarchy is derived from std::runtime_error.
 // Base for Slicer's own exceptions.
 class Exception : public std::runtime_error { using std::runtime_error::runtime_error; };
 #define SLIC3R_DERIVE_EXCEPTION(DERIVED_EXCEPTION, PARENT_EXCEPTION) \

@@ -126,6 +126,8 @@ set(SLIC3R_SOURCES
     Format/pwmx.cpp
     Format/STEP.hpp
     Format/STEP.cpp
+    Format/ZaxeArchive.hpp
+    Format/ZaxeArchive.cpp
     GCode/ThumbnailData.cpp
     GCode/ThumbnailData.hpp
     GCode/Thumbnails.cpp

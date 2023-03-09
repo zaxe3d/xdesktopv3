@@ -1560,7 +1560,7 @@ std::pair<std::vector<std::pair<int, int>>, std::vector<bool>> TriangleSelector:
                 data.second.push_back(tr.special_side() & 0b01);
                 data.second.push_back(tr.special_side() & 0b10);
                 // Now save all children.
-                // Serialized in reverse order for compatibility with PrusaSlicer 2.3.1.
+                // Serialized in reverse order for compatibility with XDesktop 2.3.1.
                 for (int child_idx = split_sides; child_idx >= 0; -- child_idx)
                     this->serialize(tr.children[child_idx]);
             } else {
@@ -1576,7 +1576,7 @@ std::pair<std::vector<std::pair<int, int>>, std::vector<bool>> TriangleSelector:
                             data.second.push_back(n & (uint64_t(0b0001) << bit_idx));
                     }
                 } else {
-                    // Simple case, compatible with PrusaSlicer 2.3.1 and older for storing paint on supports and seams.
+                    // Simple case, compatible with XDesktop 2.3.1 and older for storing paint on supports and seams.
                     // Store 2 bits of n.
                     data.second.push_back(n & 0b01);
                     data.second.push_back(n & 0b10);

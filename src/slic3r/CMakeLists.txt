@@ -242,6 +242,10 @@ set(SLIC3R_GUI_SOURCES
     GUI/DownloaderFileGet.hpp
     Utils/AppUpdater.cpp
     Utils/AppUpdater.hpp
+    GUI/NetworkMachineManager.hpp
+    GUI/NetworkMachineManager.cpp
+    GUI/Device.hpp
+    GUI/Device.cpp
     Utils/Http.cpp
     Utils/Http.hpp
     Utils/FixModelByWin10.cpp
@@ -284,6 +288,12 @@ set(SLIC3R_GUI_SOURCES
     Utils/WinRegistry.hpp
     Utils/WxFontUtils.cpp
     Utils/WxFontUtils.hpp
+    Utils/NetworkMachine.cpp
+    Utils/NetworkMachine.hpp
+    Utils/BroadcastReceiver.cpp
+    Utils/BroadcastReceiver.hpp
+    Utils/WebSocket.cpp
+    Utils/WebSocket.hpp
 )
 
 find_package(NanoSVG REQUIRED)

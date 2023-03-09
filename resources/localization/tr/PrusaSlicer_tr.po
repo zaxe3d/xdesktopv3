@@ -3227,14 +3227,6 @@ msgid ""
 "remove style \"%1%\"?"
 msgstr ""
 
-#: src/slic3r/GUI/Gizmos/GLGizmoEmboss.cpp:2496
-msgid "Yes"
-msgstr "Evet"
-
-#: src/slic3r/GUI/Gizmos/GLGizmoEmboss.cpp:2505
-msgid "No"
-msgstr "Hayır"
-
 #: src/slic3r/GUI/Gizmos/GLGizmoEmboss.cpp:2555
 msgid "Presets"
 msgstr ""
@@ -11108,10 +11100,100 @@ msgstr "%s moda geç"
 msgid "Current mode is %s"
 msgstr "Geçerli mod %s"
 
-#: src/slic3r/Utils/AstroBox.cpp:69 src/slic3r/Utils/OctoPrint.cpp:206
-#: src/slic3r/Utils/OctoPrint.cpp:255 src/slic3r/Utils/OctoPrint.cpp:667
-#: src/slic3r/Utils/OctoPrint.cpp:814 src/slic3r/Utils/OctoPrint.cpp:887
-#: src/slic3r/Utils/Repetier.cpp:88
+#: src/slic3r/GUI/Device.cpp:25
+msgid "Material: "
+msgstr "Materyal: "
+
+#: src/slic3r/GUI/Device.cpp:26
+msgid "Nozzle: "
+msgstr "Nozül: "
+
+#: src/slic3r/GUI/Device.cpp:27
+msgid "IP Address: "
+msgstr "IP Adresi: "
+
+#: src/slic3r/GUI/Device.cpp:27
+msgid "Please take your print!"
+msgstr "Lütfen baskınızı alınız!"
+
+#: src/slic3r/GUI/Device.cpp:28 src/slic3r/GUI/Device.cpp:326
+msgid "Elapsed / Estimated time: "
+msgstr "Geçen / Tahmini süre: "
+
+#: src/slic3r/GUI/Device.cpp:29
+msgid "File: "
+msgstr "Dosya: "
+
+#: src/slic3r/GUI/Device.cpp:21
+msgid "Print Now!"
+msgstr "Baskı Al!"
+
+#: src/slic3r/GUI/Device.cpp:127
+msgid ""
+"Materials don't match with this device. Please reslice with the correct "
+"material."
+msgstr ""
+"Cihazdaki materyal ile baskıda ki materyal uyuşmuyor. Lütfen cihazdaki "
+"materyal ile tekrar dilimleyiniz."
+
+#: src/slic3r/GUI/Device.cpp:127
+msgid "Wrong material type"
+msgstr "Yanlış materyal"
+
+#: src/slic3r/GUI/Device.cpp:129
+msgid ""
+"Currently installed nozzle on device doesn't match with this slice. Please "
+"reslice with the correct nozzle."
+msgstr ""
+"Cihazdaki nozül ile baskıda ki nozül uyuşmuyor. Lütfen cihazdaki nozül ile "
+"tekrar dilimleyiniz."
+
+#: src/slic3r/GUI/Device.cpp:129
+msgid "Wrong nozzle type"
+msgstr "Yanlış nozül tipi"
+
+#: src/slic3r/GUI/Device.cpp:153
+msgid "Uploading..."
+msgstr "Gönderiliyor..."
+
+#: src/slic3r/GUI/Device.cpp:156
+msgid "Paused..."
+msgstr "Duraklatıldı..."
+
+#: src/slic3r/GUI/Device.cpp:159
+msgid "Printing..."
+msgstr "Yazdırılıyor..."
+
+#: src/slic3r/GUI/Device.cpp:223
+msgid "Bed is occupied..."
+msgstr "Tabla dolu..."
+
+#: src/slic3r/GUI/Device.cpp:162
+msgid "Heating..."
+msgstr "Isıtılıyor..."
+
+#: src/slic3r/GUI/Device.cpp:165
+msgid "Calibrating..."
+msgstr "Kalibre ediliyor..."
+
+#: src/slic3r/GUI/Device.cpp:245
+msgid "Are you sure?"
+msgstr "Emin misiniz?"
+
+#: src/slic3r/GUI/Device.cpp:245
+msgid "XDesktop: Confirmation"
+msgstr "XDesktop: Konfirmasyon"
+
+#: src/slic3r/GUI/Device.cpp:246
+msgid "Yes"
+msgstr "Evet"
+
+#: src/slic3r/GUI/Device.cpp:246
+msgid "No"
+msgstr "Hayır"
+
+#: src/slic3r/Utils/AstroBox.cpp:69 src/slic3r/Utils/OctoPrint.cpp:141
+#: src/slic3r/Utils/Repetier.cpp:69
 #, c-format, boost-format
 msgid "Mismatched type of print host: %s"
 msgstr "Eşleşmeyen baskı sunucusu türü: %s"
@@ -22461,10 +22543,6 @@ msgstr "Yazdırılan sayfa %d / %d"
 #, c-format
 msgid "Printing page %d..."
 msgstr "Yazdırılan sayfa %d..."
-
-#: ../src/generic/printps.cpp:161
-msgid "Printing..."
-msgstr "Yazdırılıyor..."
 
 #: ../include/wx/richtext/richtextprint.h:109 ../include/wx/prntbase.h:267
 #: ../src/common/docview.cpp:2132
