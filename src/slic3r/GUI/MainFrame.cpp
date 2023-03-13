@@ -705,7 +705,7 @@ void MainFrame::update_title()
     	}
     }
 
-    title += wxString(build_id);
+    title += wxString(XDESKTOP_BUILD_ID);
     if (wxGetApp().is_editor())
         title += (" " + _L("based on PrusaSlicer"));
 

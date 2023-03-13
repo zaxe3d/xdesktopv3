@@ -219,7 +219,7 @@ private:
             title = wxGetApp().is_editor() ? SLIC3R_APP_NAME : GCODEVIEWER_APP_NAME;
 
             // dynamically get the version to display
-            version = _L("Version") + " " + std::string(SLIC3R_VERSION);
+            version = _L("Version") + " " + std::string(XDESKTOP_VERSION);
 
             // credits infornation
             credits =   title + " " +
@@ -3022,7 +3022,7 @@ void GUI_App::show_desktop_integration_dialog()
 void GUI_App::show_downloader_registration_dialog()
 {
     InfoDialog msg(nullptr
-        , format_wxstr(_L("Welcome to %1% version %2%."), SLIC3R_APP_NAME, SLIC3R_VERSION)
+        , format_wxstr(_L("Welcome to %1% version %2%."), SLIC3R_APP_NAME, XDESKTOP_VERSION)
         , format_wxstr(_L(
             "Do you wish to register downloads from <b>Printables.com</b>"
             "\nfor this <b>%1% %2%</b> executable?"
