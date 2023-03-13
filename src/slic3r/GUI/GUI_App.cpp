@@ -772,8 +772,8 @@ void GUI_App::post_init()
             }
         #ifdef _WIN32
             // Run external updater on Windows if version check is enabled.
-            if (this->preset_updater->version_check_enabled() && ! run_updater_win())
-                // "prusaslicer-updater.exe" was not started, run our own update check.
+            //if (this->preset_updater->version_check_enabled() && ! run_updater_win())
+                // "xdesktop-updater.exe" was not started, run our own update check.
         #endif // _WIN32
                 this->preset_updater->slic3r_update_notify();
         });
