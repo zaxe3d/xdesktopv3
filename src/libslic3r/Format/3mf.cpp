@@ -57,7 +57,7 @@ const unsigned int VERSION_3MF_COMPATIBLE = 2;
 const char* SLIC3RPE_3MF_VERSION = "slic3rpe:Version3mf"; // definition of the metadata name saved into .model file
 
 // Painting gizmos data version numbers
-// 0 : 3MF files saved by older XDesktop or the painting gizmo wasn't used. No version definition in them.
+// 0 : 3MF files saved by older PrusaSlicer or the painting gizmo wasn't used. No version definition in them.
 // 1 : Introduction of painting gizmos data versioning. No other changes in painting gizmos data.
 const unsigned int FDM_SUPPORTS_PAINTING_VERSION = 1;
 const unsigned int SEAM_PAINTING_VERSION         = 1;
@@ -137,9 +137,7 @@ static constexpr const char* SOURCE_OFFSET_Y_KEY          = "source_offset_y";
 static constexpr const char* SOURCE_OFFSET_Z_KEY          = "source_offset_z";
 static constexpr const char* SOURCE_IN_INCHES_KEY         = "source_in_inches";
 static constexpr const char* SOURCE_IN_METERS_KEY         = "source_in_meters";
-#if ENABLE_RELOAD_FROM_DISK_REWORK
 static constexpr const char* SOURCE_IS_BUILTIN_VOLUME_KEY = "source_is_builtin_volume";
-#endif // ENABLE_RELOAD_FROM_DISK_REWORK
 
 static constexpr const char* MESH_STAT_EDGES_FIXED          = "edges_fixed";
 static constexpr const char* MESH_STAT_DEGENERATED_FACETS   = "degenerate_facets";
@@ -465,7 +463,7 @@ namespace Slic3r {
         unsigned int m_version;
         bool m_check_version;
 
-        // Semantic version of XDesktop, that generated this 3MF.
+        // Semantic version of PrusaSlicer, that generated this 3MF.
         boost::optional<Semver> m_prusaslicer_generator_version;
         unsigned int m_fdm_supports_painting_version = 0;
         unsigned int m_seam_painting_version         = 0;
@@ -760,7 +758,7 @@ namespace Slic3r {
         close_zip_reader(&archive);
 
         if (m_version == 0) {
-            // if the 3mf was not produced by XDesktop and there is more than one instance,
+            // if the 3mf was not produced by PrusaSlicer and there is more than one instance,
             // split the object in as many objects as instances
             size_t curr_models_count = m_model->objects.size();
             size_t i = 0;
@@ -906,36 +904,18 @@ namespace Slic3r {
             }
         }
 
-#if ENABLE_RELOAD_FROM_DISK_REWORK
         for (int obj_id = 0; obj_id < int(model.objects.size()); ++obj_id) {
             ModelObject* o = model.objects[obj_id];
             for (int vol_id = 0; vol_id < int(o->volumes.size()); ++vol_id) {
                 ModelVolume* v = o->volumes[vol_id];
                 if (v->source.input_file.empty())
-                    v->source.input_file = v->name.empty() ? filename : v->name;
+                    v->source.input_file = filename;
                 if (v->source.volume_idx == -1)
                     v->source.volume_idx = vol_id;
                 if (v->source.object_idx == -1)
                     v->source.object_idx = obj_id;
             }
         }
-#else
-        int object_idx = 0;
-        for (ModelObject* o : model.objects) {
-            int volume_idx = 0;
-            for (ModelVolume* v : o->volumes) {
-                if (v->source.input_file.empty() && v->type() == ModelVolumeType::MODEL_PART) {
-                    v->source.input_file = filename;
-                    if (v->source.volume_idx == -1)
-                        v->source.volume_idx = volume_idx;
-                    if (v->source.object_idx == -1)
-                        v->source.object_idx = object_idx;
-                }
-                ++volume_idx;
-            }
-            ++object_idx;
-        }
-#endif // ENABLE_RELOAD_FROM_DISK_REWORK
 
 //        // fixes the min z of the model if negative
 //        model.adjust_min_z();
@@ -1082,7 +1062,7 @@ namespace Slic3r {
             // Each config line is prefixed with a semicolon (G-code comment), that is ugly.
 
             // Replacing the legacy function with load_from_ini_string_commented leads to issues when
-            // parsing 3MFs from before XDesktop 2.0.0 (which can have duplicated entries in the INI.
+            // parsing 3MFs from before PrusaSlicer 2.0.0 (which can have duplicated entries in the INI.
             // See https://github.com/prusa3d/PrusaSlicer/issues/7155. We'll revert it for now.
             //config_substitutions.substitutions = config.load_from_ini_string_commented(std::move(buffer), config_substitutions.rule);
             ConfigBase::load_from_gcode_string_legacy(config, buffer.data(), config_substitutions);
@@ -1455,7 +1435,7 @@ namespace Slic3r {
                 std::string         extra;
                 pt::ptree attr_tree = tree.find("<xmlattr>")->second;
                 if (attr_tree.find("type") == attr_tree.not_found()) {
-                    // It means that data was saved in old version (2.2.0 and older) of XDesktop
+                    // It means that data was saved in old version (2.2.0 and older) of PrusaSlicer
                     // read old data ... 
                     std::string gcode       = tree.get<std::string> ("<xmlattr>.gcode");
                     // ... and interpret them to the new data
@@ -1623,7 +1603,7 @@ namespace Slic3r {
         }
 
         if (m_version == 0) {
-            // if the 3mf was not produced by XDesktop and there is only one object,
+            // if the 3mf was not produced by PrusaSlicer and there is only one object,
             // set the object name to match the filename
             if (m_model->objects.size() == 1)
                 m_model->objects.front()->name = m_name;
@@ -1903,20 +1883,20 @@ namespace Slic3r {
         } else if (m_curr_metadata_name == "Application") {
             // Generator application of the 3MF.
             // SLIC3R_APP_KEY - SLIC3R_VERSION
-            if (boost::starts_with(m_curr_characters, "XDesktop-"))
+            if (boost::starts_with(m_curr_characters, "PrusaSlicer-"))
                 m_prusaslicer_generator_version = Semver::parse(m_curr_characters.substr(12));
         } else if (m_curr_metadata_name == SLIC3RPE_FDM_SUPPORTS_PAINTING_VERSION) {
             m_fdm_supports_painting_version = (unsigned int) atoi(m_curr_characters.c_str());
             check_painting_version(m_fdm_supports_painting_version, FDM_SUPPORTS_PAINTING_VERSION,
-                _(L("The selected 3MF contains FDM supports painted object using a newer version of XDesktop and is not compatible.")));
+                _(L("The selected 3MF contains FDM supports painted object using a newer version of PrusaSlicer and is not compatible.")));
         } else if (m_curr_metadata_name == SLIC3RPE_SEAM_PAINTING_VERSION) {
             m_seam_painting_version = (unsigned int) atoi(m_curr_characters.c_str());
             check_painting_version(m_seam_painting_version, SEAM_PAINTING_VERSION,
-                _(L("The selected 3MF contains seam painted object using a newer version of XDesktop and is not compatible.")));
+                _(L("The selected 3MF contains seam painted object using a newer version of PrusaSlicer and is not compatible.")));
         } else if (m_curr_metadata_name == SLIC3RPE_MM_PAINTING_VERSION) {
             m_mm_painting_version = (unsigned int) atoi(m_curr_characters.c_str());
             check_painting_version(m_mm_painting_version, MM_PAINTING_VERSION,
-                _(L("The selected 3MF contains multi-material painted object using a newer version of XDesktop and is not compatible.")));
+                _(L("The selected 3MF contains multi-material painted object using a newer version of PrusaSlicer and is not compatible.")));
         }
 
         return true;
@@ -2043,7 +2023,7 @@ namespace Slic3r {
             return false;
         }
 
-        // Added because of github #3435, currently not used by XDesktop
+        // Added because of github #3435, currently not used by PrusaSlicer
         // int instances_count_id = get_attribute_value_int(attributes, num_attributes, INSTANCESCOUNT_ATTR);
 
         m_objects_metadata.insert({ object_id, ObjectMetadata() });
@@ -2203,14 +2183,14 @@ namespace Slic3r {
             if (m_prusaslicer_generator_version && 
                 *m_prusaslicer_generator_version >= *Semver::parse("2.4.0-alpha1") &&
                 *m_prusaslicer_generator_version < *Semver::parse("2.4.0-alpha3"))
-                // XDesktop 2.4.0-alpha2 contained a bug, where all vertices of a single object were saved for each volume the object contained.
+                // PrusaSlicer 2.4.0-alpha2 contained a bug, where all vertices of a single object were saved for each volume the object contained.
                 // Remove the vertices, that are not referenced by any face.
                 its_compactify_vertices(its, true);
 
             TriangleMesh triangle_mesh(std::move(its), volume_data.mesh_stats);
 
             if (m_version == 0) {
-                // if the 3mf was not produced by XDesktop and there is only one instance,
+                // if the 3mf was not produced by PrusaSlicer and there is only one instance,
                 // bake the transformation into the geometry to allow the reload from disk command
                 // to work properly
                 if (object.instances.size() == 1) {
@@ -2287,10 +2267,8 @@ namespace Slic3r {
                     volume->source.is_converted_from_inches = metadata.value == "1";
                 else if (metadata.key == SOURCE_IN_METERS_KEY)
                     volume->source.is_converted_from_meters = metadata.value == "1";
-#if ENABLE_RELOAD_FROM_DISK_REWORK
                 else if (metadata.key == SOURCE_IS_BUILTIN_VOLUME_KEY)
                     volume->source.is_from_builtin_objects = metadata.value == "1";
-#endif // ENABLE_RELOAD_FROM_DISK_REWORK
                 else
                     volume->config.set_deserialize(metadata.key, metadata.value, config_substitutions);
             }
@@ -2432,7 +2410,7 @@ namespace Slic3r {
         }
 
         // Adds content types file ("[Content_Types].xml";).
-        // The content of this file is the same for each XDesktop 3mf.
+        // The content of this file is the same for each PrusaSlicer 3mf.
         if (!_add_content_types_file_to_archive(archive)) {
             close_zip_writer(&archive);
             boost::filesystem::remove(filename);
@@ -2449,7 +2427,7 @@ namespace Slic3r {
         }
 
         // Adds relationships file ("_rels/.rels"). 
-        // The content of this file is the same for each XDesktop 3mf.
+        // The content of this file is the same for each PrusaSlicer 3mf.
         // The relationshis file contains a reference to the geometry file "3D/3dmodel.model", the name was chosen to be compatible with CURA.
         if (!_add_relationships_file_to_archive(archive)) {
             close_zip_writer(&archive);
@@ -3268,7 +3246,7 @@ namespace Slic3r {
         for (const IdToObjectDataMap::value_type& obj_metadata : objects_data) {
             const ModelObject* obj = obj_metadata.second.object;
             if (obj == nullptr) continue;
-            // Output of instances count added because of github #3435, currently not used by XDesktop
+            // Output of instances count added because of github #3435, currently not used by PrusaSlicer
             stream << " <" << OBJECT_TAG << " " << ID_ATTR << "=\"" << obj_metadata.first << "\" " << INSTANCESCOUNT_ATTR << "=\"" << obj->instances.size() << "\">\n";
 
             // stores object's name
@@ -3328,10 +3306,8 @@ namespace Slic3r {
                             stream << prefix << SOURCE_IN_INCHES_KEY << "\" " << VALUE_ATTR << "=\"1\"/>\n";
                         else if (volume->source.is_converted_from_meters)
                             stream << prefix << SOURCE_IN_METERS_KEY << "\" " << VALUE_ATTR << "=\"1\"/>\n";
-#if ENABLE_RELOAD_FROM_DISK_REWORK
                         if (volume->source.is_from_builtin_objects)
                             stream << prefix << SOURCE_IS_BUILTIN_VOLUME_KEY << "\" " << VALUE_ATTR << "=\"1\"/>\n";
-#endif // ENABLE_RELOAD_FROM_DISK_REWORK
                     }
 
                     // stores volume's config data
@@ -3389,7 +3365,7 @@ bool _3MF_Exporter::_add_custom_gcode_per_print_z_file_to_archive( mz_zip_archiv
             code_tree.put("<xmlattr>.color"     , code.color    );
             code_tree.put("<xmlattr>.extra"     , code.extra    );
 
-            // add gcode field data for the old version of the XDesktop
+            // add gcode field data for the old version of the PrusaSlicer
             std::string gcode = code.type == CustomGCode::ColorChange ? config->opt_string("color_change_gcode")    :
                                 code.type == CustomGCode::PausePrint  ? config->opt_string("pause_print_gcode")     :
                                 code.type == CustomGCode::Template    ? config->opt_string("template_custom_gcode") :
@@ -3428,13 +3404,13 @@ static void handle_legacy_project_loaded(unsigned int version_project_file, Dyna
 {
     if (! config.has("brim_separation")) {
         if (auto *opt_elephant_foot   = config.option<ConfigOptionFloat>("elefant_foot_compensation", false); opt_elephant_foot) {
-            // Conversion from older XDesktop which applied brim separation equal to elephant foot compensation.
+            // Conversion from older PrusaSlicer which applied brim separation equal to elephant foot compensation.
             auto *opt_brim_separation = config.option<ConfigOptionFloat>("brim_separation", true);
             opt_brim_separation->value = opt_elephant_foot->value;
         }
     }
     
-    // In XDesktop 2.5.0-alpha2 and 2.5.0-alpha3, we introduce several parameters for Arachne that depend
+    // In PrusaSlicer 2.5.0-alpha2 and 2.5.0-alpha3, we introduce several parameters for Arachne that depend
     // on nozzle size . Later we decided to make default values for those parameters computed automatically
     // until the user changes them.
     if (prusaslicer_generator_version && *prusaslicer_generator_version >= *Semver::parse("2.5.0-alpha2") && *prusaslicer_generator_version <= *Semver::parse("2.5.0-alpha3")) {

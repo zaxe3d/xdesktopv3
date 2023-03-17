@@ -926,12 +926,12 @@ void UnsavedChangesDialog::build(Preset::Type type, PresetCollection* dependent_
             wxString action = m_app_config_key == "default_action_on_new_project"   ? _L("You will not be asked about the unsaved changes in presets the next time you create new project") : 
                               m_app_config_key == "default_action_on_select_preset" ? _L("You will not be asked about the unsaved changes in presets the next time you switch a preset") :
                                                                                       _L("You will not be asked about the unsaved changes in presets the next time you: \n"
-						                                                                    "- Closing XDesktop while some presets are modified,\n"
+						                                                                    "- Closing PrusaSlicer while some presets are modified,\n"
 						                                                                    "- Loading a new project while some presets are modified") ;
-            wxString msg = _L("XDesktop will remember your action.") + "\n\n" + action + "\n\n" +
+            wxString msg = _L("PrusaSlicer will remember your action.") + "\n\n" + action + "\n\n" +
                            format_wxstr(_L("Visit \"Preferences\" and check \"%1%\"\nto be asked about unsaved changes again."), preferences_item);
     
-            MessageDialog dialog(nullptr, msg, _L("XDesktop: Don't ask me again"), wxOK | wxCANCEL | wxICON_INFORMATION);
+            MessageDialog dialog(nullptr, msg, _L("PrusaSlicer: Don't ask me again"), wxOK | wxCANCEL | wxICON_INFORMATION);
             if (dialog.ShowModal() == wxID_CANCEL)
                 m_remember_choice->SetValue(false);
         });
@@ -1593,7 +1593,7 @@ void DiffPresetDialog::create_buttons()
     });
     m_transfer_btn->Bind(wxEVT_ENTER_WINDOW, [this, show_in_bottom_info](wxMouseEvent& e) {
         show_in_bottom_info(_L("Transfer the selected options from left preset to the right.\n"
-                            "Note: New modified presets will be selected in setting stabs after close this dialog."), e); });
+                            "Note: New modified presets will be selected in settings tabs after close this dialog."), e); });
 
     // Save
     m_save_btn = new ScalableButton(this, wxID_ANY, "save", _L("Save"), wxDefaultSize, wxDefaultPosition, wxBORDER_DEFAULT, 24);

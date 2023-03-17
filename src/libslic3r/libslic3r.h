@@ -2,8 +2,8 @@
 #define _libslic3r_h_
 
 #include "libslic3r_version.h"
-#define GCODEVIEWER_APP_NAME "XDesktop G-code Viewer"
-#define GCODEVIEWER_APP_KEY  "XDesktopGcodeViewer"
+#define GCODEVIEWER_APP_NAME "PrusaSlicer G-code Viewer"
+#define GCODEVIEWER_APP_KEY  "PrusaSlicerGcodeViewer"
 
 // this needs to be included early for MSVC (listing it in Build.PL is not enough)
 #include <memory>
@@ -35,7 +35,7 @@
 
 using coord_t = 
 #if 1
-// Saves around 32% RAM after slicing step, 6.7% after G-code export (tested on XDesktop 2.2.0 final).
+// Saves around 32% RAM after slicing step, 6.7% after G-code export (tested on PrusaSlicer 2.2.0 final).
     int32_t;
 #else
     //FIXME At least FillRectilinear2 and std::boost Voronoi require coord_t to be 32bit.
@@ -124,8 +124,7 @@ inline void append(std::vector<T>& dest, std::vector<T>&& src)
         dest.insert(dest.end(),
             std::make_move_iterator(src.begin()),
             std::make_move_iterator(src.end()));
-
-        // Vojta wants back compatibility
+        // Release memory of the source contour now.
         src.clear();
         src.shrink_to_fit();
     }
@@ -161,8 +160,7 @@ inline void append_reversed(std::vector<T>& dest, std::vector<T>&& src)
         dest.insert(dest.end(), 
             std::make_move_iterator(src.rbegin()),
             std::make_move_iterator(src.rend()));
-
-    // Vojta wants back compatibility
+    // Release memory of the source contour now.
     src.clear();
     src.shrink_to_fit();
 }

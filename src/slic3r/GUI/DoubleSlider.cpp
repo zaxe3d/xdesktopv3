@@ -130,9 +130,9 @@ Control::Control( wxWindow *parent,
     // control's view variables
     SLIDER_MARGIN     = 4 + GUI::wxGetApp().em_unit();
 
-    DARK_ORANGE_PEN   = wxPen(wxColour(237, 107, 33));
-    ORANGE_PEN        = wxPen(wxColour(253, 126, 66));
-    LIGHT_ORANGE_PEN  = wxPen(wxColour(254, 177, 139));
+    DARK_ORANGE_PEN   = wxPen(wxColour(0  , 155, 223));
+    ORANGE_PEN        = wxPen(wxColour(0  , 155, 223));
+    LIGHT_ORANGE_PEN  = wxPen(wxColour(0  , 155, 223));
 
     DARK_GREY_PEN     = wxPen(wxColour(128, 128, 128));
     GREY_PEN          = wxPen(wxColour(164, 164, 164));

@@ -3,8 +3,8 @@
 
 set(SLIC3R_APP_NAME "XDesktop")
 set(SLIC3R_APP_KEY "XDesktop")
-set(XDESKTOP_VERSION "3.0.0-beta")
-set(SLIC3R_VERSION "2.6.0-alpha4")
+set(XDESKTOP_VERSION "3.0.0-alpha")
+set(SLIC3R_VERSION "2.6.0-alpha5")
 set(SLIC3R_BUILD_ID "XDesktop-${SLIC3R_VERSION}")
 set(XDESKTOP_BUILD_ID "XDesktop-${XDESKTOP_VERSION}")
 # exe name of the slicer, should be lowercase and valid in all os

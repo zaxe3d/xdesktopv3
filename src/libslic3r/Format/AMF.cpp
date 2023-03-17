@@ -346,7 +346,7 @@ void AMFParserContext::startElement(const char *name, const char **atts)
                 }
                 else
                 {
-                    // It means that data was saved in old version (2.2.0 and older) of XDesktop
+                    // It means that data was saved in old version (2.2.0 and older) of PrusaSlicer
                     // read old data ... 
                     std::string gcode = get_attribute(atts, "gcode");
                     // ... and interpret them to the new data
@@ -657,11 +657,7 @@ void AMFParserContext::endElement(const char * /* name */)
         if (bool has_transform = !m_volume_transform.isApprox(Transform3d::Identity(), 1e-10); has_transform)
             m_volume->source.transform = Slic3r::Geometry::Transformation(m_volume_transform);
 
-#if ENABLE_RELOAD_FROM_DISK_REWORK
         if (m_volume->source.input_file.empty()) {
-#else
-        if (m_volume->source.input_file.empty() && m_volume->type() == ModelVolumeType::MODEL_PART) {
-#endif // ENABLE_RELOAD_FROM_DISK_REWORK
             m_volume->source.object_idx = (int)m_model.objects.size() - 1;
             m_volume->source.volume_idx = (int)m_model.objects.back()->volumes.size() - 1;
             m_volume->center_geometry_after_creation();
@@ -723,7 +719,7 @@ void AMFParserContext::endElement(const char * /* name */)
             // Each config line is prefixed with a semicolon (G-code comment), that is ugly.
 
             // Replacing the legacy function with load_from_ini_string_commented leads to issues when
-            // parsing 3MFs from before XDesktop 2.0.0 (which can have duplicated entries in the INI.
+            // parsing 3MFs from before PrusaSlicer 2.0.0 (which can have duplicated entries in the INI.
             // See https://github.com/prusa3d/PrusaSlicer/issues/7155. We'll revert it for now.
             //m_config_substitutions->substitutions = m_config->load_from_ini_string_commented(std::move(m_value[1].c_str()), m_config_substitutions->rule);
             ConfigBase::load_from_gcode_string_legacy(*m_config, std::move(m_value[1].c_str()), *m_config_substitutions);
@@ -818,10 +814,8 @@ void AMFParserContext::endElement(const char * /* name */)
                     m_volume->source.is_converted_from_inches = m_value[1] == "1";
                 else if (strcmp(opt_key, "source_in_meters") == 0)
                     m_volume->source.is_converted_from_meters = m_value[1] == "1";
-#if ENABLE_RELOAD_FROM_DISK_REWORK
                 else if (strcmp(opt_key, "source_is_builtin_volume") == 0)
                     m_volume->source.is_from_builtin_objects = m_value[1] == "1";
-#endif // ENABLE_RELOAD_FROM_DISK_REWORK
             }
         }
         else if (m_path.size() == 3) {
@@ -922,11 +916,7 @@ bool load_amf_file(const char *path, DynamicPrintConfig *config, ConfigSubstitut
         unsigned int counter = 0;
         for (ModelVolume* v : o->volumes) {
             ++counter;
-#if ENABLE_RELOAD_FROM_DISK_REWORK
             if (v->source.input_file.empty())
-#else
-            if (v->source.input_file.empty() && v->type() == ModelVolumeType::MODEL_PART)
-#endif // ENABLE_RELOAD_FROM_DISK_REWORK
                 v->source.input_file = path;
             if (v->name.empty()) {
                 v->name = o->name;
@@ -1075,11 +1065,7 @@ bool load_amf_archive(const char* path, DynamicPrintConfig* config, ConfigSubsti
 
     for (ModelObject *o : model->objects)
         for (ModelVolume *v : o->volumes)
-#if ENABLE_RELOAD_FROM_DISK_REWORK
             if (v->source.input_file.empty())
-#else
-            if (v->source.input_file.empty() && v->type() == ModelVolumeType::MODEL_PART)
-#endif // ENABLE_RELOAD_FROM_DISK_REWORK
                 v->source.input_file = path;
 
     return true;
@@ -1270,10 +1256,8 @@ bool store_amf(const char* path, Model* model, const DynamicPrintConfig* config,
                 stream << "        <metadata type=\"slic3r.source_in_inches\">1</metadata>\n";
             else if (volume->source.is_converted_from_meters)
                 stream << "        <metadata type=\"slic3r.source_in_meters\">1</metadata>\n";
-#if ENABLE_RELOAD_FROM_DISK_REWORK
             if (volume->source.is_from_builtin_objects)
                 stream << "        <metadata type=\"slic3r.source_is_builtin_volume\">1</metadata>\n";
-#endif // ENABLE_RELOAD_FROM_DISK_REWORK
             stream << std::setprecision(std::numeric_limits<float>::max_digits10);
             const indexed_triangle_set &its = volume->mesh().its;
             for (size_t i = 0; i < its.indices.size(); ++i) {
@@ -1333,7 +1317,7 @@ bool store_amf(const char* path, Model* model, const DynamicPrintConfig* config,
             code_tree.put("<xmlattr>.color"     , code.color    );
             code_tree.put("<xmlattr>.extra"     , code.extra    );
 
-            // add gcode field data for the old version of the XDesktop
+            // add gcode field data for the old version of the PrusaSlicer
             std::string gcode = code.type == CustomGCode::ColorChange ? config->opt_string("color_change_gcode")    :
                                 code.type == CustomGCode::PausePrint  ? config->opt_string("pause_print_gcode")     :
                                 code.type == CustomGCode::Template    ? config->opt_string("template_custom_gcode") :
