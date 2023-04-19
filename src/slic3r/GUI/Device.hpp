@@ -59,6 +59,9 @@ public:
     NetworkMachine* nm; // network machine.
 
     void setName(const string &name);
+    void setMaterial(const string &material);
+    void setNozzle(const string &nozzle);
+    void setPin(const bool hasPin);
     void setFileStart();
     void updateStates();
     void updateProgress();

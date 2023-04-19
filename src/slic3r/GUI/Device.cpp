@@ -344,6 +344,21 @@ void Device::setName(const string &name)
     m_txtDeviceName->SetLabel(name);
 }
 
+void Device::setMaterial(const string &material)
+{
+    m_txtDeviceMaterial->SetLabel(_L("Material: ") + NetworkMachineManager::MaterialName(nm->attr->material));
+}
+
+void Device::setPin(const bool hasPin)
+{
+    nm->attr->hasPin = hasPin; // needed?
+}
+
+void Device::setNozzle(const string &nozzle)
+{
+    m_txtDeviceNozzleDiameter->SetLabel(_L("Nozzle: ") + nm->attr->nozzle + "mm");
+}
+
 void Device::setFileStart()
 {
     m_txtFileName->SetLabel(nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS));

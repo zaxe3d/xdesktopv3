@@ -278,19 +278,19 @@ void PresetUpdater::priv::get_missing_resource(const std::string& vendor, const 
 	const fs::path file_in_cache(cache_path / (vendor + "/" + filename));
 
 	if (fs::exists(file_in_vendor)) { // Already in vendor. No need to do anything.
-		BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in vendor folder. No need to download.";
+		//BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in vendor folder. No need to download.";
 		return;
 	}
 	if (fs::exists(file_in_rsrc)) { // In resources dir since installation. No need to do anything.
-		BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in resources folder. No need to download.";
+		///BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in resources folder. No need to download.";
 		return;
 	}
 	if (fs::exists(file_in_cache)) { // In cache/venodr_name/ dir. No need to do anything.
-		BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in cache folder. No need to download.";
+		//BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in cache folder. No need to download.";
 		return;
 	}
 
-	BOOST_LOG_TRIVIAL(info) << "Resources check could not find " << vendor << " / " << filename << " bed texture. Downloading.";
+	BOOST_LOG_TRIVIAL(debug) << "Resources check could not find " << vendor << " / " << filename << " bed texture. Downloading.";
 
 	const auto resource_url = format("%1%%2%%3%", url, url.back() == '/' ? "" : "/", escaped_filename); // vendor should already be in url 
 
@@ -312,15 +312,16 @@ void PresetUpdater::priv::get_or_copy_missing_resource(const std::string& vendor
 	const fs::path file_in_cache(cache_path / (vendor + "/" + filename));
 
 	if (fs::exists(file_in_vendor)) { // Already in vendor. No need to do anything.
-		BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in vendor folder. No need to download.";
+		//BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in vendor folder. No need to download.";
 		return;
 	}
 	if (fs::exists(file_in_rsrc)) { // In resources dir since installation. No need to do anything.
-		BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in resources folder. No need to download.";
+		//BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in resources folder. No need to download.";
 		return;
 	}
 	if (!fs::exists(file_in_cache)) { // No file to copy. Download it to straight to the vendor dir.
-		if (!boost::starts_with(url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
+		if (!boost::starts_with(url, "https://software.zaxe.com/xdesktop-config/") &&
+			!boost::starts_with(url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
 			!boost::starts_with(url, "https://files.prusa3d.com/wp-content/uploads/repository/"))
 		{
 			throw Slic3r::CriticalException(GUI::format("URL outside prusa3d.com network: %1%", url));
@@ -360,8 +361,9 @@ void PresetUpdater::priv::sync_config(const VendorMap vendors, const std::string
 		return;
 	}
 	BOOST_LOG_TRIVIAL(info) << "Downloading vedor profiles archive zip from " << index_archive_url;
-	//check if idx_url is leading to our site 
-	if (!boost::starts_with(index_archive_url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
+	//check if idx_url is leading to our site
+	if (!boost::starts_with(index_archive_url, "https://software.zaxe.com/xdesktop-config/") &&
+		!boost::starts_with(index_archive_url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
 		!boost::starts_with(index_archive_url, "https://files.prusa3d.com/wp-content/uploads/repository/"))
 	{
 		BOOST_LOG_TRIVIAL(error) << "Unsafe url path for vedor profiles archive zip. Download is rejected.";

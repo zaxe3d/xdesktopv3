@@ -95,6 +95,12 @@ void NetworkMachineManager::onMachineMessage(MachineNewMessageEvent &event)
         m_deviceMap[event.nm->ip]->updateProgress();
     } else if (event.event == "new_name") {
         m_deviceMap[event.nm->ip]->setName(event.nm->name);
+    } else if (event.event == "material_change") {
+        m_deviceMap[event.nm->ip]->setMaterial(event.nm->attr->material);
+    } else if (event.event == "nozzle_change") {
+        m_deviceMap[event.nm->ip]->setNozzle(event.nm->attr->nozzle);
+    } else if (event.event == "pin_change") {
+        m_deviceMap[event.nm->ip]->setPin(event.nm->attr->hasPin);
     } else if (event.event == "start_print") {
         m_deviceMap[event.nm->ip]->setFileStart();
     }
