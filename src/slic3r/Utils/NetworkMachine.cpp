@@ -325,13 +325,12 @@ void NetworkMachine::uploadFTP(const char *filename, const char *uploadAs)
     ::curl_easy_setopt(curl, CURLOPT_VERBOSE, get_logging_level() >= 5);
     ::curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xfercb);
     ::curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, static_cast<void *>(this));
+    ::curl_easy_setopt(curl, CURLOPT_FTP_USE_EPSV, 0L);
 
     if ( ! attr->isNoneTLS) {
-        ::curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
-        ::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-        ::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    } else {
-        ::curl_easy_setopt(curl, CURLOPT_FTP_USE_EPSV, 0L);
+        //::curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_ALL);
+        //::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        //::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
     }
     res = curl_easy_perform(curl);
     ::curl_free(encodedFilename);
@@ -339,7 +338,7 @@ void NetworkMachine::uploadFTP(const char *filename, const char *uploadAs)
     putFile.reset();
     states->uploading = false;
     if (CURLE_OK != res) {
-        BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for uploading print.") % name % ip;
+        BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for uploading print. ERROR_CODE: %3%") % name % ip % res;
         return;
     }
 

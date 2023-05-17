@@ -139,6 +139,8 @@ void ZaxeArchive::generate_info_file(ConfMap &m, const Print &print)
     string fill_density = get_cfg_value(cfg, "fill_density");
     bool has_raft = stoi(get_cfg_value(cfg, "raft_layers")) > 0;
     bool has_skirt = stoi(get_cfg_value(cfg, "skirts")) > 0;
+    string dM = to_upper_copy(get_cfg_value(cfg, "printer_model"));
+    boost::replace_all(dM, "+", "PLUS");
 
     m["version"]                = ZAXE_FILE_VERSION;
     m["duration"]               = get_time_hms(stats.estimated_normal_print_time);
@@ -147,7 +149,7 @@ void ZaxeArchive::generate_info_file(ConfMap &m, const Print &print)
     m["infill_density"]         = fill_density.replace(fill_density.find("%"), 1, "");
     m["support_angle"]          = get_cfg_value(cfg, "support_material_angle");
     m["material"]               = get_cfg_value(cfg, "filament_notes", "0", true, ';'); // FIXME change this to filament code later.
-    m["model"]                  = get_cfg_value(cfg, "printer_model");
+    m["model"]                  = dM;
     m["printer_profile"]        = get_cfg_value(cfg, "printer_settings_id");
     m["filament_used"]          = std::to_string(stats.total_used_filament);
     m["nozzle_diameter"]        = get_cfg_value(cfg, "printer_variant", "0.4", true);
