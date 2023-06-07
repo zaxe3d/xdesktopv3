@@ -266,10 +266,11 @@ void PresetUpdater::priv::get_missing_resource(const std::string& vendor, const 
 	if (filename.empty() || vendor.empty())
 		return;
 
-	if (!boost::starts_with(url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
+	if (!boost::starts_with(url, "https://software.zaxe.com/xdesktop-config/") &&
+		!boost::starts_with(url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
 		!boost::starts_with(url, "https://files.prusa3d.com/wp-content/uploads/repository/"))
 	{
-		throw Slic3r::CriticalException(GUI::format("URL outside prusa3d.com network: %1%", url));
+		throw Slic3r::CriticalException(GUI::format("URL outside network: %1%", url));
 	}
 
 	std::string escaped_filename = escape_string_url(filename);

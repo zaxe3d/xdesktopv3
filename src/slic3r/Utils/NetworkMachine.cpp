@@ -332,7 +332,9 @@ void NetworkMachine::uploadFTP(const char *filename, const char *uploadAs)
         ::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
         ::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         ::curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+#ifndef __WINDOWS__
         ::curl_easy_setopt(curl, CURLOPT_SSL_CIPHER_LIST, "AES256-GCM-SHA384");
+#endif
     }
     res = curl_easy_perform(curl);
     ::curl_free(encodedFilename);
