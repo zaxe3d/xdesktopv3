@@ -106,8 +106,13 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
                 wxFileName ffplay(wxStandardPaths::Get().GetExecutablePath());
                 wxString curExecPath(ffplay.GetPath());
                 wxExecute(
+#ifdef _WIN32
+                    "cmd.exe /c " + curExecPath + "/ffplay tcp://" + this->nm->ip + ":5002 -window_title \"Zaxe " + to_upper_copy(this->nm->attr->deviceModel) + ": " + this->nm->name + "\" -x 720",
+                    wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE
+#else
                     curExecPath + "/ffplay tcp://" + this->nm->ip + ":5002 -window_title \"Zaxe " + to_upper_copy(this->nm->attr->deviceModel) + ": " + this->nm->name + "\" -x 720",
-                    wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER
+                    wxEXEC_ASYNC
+#endif
                 );
             } else {
                 wxMessageBox("Need device firmware version at least v3.3.80 to comply.", "Need firmware update for this feautre.", wxICON_INFORMATION);
