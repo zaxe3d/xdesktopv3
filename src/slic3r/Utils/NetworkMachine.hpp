@@ -89,7 +89,7 @@ struct MachineAttributes // attributes.
     string estimatedTime;
     int startTime;
     int filamentRemaining;
-    int firmwareVersion;
+    wxVersionInfo firmwareVersion;
 };
 
 class NetworkMachine

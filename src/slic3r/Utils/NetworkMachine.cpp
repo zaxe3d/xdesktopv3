@@ -79,6 +79,9 @@ void NetworkMachine::onWSRead(string message)
                 attr->hasNFCSpool = to_lower_copy(pt.get<string>("has_nfc_spool", "false")) == "true";
                 attr->filamentColor = to_lower_copy(pt.get<string>("filament_color", "unknown"));
             }
+            vector<string> fwV;
+            split(fwV, to_lower_copy(pt.get<string>("version", "1.0.0")), is_any_of("."));
+            attr->firmwareVersion = wxVersionInfo("fw_version", stoi(fwV[0]), stoi(fwV[1]), stoi(fwV[2]));
         }
         if (event == "hello" || event == "states_update") {
             // states

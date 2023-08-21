@@ -99,6 +99,21 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     wxString dMWx(dM);
     m_avatar->SetText(dMWx);
     m_deviceSizer->Add(m_avatar, wxSizerFlags().Border(wxALL, 7));
+    if (is_there(this->nm->attr->deviceModel, {"z2", "z3"})) {
+        m_avatar->Bind(wxEVT_LEFT_DCLICK, [this](const wxMouseEvent &evt) {
+            BOOST_LOG_TRIVIAL(info) << "Clicked on avatar trying to open stream on: " << this->nm->name;
+            if (this->nm->attr->firmwareVersion.GetMinor() >= 3 && this->nm->attr->firmwareVersion.GetMicro() >= 80) {
+                wxFileName ffplay(wxStandardPaths::Get().GetExecutablePath());
+                wxString curExecPath(ffplay.GetPath());
+                wxExecute(
+                    curExecPath + "/ffplay tcp://" + this->nm->ip + ":5002 -window_title 'Zaxe " + to_upper_copy(this->nm->attr->deviceModel) + ": " + this->nm->name + "' -x 720",
+                    wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE
+                );
+            } else {
+                wxMessageBox("Need device firmware version at least v3.3.80 to comply.", "Need firmware update for this feautre.", wxICON_INFORMATION);
+            }
+        });
+    }
     // End of Device model.
 
     // Right pane (2nd column start)
