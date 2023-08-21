@@ -106,8 +106,8 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
                 wxFileName ffplay(wxStandardPaths::Get().GetExecutablePath());
                 wxString curExecPath(ffplay.GetPath());
                 wxExecute(
-                    curExecPath + "/ffplay tcp://" + this->nm->ip + ":5002 -window_title 'Zaxe " + to_upper_copy(this->nm->attr->deviceModel) + ": " + this->nm->name + "' -x 720",
-                    wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE
+                    curExecPath + "/ffplay tcp://" + this->nm->ip + ":5002 -window_title \"Zaxe " + to_upper_copy(this->nm->attr->deviceModel) + ": " + this->nm->name + "\" -x 720",
+                    wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER
                 );
             } else {
                 wxMessageBox("Need device firmware version at least v3.3.80 to comply.", "Need firmware update for this feautre.", wxICON_INFORMATION);
@@ -122,7 +122,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     // Device name and action buttons start...
     wxBoxSizer* dnaabp = new wxBoxSizer(wxHORIZONTAL); // device name and action buttons
     m_txtDeviceName->SetFont(boldSmallFont);
-
+    wxGetApp().UpdateDarkUI(m_txtDeviceName);
     auto* actionBtnsSizer = new wxBoxSizer(wxHORIZONTAL); // action buttons ie: hi.
     actionBtnsSizer->Add(m_btnPreheat);
     actionBtnsSizer->Add(m_btnSayHi);
