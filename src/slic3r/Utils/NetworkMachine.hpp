@@ -65,6 +65,7 @@ struct MachineStates { // states.
     bool printing;
     bool heating;
     bool paused;
+    bool hasError;
     inline bool ptreeStringtoBool(ptree pt, string prop) {
         return pt.get<string>(prop, "False") == "True";
     }
@@ -105,6 +106,7 @@ public:
     progress_callback_t m_uploadProgressCallback;
 
     // Actions
+    void unloadFilament();
     void sayHi();
     void togglePreheat();
     void cancel();
@@ -132,6 +134,9 @@ public:
     wxBitmap& getAvatar() {
         boost::lock_guard<boost::mutex> avatarlock(m_avatarMtx);
         return m_avatar;
+    }
+    bool isBusy() {
+        return states->printing || states->heating || states->calibrating || states->paused || states->uploading;
     }
 private:
 #ifdef _WIN32

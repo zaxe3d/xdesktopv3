@@ -77,6 +77,7 @@ private:
     wxSizer* m_mainSizer; // vertical sizer (device sizer - horizontal line (seperator).
     wxSizer* m_deviceSizer; // horizontal sizer (avatar | right pane)).
     wxSizer* m_expansionSizer; // vertical sizer (filament | printing time etc.)
+    wxSizer* m_filamentSizer; // horizontal sizer (filament | unload filament button).
     wxSizer* m_rightSizer; // vertical right pane. (name - status - progress bar).
 
     CustomProgressBar* m_progressBar; // progress bar.
@@ -86,6 +87,7 @@ private:
     wxBitmapButton* m_btnResume; // resume button.
     wxBitmapButton* m_btnCancel; // cancel button.
     wxBitmapButton* m_btnExpandCollapse; // expand/collapse button.
+    wxButton* m_btnUnload; // unload filament button.
     wxButton* m_btnPrintNow; // print now button.
     wxStaticText* m_txtStatus; // status text.
     wxStaticText* m_txtProgress; // progress text.
@@ -96,6 +98,8 @@ private:
     wxStaticText* m_txtFileName; // file name text.
     wxStaticText* m_txtFileTime; // file elapsed time / estimated time text.
     wxStaticText* m_txtBedOccupiedMessage; // bed occuppied message under status text.
+    wxStaticText* m_txtErrorMessage; // bed occuppied message under status text.
+    wxStaticText* m_txtFWVersion; // firmware version at the very bottom.
 
     RoundedPanel* m_avatar;
 

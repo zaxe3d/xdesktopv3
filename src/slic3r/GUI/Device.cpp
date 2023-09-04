@@ -15,6 +15,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     nm(nm),
     m_mainSizer(new wxBoxSizer(wxVERTICAL)), // vertical sizer (device sizer - horizontal line (seperator).
     m_deviceSizer(new wxBoxSizer(wxHORIZONTAL)), // horizontal sizer (avatar | right pane).)
+    m_filamentSizer(new wxBoxSizer(wxHORIZONTAL)), // horizontal sizer (filament | unload filament button).
     m_expansionSizer(new wxBoxSizer(wxVERTICAL)), // vertical sizer (filament | printing time etc.)
     m_rightSizer(new wxBoxSizer(wxVERTICAL)), // vertical right pane. (name - status - progress bar).
     m_progressBar(new CustomProgressBar(this, wxID_ANY, wxSize(-1, 5))),
@@ -25,8 +26,11 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "-" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtBedOccupiedMessage(new wxStaticText(this, wxID_ANY, _L("Please take your print!"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtErrorMessage(new wxStaticText(this, wxID_ANY, _L("Device is in error state!"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtFileTime(new wxStaticText(this, wxID_ANY, _L("Elapsed / Estimated time: ") + get_time_hms(std::to_string(nm->attr->startTime)) + " / " + nm->attr->estimatedTime, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtFWVersion(new wxStaticText(this, wxID_ANY, nm->attr->firmwareVersion.GetVersionString(), wxDefaultPosition, wxSize(-1, 10), wxTE_RIGHT)),
+    m_btnUnload(new wxButton(this, wxID_ANY, _L("Unload"), wxDefaultPosition, wxSize(-1, 15), wxTE_CENTER)),
     m_btnPrintNow(new wxButton(this, wxID_ANY, _L("Print Now!"))),
     m_avatar(new RoundedPanel(this, wxID_ANY, "", wxSize(60, 60), wxColour(169, 169, 169), wxColour("WHITE"))),
     m_bitPreheatActive(new wxBitmap()),
@@ -66,6 +70,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_btnCancel->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->cancel(); }); });
     m_btnPause->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->pause(); }); });
     m_btnResume->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->resume(); }); });
+    m_btnUnload->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->unloadFilament(); }); });
     m_timer->Bind(wxEVT_TIMER, [this](wxTimerEvent &evt) { this->onTimer(evt); });
 
     nm->setUploadProgressCallback([this](int progress) {
@@ -164,6 +169,19 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_txtBedOccupiedMessage->SetFont(xsmallFont);
     m_rightSizer->Add(m_txtBedOccupiedMessage, 0, wxTOP, -1);
     // Bed occupied message end...
+    // Error message
+    m_txtErrorMessage->SetForegroundColour(DEVICE_COLOR_DANGER);
+    m_txtErrorMessage->SetFont(xsmallFont);
+    m_rightSizer->Add(m_txtErrorMessage, 0, wxTOP, -1);
+    m_txtErrorMessage->Hide();
+    // Error message end...
+    // Unload button
+    m_btnUnload->SetFont(xsmallFont);
+    // Unload button end...
+    // FW version
+    m_txtFWVersion->SetFont(xsmallFont);
+    m_txtFWVersion->SetForegroundColour("GREY");
+    // FW version end...
     // Print now button.
     m_rightSizer->Add(m_btnPrintNow, 0, wxTOP, -12);
     m_btnPrintNow->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) {
@@ -196,12 +214,15 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
             SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT));
             m_expansionSizer->ShowItems(false);
         } else {
-            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 100 : 60)));
+            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 110 : 70)));
             m_expansionSizer->ShowItems(true);
             if (!this->nm->states->printing) {
                 // hide m_txtFileName and duration and their bottom borders.
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 2; i++)
                     m_expansionSizer->Hide((size_t)i);
+                !is_there(this->nm->attr->deviceModel, {"z"}) || this->nm->isBusy() || this->nm->states->bedOccupied || this->nm->states->hasError ? m_btnUnload->Hide() : m_btnUnload->Show();
+            } else {
+                m_btnUnload->Hide();
             }
         }
         m_expansionSizer->Layout();
@@ -215,14 +236,13 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
 
     // inside the expansion panel.
     m_expansionSizer->Add(m_txtFileName, 0, wxBOTTOM);
-    m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
     m_expansionSizer->Add(m_txtFileTime, 0, wxBOTTOM);
-    m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
-    m_expansionSizer->Add(m_txtDeviceMaterial, 0, wxBOTTOM);
-    m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
+    m_filamentSizer->Add(m_txtDeviceMaterial, 0, wxLEFT);
+    m_filamentSizer->Add(m_btnUnload, 0, wxLEFT, 10);
+    m_expansionSizer->Add(m_filamentSizer, 0, wxTOP);
     m_expansionSizer->Add(m_txtDeviceNozzleDiameter, 0, wxBOTTOM);
-    m_expansionSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
     m_expansionSizer->Add(m_txtDeviceIP, 0, wxBOTTOM);
+    m_expansionSizer->Add(m_txtFWVersion, 0, wxEXPAND | wxRIGHT, 25);
     m_expansionSizer->ShowItems(false);
     m_mainSizer->Add(m_expansionSizer, 0, wxEXPAND | wxLEFT, m_avatar->GetSize().GetWidth() + 14); // only expand horizontally in vertical sizer.
     // end of expansion panel contents.
@@ -282,11 +302,8 @@ void Device::updateStatus()
 
 void Device::updateStates()
 {
-    if (nm->states->printing ||
-        nm->states->heating ||
-        nm->states->calibrating ||
-        nm->states->paused ||
-        nm->states->uploading) {
+
+    if (nm->isBusy()) {
         m_progressBar->Show();
         m_txtProgress->Show();
         m_btnSayHi->Hide();
@@ -295,6 +312,8 @@ void Device::updateStates()
         m_btnResume->Hide();
         m_btnPause->Hide();
         m_txtBedOccupiedMessage->Hide();
+        m_btnUnload->Hide();
+
         if (nm->states->printing) {
             if (nm->states->paused) {
                 m_btnResume->Show();
@@ -309,39 +328,51 @@ void Device::updateStates()
             m_btnCancel->Show();
         }
         updateProgress();
+        if (nm->states->hasError) {
+            m_progressBar->Hide();
+            m_txtProgress->Hide();
+            m_txtErrorMessage->Show();
+        }
     } else {
         m_btnPause->Hide();
         m_btnResume->Hide();
         m_btnCancel->Hide();
         m_progressBar->Hide();
         m_txtProgress->Hide();
-        if (nm->states->bedOccupied) {
-            m_txtBedOccupiedMessage->Show();
+        if (nm->states->bedOccupied || nm->states->hasError) {
+            if (nm->states->hasError) {
+                m_txtErrorMessage->Show();
+                m_txtBedOccupiedMessage->Hide();
+            } else if (nm->states->bedOccupied)
+                m_txtBedOccupiedMessage->Show();
             m_btnPrintNow->Hide();
             m_btnSayHi->Hide();
             m_btnPreheat->Hide();
+            m_btnUnload->Hide();
         } else {
             m_btnSayHi->Show();
             m_btnPreheat->Show();
             m_btnPrintNow->Show();
             m_txtBedOccupiedMessage->Hide();
+            if (is_there(this->nm->attr->deviceModel, {"z"}) && m_isExpanded)
+                m_btnUnload->Show();
         }
     }
 
     if (nm->states->printing) {
         if (m_isExpanded) {
-            // show m_txtFileName and duration and their bottom borders.
-            for (int i = 0; i < 4; i++)
+            // show m_txtFileName and duration
+            for (int i = 0; i < 2; i++)
                 m_expansionSizer->Show((size_t)i);
         }
     } else if (m_isExpanded) {
-        // hide m_txtFileName and duration and their bottom borders.
-        for (int i = 0; i < 4; i++)
+        // hide m_txtFileName and duration
+        for (int i = 0; i < 2; i++)
             m_expansionSizer->Hide((size_t)i);
     }
 
     if (m_isExpanded) {
-        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 100 : 60)));
+        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 110 : 70)));
         m_expansionSizer->Layout();
         GetParent()->Layout();
         GetParent()->FitInside();

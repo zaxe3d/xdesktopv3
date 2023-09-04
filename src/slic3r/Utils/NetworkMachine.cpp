@@ -81,7 +81,7 @@ void NetworkMachine::onWSRead(string message)
             }
             vector<string> fwV;
             split(fwV, to_lower_copy(pt.get<string>("version", "1.0.0")), is_any_of("."));
-            attr->firmwareVersion = wxVersionInfo("fw_version", stoi(fwV[0]), stoi(fwV[1]), stoi(fwV[2]));
+            attr->firmwareVersion = wxVersionInfo("v", stoi(fwV[0]), stoi(fwV[1]), stoi(fwV[2]));
         }
         if (event == "hello" || event == "states_update") {
             // states
@@ -93,6 +93,7 @@ void NetworkMachine::onWSRead(string message)
             states->printing       = states->ptreeStringtoBool(pt, "is_printing");
             states->heating        = states->ptreeStringtoBool(pt, "is_heating");
             states->paused         = states->ptreeStringtoBool(pt, "is_paused");
+            states->hasError       = states->ptreeStringtoBool(pt, "is_error");
         }
         if (event == "new_name")
             name = pt.get<string>("name", "Zaxe");
@@ -124,6 +125,11 @@ void NetworkMachine::onWSRead(string message)
     } catch(...) {
         BOOST_LOG_TRIVIAL(warning) << "Cannot parse machine message json.";
     }
+}
+
+void NetworkMachine::unloadFilament()
+{
+    request("filament_unload");
 }
 
 void NetworkMachine::sayHi()
