@@ -29,8 +29,8 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_txtErrorMessage(new wxStaticText(this, wxID_ANY, _L("Device is in error state!"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtFileTime(new wxStaticText(this, wxID_ANY, _L("Elapsed / Estimated time: ") + get_time_hms(std::to_string(nm->attr->startTime)) + " / " + nm->attr->estimatedTime, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtFWVersion(new wxStaticText(this, wxID_ANY, nm->attr->firmwareVersion.GetVersionString(), wxDefaultPosition, wxSize(-1, 10), wxTE_RIGHT)),
-    m_btnUnload(new wxButton(this, wxID_ANY, _L("Unload"), wxDefaultPosition, wxSize(-1, 15), wxTE_CENTER)),
+    m_txtFWVersion(new wxStaticText(this, wxID_ANY, nm->attr->firmwareVersion.GetVersionString(), wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
+    m_btnUnload(new wxButton(this, wxID_ANY, _L("Unload"), wxDefaultPosition, wxSize(-1, 18), wxCENTER | wxCentreY)),
     m_btnPrintNow(new wxButton(this, wxID_ANY, _L("Print Now!"))),
     m_avatar(new RoundedPanel(this, wxID_ANY, "", wxSize(60, 60), wxColour(169, 169, 169), wxColour("WHITE"))),
     m_bitPreheatActive(new wxBitmap()),
@@ -107,12 +107,12 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     if (is_there(this->nm->attr->deviceModel, {"z2", "z3"})) {
         m_avatar->Bind(wxEVT_LEFT_DCLICK, [this](const wxMouseEvent &evt) {
             BOOST_LOG_TRIVIAL(info) << "Clicked on avatar trying to open stream on: " << this->nm->name;
-            if (this->nm->attr->firmwareVersion.GetMinor() >= 3 && this->nm->attr->firmwareVersion.GetMicro() >= 80) {
+            if (this->nm->attr->firmwareVersion.GetMinor() >= 4 || (this->nm->attr->firmwareVersion.GetMinor() >= 3 && this->nm->attr->firmwareVersion.GetMicro() >= 80)) {
                 wxFileName ffplay(wxStandardPaths::Get().GetExecutablePath());
                 wxString curExecPath(ffplay.GetPath());
                 wxExecute(
 #ifdef _WIN32
-                    "cmd.exe /c " + curExecPath + "/ffplay tcp://" + this->nm->ip + ":5002 -window_title \"Zaxe " + to_upper_copy(this->nm->attr->deviceModel) + ": " + this->nm->name + "\" -x 720",
+                    "cmd.exe /c ffplay tcp://" + this->nm->ip + ":5002 -window_title \"Zaxe " + to_upper_copy(this->nm->attr->deviceModel) + ": " + this->nm->name + "\" -x 720",
                     wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE
 #else
                     curExecPath + "/ffplay tcp://" + this->nm->ip + ":5002 -window_title \"Zaxe " + to_upper_copy(this->nm->attr->deviceModel) + ": " + this->nm->name + "\" -x 720",
@@ -214,7 +214,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
             SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT));
             m_expansionSizer->ShowItems(false);
         } else {
-            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 110 : 70)));
+            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 115 : 75)));
             m_expansionSizer->ShowItems(true);
             if (!this->nm->states->printing) {
                 // hide m_txtFileName and duration and their bottom borders.
@@ -248,7 +248,9 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     // end of expansion panel contents.
 
     // Bottom line. (separator)
-    m_mainSizer->Add(new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL), 0, wxRIGHT | wxEXPAND, 20);
+    wxStaticLine* bl = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL);
+    wxGetApp().UpdateDarkUI(bl);
+    m_mainSizer->Add(bl, 0, wxRIGHT | wxEXPAND, 20);
 
     updateStates();
 
@@ -372,7 +374,7 @@ void Device::updateStates()
     }
 
     if (m_isExpanded) {
-        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 110 : 70)));
+        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 115 : 75)));
         m_expansionSizer->Layout();
         GetParent()->Layout();
         GetParent()->FitInside();
@@ -445,7 +447,7 @@ void Device::onTimer(wxTimerEvent& event)
 
 void Device::confirm(function<void()> cb)
 {
-    RichMessageDialog dialog(GetParent(), wxString(_L("Are you sure?")), _L("XDesktop: Confirmation"), wxYES_NO);
+    RichMessageDialog dialog(GetParent(), wxString(_L("Are you sure?")), _L("XDesktop: Confirmation"), wxICON_QUESTION | wxYES_NO);
     dialog.SetYesNoLabels(_L("Yes"), _L("No"));
     int res = dialog.ShowModal();
     if (res == wxID_YES) cb();

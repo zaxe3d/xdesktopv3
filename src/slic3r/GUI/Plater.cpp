@@ -968,6 +968,7 @@ Sidebar::Sidebar(Plater *parent)
     // Machine carousel.
     auto *mm_label = new wxStaticText(this, wxID_ANY, "..::" + _L("Zaxe Machine Carousel") + "::..",
                                       wxDefaultPosition, wxSize(-1, 30), wxTE_CENTER);
+    wxGetApp().UpdateDarkUI(mm_label);
 
     wxFont label_font = wxGetApp().bold_font();
     label_font.SetPointSize(14);
