@@ -18,6 +18,8 @@ set(SLIC3R_GUI_SOURCES
     GUI/BitmapCache.hpp
     GUI/ConfigSnapshotDialog.cpp
     GUI/ConfigSnapshotDialog.hpp
+    GUI/CustomIPDialog.cpp
+    GUI/CustomIPDialog.hpp
     GUI/3DScene.cpp
     GUI/3DScene.hpp
     GUI/format.hpp

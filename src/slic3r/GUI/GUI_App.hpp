@@ -88,6 +88,7 @@ extern wxString file_wildcards(FileType file_type, const std::string &custom_ext
 
 enum ConfigMenuIDs {
     ConfigMenuWizard,
+    ConfigMenuCustomIPs,
     ConfigMenuSnapshots,
     ConfigMenuTakeSnapshot,
     ConfigMenuUpdateConf,

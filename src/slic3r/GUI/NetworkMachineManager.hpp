@@ -22,6 +22,7 @@ public:
     virtual ~NetworkMachineManager(); // avoid leakage on possible children.
 
     void enablePrintNowButton(bool enable);
+    void addMachine(std::string ip, int port, std::string id);
 
     static inline std::map<string, string> materialMap = {
         { "zaxe_abs", "Zaxe ABS" },

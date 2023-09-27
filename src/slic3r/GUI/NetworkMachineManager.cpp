@@ -1,4 +1,6 @@
 #include "NetworkMachineManager.hpp"
+#include "GUI_App.hpp"
+#include "MainFrame.hpp" // for wxGetApp().app_config
 
 namespace Slic3r {
 namespace GUI {
@@ -22,6 +24,10 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent) :
 
     // start listenting for devices here on the network.
     m_broadcastReceiver->Bind(EVT_BROADCAST_RECEIVED, &NetworkMachineManager::onBroadcastReceived, this);
+    // add custom ips here.
+    auto ips = wxGetApp().app_config->get_custom_ips();
+    for (int i = 0; i < ips.size(); i++)
+        addMachine(ips[i], 9294, "Zaxe (m.)");
 }
 
 void NetworkMachineManager::enablePrintNowButton(bool enable)
@@ -41,23 +47,23 @@ void NetworkMachineManager::onBroadcastReceived(wxCommandEvent &event)
 
     boost::property_tree::ptree pt; // construct root obj.
     boost::property_tree::read_json(jsonStream, pt);
-
     try {
-        auto machine  = this->m_networkMContainer->addMachine(
-            pt.get<std::string>("ip"),
-            pt.get<int>("port"),
-            pt.get<std::string>("id"));
-        if (machine != nullptr) {
-            this->m_networkMContainer->Bind(EVT_MACHINE_OPEN, &NetworkMachineManager::onMachineOpen, this);
-            this->m_networkMContainer->Bind(EVT_MACHINE_CLOSE, &NetworkMachineManager::onMachineClose, this);
-            this->m_networkMContainer->Bind(EVT_MACHINE_NEW_MESSAGE, &NetworkMachineManager::onMachineMessage, this);
-            this->m_networkMContainer->Bind(EVT_MACHINE_AVATAR_READY, &NetworkMachineManager::onMachineAvatarReady, this);
-        }
+        this->addMachine(pt.get<std::string>("ip"), pt.get<int>("port"), pt.get<std::string>("id"));
     } catch(std::exception ex) {
         BOOST_LOG_TRIVIAL(warning) << boost::format("Cannot parse broadcast message json: [%1%].") % ex.what();
     }
 }
 
+void NetworkMachineManager::addMachine(std::string ip, int port, std::string id)
+{
+    auto machine  = this->m_networkMContainer->addMachine(ip, port, id);
+    if (machine != nullptr) {
+        this->m_networkMContainer->Bind(EVT_MACHINE_OPEN, &NetworkMachineManager::onMachineOpen, this);
+        this->m_networkMContainer->Bind(EVT_MACHINE_CLOSE, &NetworkMachineManager::onMachineClose, this);
+        this->m_networkMContainer->Bind(EVT_MACHINE_NEW_MESSAGE, &NetworkMachineManager::onMachineMessage, this);
+        this->m_networkMContainer->Bind(EVT_MACHINE_AVATAR_READY, &NetworkMachineManager::onMachineAvatarReady, this);
+    }
+}
 void NetworkMachineManager::onMachineOpen(MachineEvent &event)
 {
     // Now we can add this to UI.

@@ -153,6 +153,9 @@ public:
     std::vector<std::string> get_recent_projects() const;
     bool set_recent_projects(const std::vector<std::string>& recent_projects);
 
+    std::vector<std::string> get_custom_ips() const;
+    bool set_custom_ips(const std::vector<std::string>& custom_ips);
+
 	bool set_mouse_device(const std::string& name, double translation_speed, double translation_deadzone, float rotation_speed, float rotation_deadzone, double zoom_speed, bool swap_yz);
 	std::vector<std::string> get_mouse_device_names() const;
 	bool get_mouse_device_translation_speed(const std::string& name, double& speed) const

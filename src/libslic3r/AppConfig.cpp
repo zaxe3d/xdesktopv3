@@ -595,6 +595,43 @@ std::string AppConfig::get_last_dir() const
     return std::string();
 }
 
+std::vector<std::string> AppConfig::get_custom_ips() const
+{
+    std::vector<std::string> ret;
+    const auto it = m_storage.find("custom_ips");
+    if (it != m_storage.end())
+    {
+        for (const std::map<std::string, std::string>::value_type& item : it->second)
+        {
+            ret.push_back(item.second);
+        }
+    }
+    return ret;
+}
+
+bool AppConfig::set_custom_ips(const std::vector<std::string>& custom_ips)
+{
+    static constexpr const char *section = "custom_ips";
+    auto it_section = m_storage.find(section);
+    if (it_section == m_storage.end()) {
+        if (custom_ips.empty())
+            return false;
+        it_section = m_storage.insert({ std::string(section), {} }).first;
+    }
+    auto &dst = it_section->second;
+
+    std::map<std::string, std::string> src;
+    for (unsigned int i = 0; i < (unsigned int)custom_ips.size(); ++i)
+        src[std::to_string(i + 1)] = custom_ips[i];
+
+    if (src != dst) {
+        dst = std::move(src);
+        m_dirty = true;
+        return true;
+    } else
+        return false;
+}
+
 std::vector<std::string> AppConfig::get_recent_projects() const
 {
     std::vector<std::string> ret;

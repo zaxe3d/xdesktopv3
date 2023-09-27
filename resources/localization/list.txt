@@ -85,6 +85,7 @@ src/slic3r/GUI/Tab.hpp
 src/slic3r/GUI/UnsavedChangesDialog.cpp
 src/slic3r/GUI/UpdateDialogs.cpp
 src/slic3r/GUI/WipeTowerDialog.cpp
+src/slic3r/GUI/CustomIPDialog.cpp
 src/slic3r/GUI/wxExtensions.cpp
 src/slic3r/GUI/Device.cpp
 src/slic3r/Utils/AstroBox.cpp

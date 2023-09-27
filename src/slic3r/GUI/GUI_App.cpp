@@ -63,6 +63,7 @@
 #include "../Utils/WinRegistry.hpp"
 #include "slic3r/Config/Snapshot.hpp"
 #include "ConfigSnapshotDialog.hpp"
+#include "CustomIPDialog.hpp"
 #include "FirmwareDialog.hpp"
 #include "Preferences.hpp"
 #include "Tab.hpp"
@@ -2347,6 +2348,7 @@ void GUI_App::add_config_menu(wxMenuBar *menu)
     // Cmd+, is standard on OS X - what about other operating systems?
     if (is_editor()) {
         local_menu->Append(config_id_base + ConfigMenuWizard, config_wizard_name + dots, config_wizard_tooltip);
+        local_menu->Append(config_id_base + ConfigMenuCustomIPs, _L("Custom &IP Configuration") + dots, _L("Add / Remove manual devices by IP to machine carousel"));
         local_menu->Append(config_id_base + ConfigMenuSnapshots, _L("&Configuration Snapshots") + dots, _L("Inspect / activate configuration snapshots"));
         local_menu->Append(config_id_base + ConfigMenuTakeSnapshot, _L("Take Configuration &Snapshot"), _L("Capture a configuration snapshot"));
         local_menu->Append(config_id_base + ConfigMenuUpdateConf, _L("Check for Configuration Updates"), _L("Check for configuration updates"));
@@ -2451,6 +2453,12 @@ void GUI_App::add_config_menu(wxMenuBar *menu)
                 }
             }
             break;
+        case ConfigMenuCustomIPs:
+        {
+            CustomIPDialog dlg;
+            dlg.ShowModal();
+            break;
+        }
         case ConfigMenuPreferences:
         {
             open_preferences();
