@@ -8017,7 +8017,7 @@ msgstr "Şimdi dilimle"
 
 #: src/slic3r/GUI/Plater.cpp:969
 msgid "Zaxe Machine Carousel"
-msgstr ""
+msgstr "Zaxe Makine Parkuru"
 
 #: src/slic3r/GUI/Plater.cpp:1144
 msgid "Hold Shift to Slice & Export G-code"
