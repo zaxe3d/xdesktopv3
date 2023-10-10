@@ -68,6 +68,7 @@ CustomIPDialog::CustomIPDialog()
             wxGetApp().app_config->set_custom_ips(this->ips);
             wxGetApp().sidebar().machine_manager()->addMachine(ip, 9294, "Zaxe (m.)");
         }
+        this->btnAdd->Enable(false);
         this->txtIP->SetValue("");
     });
     actionSizer->Add(txtIP, 1, wxEXPAND, 0);
