@@ -366,6 +366,11 @@ public:
     size_t          get_selected_idx()    const { return m_idx_selected; }
     // Returns the name of the selected preset, or an empty string if no preset is selected.
     std::string     get_selected_preset_name() const { return (m_idx_selected == size_t(-1)) ? std::string() : this->get_selected_preset().name; }
+    bool            is_selected_preset_zaxe_premium() const {
+        std::string pname = get_selected_preset_name();
+        return is_selected_preset_zaxe() &&
+               pname.find("Z3") != std::string::npos;
+    }
     bool            is_selected_preset_zaxe() const {
         std::string pname = get_selected_preset_name();
         return pname.find("Zaxe") != std::string::npos &&

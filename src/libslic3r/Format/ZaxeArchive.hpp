@@ -29,13 +29,13 @@ using namespace boost::property_tree;
 using namespace std;
 using ConfMap = std::map<std::string, std::string>;
 
-#define ZAXE_FILE_VERSION "3.0.0"
+#define ZAXE_FILE_VERSION "3.0.1"
 namespace Slic3r {
 class ZaxeArchive {
 public:
     ZaxeArchive() = default;
     /// Actually perform the export.
-    void export_print(const string archive_path, ThumbnailsList thumbnails, const Print &print, const string temp_gcode_output_path);
+    void export_print(const string archive_path, ThumbnailsList thumbnails, const Print &print, const string temp_gcode_output_path, const bool bed_level, const bool arc_welder);
     std::string get_info(const std::string &key) const;
 protected:
     void generate_info_file(ConfMap &m, const Print &print);

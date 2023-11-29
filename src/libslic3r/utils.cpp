@@ -681,7 +681,7 @@ CopyFileResult copy_file_inner(const std::string& from, const std::string& to, s
 	boost::system::error_code ec;
 	boost::filesystem::permissions(target, perms, ec);
 	if (ec)
-		BOOST_LOG_TRIVIAL(debug) << "boost::filesystem::permisions before copy error message (this could be irrelevant message based on file system): " << ec.message();
+		BOOST_LOG_TRIVIAL(trace) << "boost::filesystem::permisions before copy error message (this could be irrelevant message based on file system): " << ec.message();
 	ec.clear();
 #ifdef __linux__
 	// We want to allow copying files on Linux to succeed even if changing the file attributes fails.

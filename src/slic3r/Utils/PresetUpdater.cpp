@@ -55,7 +55,7 @@ static const char *TMP_EXTENSION = ".download";
 namespace {
 void copy_file_fix(const fs::path &source, const fs::path &target)
 {
-	BOOST_LOG_TRIVIAL(debug) << format("PresetUpdater: Copying %1% -> %2%", source, target);
+	BOOST_LOG_TRIVIAL(trace) << format("PresetUpdater: Copying %1% -> %2%", source, target);
 	std::string error_message;
 	CopyFileResult cfr = copy_file(source.string(), target.string(), error_message, false);
 	if (cfr != CopyFileResult::SUCCESS) {
@@ -223,7 +223,7 @@ bool PresetUpdater::priv::get_file(const std::string &url, const fs::path &targe
 	fs::path tmp_path = target_path;
 	tmp_path += format(".%1%%2%", get_current_pid(), TMP_EXTENSION);
 
-	BOOST_LOG_TRIVIAL(info) << format("Get: `%1%`\n\t-> `%2%`\n\tvia tmp path `%3%`",
+	BOOST_LOG_TRIVIAL(trace) << format("Get: `%1%`\n\t-> `%2%`\n\tvia tmp path `%3%`",
 		url,
 		target_path.string(),
 		tmp_path.string());
@@ -234,7 +234,7 @@ bool PresetUpdater::priv::get_file(const std::string &url, const fs::path &targe
 		})
 		.on_error([&](std::string body, std::string error, unsigned http_status) {
 			(void)body;
-			BOOST_LOG_TRIVIAL(error) << format("Error getting: `%1%`: HTTP %2%, %3%",
+			BOOST_LOG_TRIVIAL(trace) << format("Error getting: `%1%`: HTTP %2%, %3%",
 				url,
 				http_status,
 				error);
@@ -327,7 +327,7 @@ void PresetUpdater::priv::get_or_copy_missing_resource(const std::string& vendor
 		{
 			throw Slic3r::CriticalException(GUI::format("URL outside prusa3d.com network: %1%", url));
 		}
-		BOOST_LOG_TRIVIAL(info) << "Downloading resources missing in cache directory: " << vendor << " / " << filename;
+		BOOST_LOG_TRIVIAL(trace) << "Downloading resources missing in cache directory: " << vendor << " / " << filename;
 
 		const auto resource_url = format("%1%%2%%3%", url, url.back() == '/' ? "" : "/", escaped_filename); // vendor should already be in url 
 
@@ -453,7 +453,7 @@ void PresetUpdater::priv::sync_config(const VendorMap vendors, const std::string
 		const auto vendor_it = vendors.find(index.vendor());
 		if (vendor_it == vendors.end()) {
 			// Not installed vendor yet we need to check missing thumbnails (of new printers)
-			BOOST_LOG_TRIVIAL(debug) << "No such vendor: " << index.vendor();
+			BOOST_LOG_TRIVIAL(trace) << "No such vendor: " << index.vendor();
 			if (archive_it != vendors_with_status.end())
 				archive_it->second = VendorStatus::IN_CACHE;
 			continue;
@@ -783,7 +783,7 @@ void PresetUpdater::priv::check_install_indices() const
 			const auto path_in_cache = cache_path / path.filename();
 
 			if (! fs::exists(path_in_cache)) {
-				BOOST_LOG_TRIVIAL(info) << "Install index from resources: " << path.filename();
+				BOOST_LOG_TRIVIAL(trace) << "Install index from resources: " << path.filename();
 				copy_file_fix(path, path_in_cache);
 			} else {
 				Index idx_rsrc, idx_cache;
@@ -813,7 +813,7 @@ Updates PresetUpdater::priv::get_config_updates(const Semver &old_slic3r_version
 		auto bundle_path_idx = vendor_path / idx.path().filename();
 
 		if (! fs::exists(bundle_path)) {
-			BOOST_LOG_TRIVIAL(info) << format("Confing bundle not installed for vendor %1%, skipping: ", idx.vendor());
+			BOOST_LOG_TRIVIAL(trace) << format("Confing bundle not installed for vendor %1%, skipping: ", idx.vendor());
 			continue;
 		}
 

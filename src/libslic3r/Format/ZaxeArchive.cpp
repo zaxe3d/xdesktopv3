@@ -90,7 +90,14 @@ std::string ZaxeArchive::get_info(const string &key) const
         return it->second;
     return "";
 }
-void ZaxeArchive::export_print(const string archive_path, ThumbnailsList thumbnails, const Print &print, const string temp_gcode_output_path)
+void ZaxeArchive::export_print(
+    const string archive_path,
+    ThumbnailsList thumbnails,
+    const Print &print,
+    const string temp_gcode_output_path,
+    const bool bed_level,
+    const bool arc_welder
+)
 {
     Zipper zipper{archive_path};
     boost::filesystem::path temp_path(temp_gcode_output_path);
@@ -100,8 +107,10 @@ void ZaxeArchive::export_print(const string archive_path, ThumbnailsList thumbna
     try {
         m_infoconf = ConfMap{
             { "name", boost::filesystem::path(zipper.get_filename()).stem().string() },
-            { "checksum", generate_md5_checksum(temp_gcode_output_path)
-        } };
+            { "checksum", generate_md5_checksum(temp_gcode_output_path) },
+            { "bed_level", bed_level ? "on" : "off" },
+            { "arc_welder", arc_welder ? "on" : "off" },
+        };
         generate_info_file(m_infoconf, print); // generate info.json contents.
         zipper.add_entry("info.json");
         zipper << to_json(m_infoconf);
@@ -156,7 +165,8 @@ void ZaxeArchive::generate_info_file(ConfMap &m, const Print &print)
     m["extruder_temperature"]   = get_cfg_value(cfg, "first_layer_temperature", "0", true);
     m["bed_temperature"]        = get_cfg_value(cfg, "bed_temperature", "0", true);
     m["standby_temperature"]    = standby_temp_char;
-    m["slicer_version"]         = SLIC3R_BUILD_ID;
+    m["slicer_version"]         = SLIC3R_VERSION;
+    m["xdesktop_version"]       = XDESKTOP_VERSION;
 }
 
 } // namespace Slic3r

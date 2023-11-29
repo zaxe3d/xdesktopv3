@@ -189,10 +189,13 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
         BOOST_LOG_TRIVIAL(info) << "Print now pressed on " << this->nm->name;
         const ZaxeArchive& archive = wxGetApp().plater()->get_zaxe_archive();
 
+        vector<string> sPV;
+        split(sPV, GUI::wxGetApp().preset_bundle->printers.get_selected_preset().name, is_any_of("-"));
+        string pN = sPV[0]; // ie: Zaxe Z3S - 0.6mm nozzle -> Zaxe Z3S
         string dM = to_upper_copy(this->nm->attr->deviceModel);
-        string pN = GUI::wxGetApp().preset_bundle->printers.get_selected_preset().name;
         auto s = pN.find(dM);
         boost::replace_all(dM, "PLUS", "+");
+        trim(pN);
         if (s == std::string::npos || pN.length() != dM.length() + s) {
             wxMessageBox(L("Device model does NOT match. Please reslice with the correct model."), _L("Wrong device model"), wxICON_ERROR);
         } else if (!this->nm->attr->isLite && this->nm->attr->material.compare(archive.get_info("material")) != 0) {
@@ -306,7 +309,7 @@ void Device::updateStatus()
 
 void Device::updateStates()
 {
-
+    //Freeze();
     if (nm->isBusy()) {
         m_progressBar->Show();
         m_txtProgress->Show();
@@ -384,6 +387,7 @@ void Device::updateStates()
 
     m_rightSizer->Layout();
     updateStatus();
+    //Thaw();
 }
 
 void Device::updateProgress()

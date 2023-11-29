@@ -176,6 +176,7 @@ public:
     void load_gcode(const wxString& filename);
     void reload_gcode_from_disk();
     void refresh_print();
+    void reset_print();
 
     std::vector<size_t> load_files(const std::vector<boost::filesystem::path>& input_files, bool load_model = true, bool load_config = true, bool imperial_units = false);
     // To be called when providing a list of files to the GUI slic3r on command line.
@@ -347,6 +348,10 @@ public:
     PrinterTechnology   printer_technology() const;
     const DynamicPrintConfig * config() const;
     bool                set_printer_technology(PrinterTechnology printer_technology);
+    bool is_bed_level_active();
+    void set_bed_level_active(bool active);
+    bool is_arc_welder_active();
+    void set_arc_welder_active(bool active);
 
     // see if we need a zaxe file according to technology and selected printer model on config change.
     void check_and_set_zaxe_file();

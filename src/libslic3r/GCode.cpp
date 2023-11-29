@@ -1034,7 +1034,7 @@ void GCode::_do_export(Print& print, GCodeOutputStream &file, ThumbnailsGenerato
     if (const auto [thumbnails, thumbnails_format] = std::make_pair(
             print.full_print_config().option<ConfigOptionPoints>("thumbnails"),
             print.full_print_config().option<ConfigOptionEnum<GCodeThumbnailsFormat>>("thumbnails_format"));
-        thumbnails)
+        thumbnails && m_config.printer_vendor != "Zaxe")
         GCodeThumbnails::export_thumbnails_to_file(
             thumbnail_cb, thumbnails->values, thumbnails_format ? thumbnails_format->value : GCodeThumbnailsFormat::PNG,
             [&file](const char* sz) { file.write(sz); },

@@ -380,7 +380,14 @@ FreqChangedParams::FreqChangedParams(wxWindow* parent) :
         Tab* tab_print = wxGetApp().get_tab(Preset::TYPE_PRINT);
         if (!tab_print) return;
 
-        if (opt_key == "fill_density") {
+        if (opt_key == "arc_welder" || opt_key == "bed_level") {
+            if (opt_key == "arc_welder")
+                wxGetApp().plater()->set_arc_welder_active(boost::any_cast<bool>(value));
+            else if (opt_key == "bed_level")
+                wxGetApp().plater()->set_bed_level_active(boost::any_cast<bool>(value));
+            wxGetApp().plater()->reset_print();
+        }
+        if (opt_key == "arc_welder" || opt_key == "fill_density" || opt_key == "bed_level") {
             tab_print->update_dirty();
             tab_print->reload_config();
             tab_print->update();
@@ -479,6 +486,24 @@ FreqChangedParams::FreqChangedParams(wxWindow* parent) :
     def.gui_type = ConfigOptionDef::GUIType::undefined;
     def.set_default_value(new ConfigOptionBool{ m_brim_width > 0.0 ? true : false });
     option = Option(def, "brim");
+    option.opt.sidetext = "";
+    line.append_option(option);
+
+    def.label = "G29";
+    def.type = coBool;
+    def.tooltip = L("This flag enables/disables the mesh leveling after homing. If unchecked will use the previous bed leveling mesh. This can greatly reduce initial time to start the file.");
+    def.gui_type = ConfigOptionDef::GUIType::undefined;
+    def.set_default_value(new ConfigOptionBool{ true });
+    option = Option(def, "bed_level");
+    option.opt.sidetext = "";
+    line.append_option(option);
+
+    def.label = L("Arc welder");
+    def.type = coBool;
+    def.tooltip = L("This flag enables arc welding. This can greatly compress some GCode and might reduce stuttering.");
+    def.gui_type = ConfigOptionDef::GUIType::undefined;
+    def.set_default_value(new ConfigOptionBool{ true });
+    option = Option(def, "arc_welder");
     option.opt.sidetext = "";
     line.append_option(option);
 
@@ -2004,6 +2029,8 @@ struct Plater::priv
     std::string                 last_output_dir_path;
     bool                        inside_snapshot_capture() { return m_prevent_snapshots != 0; }
 	bool                        process_completed_with_error { false };
+    bool                        arc_welder_active { true };
+    bool                        bed_level_active { true };
    
 private:
     bool layers_height_allowed() const;
@@ -3141,6 +3168,7 @@ void Plater::priv::reset()
 
     // Stop and reset the Print content.
     this->background_process.reset();
+
     model.clear_objects();
     update();
     // Delete object from Sidebar list. Do it after update, so that the GLScene selection is updated with the modified model.
@@ -5448,6 +5476,11 @@ void Plater::refresh_print()
     p->preview->refresh_print();
 }
 
+void Plater::reset_print()
+{
+    p->background_process.reset();
+}
+
 std::vector<size_t> Plater::load_files(const std::vector<fs::path>& input_files, bool load_model, bool load_config, bool imperial_units /*= false*/) { return p->load_files(input_files, load_model, load_config, imperial_units); }
 
 // To be called when providing a list of files to the GUI slic3r on command line.
@@ -7219,6 +7252,26 @@ void Plater::check_and_set_zaxe_file()
     const bool isZaxe = wxGetApp().preset_bundle->printers.is_selected_preset_zaxe();
     p->label_btn_export = p->printer_technology == ptFFF && !isZaxe ?  L("Export G-code") : L("Export");
     p->label_btn_send   = p->printer_technology == ptFFF && !isZaxe ? L("Send G-code") : L("Send to printer");
+}
+
+bool Plater::is_bed_level_active()
+{
+    return p->bed_level_active;
+}
+
+void Plater::set_bed_level_active(bool active)
+{
+    p->bed_level_active = active;
+}
+
+bool Plater::is_arc_welder_active()
+{
+    return p->arc_welder_active;
+}
+
+void Plater::set_arc_welder_active(bool active)
+{
+    p->arc_welder_active = active;
 }
 
 bool Plater::set_printer_technology(PrinterTechnology printer_technology)
