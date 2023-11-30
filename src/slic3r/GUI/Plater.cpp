@@ -1002,11 +1002,11 @@ Sidebar::Sidebar(Plater *parent)
 
     auto *sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(mm_label, 0, wxLEFT | wxRIGHT | wxCENTRE);
-    sizer->Add(p->machine_manager, 7, wxEXPAND);
+    sizer->Add(p->machine_manager, 6.5, wxEXPAND);
     sizer->AddSpacer(10);
     sizer->Add(btns_sizer, 0, wxEXPAND | wxLEFT, 10);
     sizer->AddSpacer(10);
-    sizer->Add(p->scrolled, 3, wxEXPAND);
+    sizer->Add(p->scrolled, 3.5, wxEXPAND);
     SetSizer(sizer);
 
     // Events
