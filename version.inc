@@ -3,7 +3,7 @@
 
 set(SLIC3R_APP_NAME "XDesktop")
 set(SLIC3R_APP_KEY "XDesktop")
-set(XDESKTOP_VERSION "3.0.1-alpha")
+set(XDESKTOP_VERSION "3.0.0-alpha1")
 set(SLIC3R_VERSION "2.6.0-alpha5")
 set(SLIC3R_BUILD_ID "XDesktop-${SLIC3R_VERSION}")
 set(XDESKTOP_BUILD_ID "XDesktop-${XDESKTOP_VERSION}")

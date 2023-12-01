@@ -2,6 +2,6 @@
 
 namespace Slic3r {
 
-Semver SEMVER { SLIC3R_VERSION };
+Semver SEMVER { XDESKTOP_VERSION };
 
 }
