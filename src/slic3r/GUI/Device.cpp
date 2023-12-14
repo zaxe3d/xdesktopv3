@@ -133,6 +133,11 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     wxBoxSizer* dnaabp = new wxBoxSizer(wxHORIZONTAL); // device name and action buttons
     m_txtDeviceName->SetFont(boldSmallFont);
     wxGetApp().UpdateDarkUI(m_txtDeviceName);
+    wxGetApp().UpdateDarkUI(m_txtFileName);
+    wxGetApp().UpdateDarkUI(m_txtFileTime);
+    wxGetApp().UpdateDarkUI(m_txtDeviceMaterial);
+    wxGetApp().UpdateDarkUI(m_txtDeviceNozzleDiameter);
+    wxGetApp().UpdateDarkUI(m_txtDeviceIP);
     auto* actionBtnsSizer = new wxBoxSizer(wxHORIZONTAL); // action buttons ie: hi.
     actionBtnsSizer->Add(m_btnPreheat);
     actionBtnsSizer->Add(m_btnSayHi);

@@ -233,7 +233,7 @@ void NetworkMachine::ftpRun()
     ::curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     ::curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
     ::curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void*>(&chunk));
-    //::curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    ::curl_easy_setopt(curl, CURLOPT_VERBOSE, get_logging_level() >= 5);
     res = curl_easy_perform(curl);
     ::curl_easy_cleanup(curl);
 
