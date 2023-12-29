@@ -1,3 +1,7 @@
+///|/ Copyright (c) Prusa Research 2022 - 2023 Vojtěch Bubník @bubnikv
+///|/
+///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/
 #include "RegionExpansion.hpp"
 
 #include <libslic3r/AABBTreeIndirect.hpp>
@@ -206,7 +210,7 @@ std::vector<WaveSeed> wave_seeds(
 {
     assert(tiny_expansion > 0);
 
-    if (src.empty())
+    if (src.empty() || boundary.empty())
         return {};
 
     using Intersection  = ClipperZUtils::ClipperZIntersectionVisitor::Intersection;
@@ -480,10 +484,8 @@ std::vector<Polygons> expand_expolygons(const ExPolygons &src, const ExPolygons 
     return out;
 }
 
-std::vector<ExPolygon> expand_merge_expolygons(ExPolygons &&src, const ExPolygons &boundary, const RegionExpansionParameters &params)
+std::vector<ExPolygon> merge_expansions_into_expolygons(ExPolygons &&src, std::vector<RegionExpansion> &&expanded)
 {
-    // expanded regions are sorted by boundary id and source id
-    std::vector<RegionExpansion> expanded = propagate_waves(src, boundary, params);
     // expanded regions will be merged into source regions, thus they will be re-sorted by source id.
     std::sort(expanded.begin(), expanded.end(), [](const auto &l, const auto &r) { return l.src_id < r.src_id; });
     uint32_t   last = 0;
@@ -533,6 +535,13 @@ std::vector<ExPolygon> expand_merge_expolygons(ExPolygons &&src, const ExPolygon
     for (; last < uint32_t(src.size()); ++ last)
         out.emplace_back(std::move(src[last]));
     return out;
+}
+
+std::vector<ExPolygon> expand_merge_expolygons(ExPolygons &&src, const ExPolygons &boundary, const RegionExpansionParameters &params)
+{
+    // expanded regions are sorted by boundary id and source id
+    std::vector<RegionExpansion> expanded = propagate_waves(src, boundary, params);
+    return merge_expansions_into_expolygons(std::move(src), std::move(expanded));
 }
 
 } // Algorithm

@@ -1,3 +1,8 @@
+///|/ Copyright (c) Prusa Research 2016 - 2023 Oleksandra Iushchenko @YuSanka, Vojtěch Bubník @bubnikv, Filip Sykala @Jony01, David Kocík @kocikdav, Enrico Turri @enricoturri1966, Tomáš Mészáros @tamasmeszaros, Lukáš Matěna @lukasmatena, Vojtěch Král @vojtechkral
+///|/ Copyright (c) 2019 Sijmen Schoon
+///|/
+///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/
 #ifndef slic3r_Utils_hpp_
 #define slic3r_Utils_hpp_
 
@@ -52,6 +57,11 @@ const std::string& sys_shapes_dir();
 
 // Return a full path to the custom shapes gallery directory.
 std::string custom_shapes_dir();
+
+// Set a path with shapes gallery files.
+void set_custom_gcodes_dir(const std::string &path);
+// Return a full path to the system shapes gallery directory.
+const std::string& custom_gcodes_dir();
 
 // Set a path with preset files.
 void set_data_dir(const std::string &path);
@@ -251,7 +261,6 @@ inline typename CONTAINER_TYPE::value_type& next_value_modulo(typename CONTAINER
 	return container[next_idx_modulo(idx, container.size())];
 }
 
-extern std::string translate_chars(std::string text);
 extern std::string xml_escape(std::string text, bool is_marked = false);
 extern std::string xml_escape_double_quotes_attribute_value(std::string text);
 
@@ -306,93 +315,11 @@ public:
     void reset() { closure = Closure(); }
 };
 
-// Returns true if needle is in the haystack
-inline bool is_there(const std::string &haystack, const std::vector<std::string> &needles)
-{
-    for (auto &needle : needles)
-        if (haystack.find(needle) != std::string::npos)
-            return true;
-    return false;
-}
-
 // Shorten the dhms time by removing the seconds, rounding the dhm to full minutes
 // and removing spaces.
-inline std::string short_time(const std::string &time)
-{
-    // Parse the dhms time format.
-    int days = 0;
-    int hours = 0;
-    int minutes = 0;
-    int seconds = 0;
-    if (time.find('d') != std::string::npos)
-        ::sscanf(time.c_str(), "%dd %dh %dm %ds", &days, &hours, &minutes, &seconds);
-    else if (time.find('h') != std::string::npos)
-        ::sscanf(time.c_str(), "%dh %dm %ds", &hours, &minutes, &seconds);
-    else if (time.find('m') != std::string::npos)
-        ::sscanf(time.c_str(), "%dm %ds", &minutes, &seconds);
-    else if (time.find('s') != std::string::npos)
-        ::sscanf(time.c_str(), "%ds", &seconds);
-    // Round to full minutes.
-    if (days + hours + minutes > 0 && seconds >= 30) {
-        if (++minutes == 60) {
-            minutes = 0;
-            if (++hours == 24) {
-                hours = 0;
-                ++days;
-            }
-        }
-    }
-    // Format the dhm time.
-    char buffer[64];
-    if (days > 0)
-        ::sprintf(buffer, "%dd%dh%dm", days, hours, minutes);
-    else if (hours > 0)
-        ::sprintf(buffer, "%dh%dm", hours, minutes);
-    else if (minutes > 0)
-        ::sprintf(buffer, "%dm", minutes);
-    else
-        ::sprintf(buffer, "%ds", seconds);
-    return buffer;
-}
-
-// Returns the given time is seconds in format HHh:MMm:SSs
-inline std::string get_time_hms(const std::string &time)
-{
-    // Parse the dhms time format.
-    int days = 0;
-    int hours = 0;
-    int minutes = 0;
-    int seconds = 0;
-    if (time.find('d') != std::string::npos)
-        ::sscanf(time.c_str(), "%dd %dh %dm %ds", &days, &hours, &minutes, &seconds);
-    else if (time.find('h') != std::string::npos)
-        ::sscanf(time.c_str(), "%dh %dm %ds", &hours, &minutes, &seconds);
-    else if (time.find('m') != std::string::npos)
-        ::sscanf(time.c_str(), "%dm %ds", &minutes, &seconds);
-    else if (time.find('s') != std::string::npos)
-        ::sscanf(time.c_str(), "%ds", &seconds);
-
-    hours += days * 24; // eliminate days.
-
-    char buffer[64];
-    ::sprintf(buffer, "%02d:%02d:%02d", hours, minutes, seconds);
-
-    return buffer;
-}
-
-// Returns the given time in seconds in format HHh MMm SSs
-inline std::string get_time_hms(float time_in_secs)
-{
-    int hours = (int)(time_in_secs / 3600.0f);
-    time_in_secs -= (float)hours * 3600.0f;
-    int minutes = (int)(time_in_secs / 60.0f);
-    time_in_secs -= (float)minutes * 60.0f;
-
-    char buffer[64];
-    ::sprintf(buffer, "%02d:%02d:%02d", hours, minutes, (int)time_in_secs);
-
-    return buffer;
-}
+std::string short_time(const std::string& time, bool force_localization = false);
+// localized short_time used on UI
+inline std::string short_time_ui(const std::string& time) { return short_time(time, true); }
 
 // Returns the given time is seconds in format DDd HHh MMm SSs
 inline std::string get_time_dhms(float time_in_secs)

@@ -1,3 +1,7 @@
+///|/ Copyright (c) Prusa Research 2021 - 2022 Enrico Turri @enricoturri1966, Vojtěch Bubník @bubnikv
+///|/
+///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/
 #ifndef slic3r_Color_hpp_
 #define slic3r_Color_hpp_
 
@@ -58,7 +62,7 @@ public:
 	static const ColorRGB GREENISH()    { return { 0.5f, 1.0f, 0.5f }; }
 	static const ColorRGB LIGHT_GRAY()  { return { 0.75f, 0.75f, 0.75f }; }
 	static const ColorRGB MAGENTA()     { return { 1.0f, 0.0f, 1.0f }; }
-	static const ColorRGB ORANGE()      { return { 0.0f, 0.60f, 0.87f }; }
+	static const ColorRGB ORANGE()      { return { 0.92f, 0.50f, 0.26f }; }
 	static const ColorRGB RED()         { return { 1.0f, 0.0f, 0.0f }; }
 	static const ColorRGB REDISH()      { return { 1.0f, 0.5f, 0.5f }; }
 	static const ColorRGB YELLOW()      { return { 1.0f, 1.0f, 0.0f }; }
@@ -124,7 +128,7 @@ public:
 	static const ColorRGBA GREENISH()    { return { 0.5f, 1.0f, 0.5f, 1.0f }; }
 	static const ColorRGBA LIGHT_GRAY()  { return { 0.75f, 0.75f, 0.75f, 1.0f }; }
 	static const ColorRGBA MAGENTA()     { return { 1.0f, 0.0f, 1.0f, 1.0f }; }
-	static const ColorRGBA ORANGE()      { return { 0.0f, 0.607f, 0.874f, 1.0f }; }
+	static const ColorRGBA ORANGE()      { return { 0.923f, 0.504f, 0.264f, 1.0f }; }
 	static const ColorRGBA RED()         { return { 1.0f, 0.0f, 0.0f, 1.0f }; }
 	static const ColorRGBA REDISH()      { return { 1.0f, 0.5f, 0.5f, 1.0f }; }
 	static const ColorRGBA YELLOW()      { return { 1.0f, 1.0f, 0.0f, 1.0f }; }

@@ -1,3 +1,7 @@
+///|/ Copyright (c) Prusa Research 2018 - 2023 Tomáš Mészáros @tamasmeszaros, Lukáš Matěna @lukasmatena, Vojtěch Bubník @bubnikv, Enrico Turri @enricoturri1966
+///|/
+///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/
 #include "Arrange.hpp"
 
 #include "BoundingBox.hpp"
@@ -12,6 +16,7 @@
 #include <ClipperUtils.hpp>
 
 #include <boost/geometry/index/rtree.hpp>
+#include <boost/container/small_vector.hpp>
 
 #if defined(_MSC_VER) && defined(__clang__)
 #define BOOST_NO_CXX17_HDR_STRING_VIEW
@@ -258,7 +263,7 @@ protected:
             auto& index = isBig(item.area()) ? spatindex : smalls_spatindex;
 
             // Query the spatial index for the neighbors
-            std::vector<SpatElement> result;
+            boost::container::small_vector<SpatElement, 100> result;
             result.reserve(index.size());
 
             index.query(query, std::back_inserter(result));
@@ -583,8 +588,12 @@ static void process_arrangeable(const ArrangePolygon &arrpoly,
     outp.emplace_back(std::move(p));
     outp.back().rotation(rotation);
     outp.back().translation({offs.x(), offs.y()});
+    outp.back().inflate(arrpoly.inflation);
     outp.back().binId(arrpoly.bed_idx);
     outp.back().priority(arrpoly.priority);
+    outp.back().setOnPackedFn([&arrpoly](Item &itm){
+        itm.inflate(-arrpoly.inflation);
+    });
 }
 
 template<class Fn> auto call_with_bed(const Points &bed, Fn &&fn)
@@ -746,9 +755,25 @@ void arrange(ArrangePolygons &items,
         d += corr;
 
         for (auto &itm : items)
-            if (itm.bed_idx == bedidx)
+            if (itm.bed_idx == int(bedidx))
                 itm.translation += d;
     }
+}
+
+BoundingBox bounding_box(const InfiniteBed &bed)
+{
+    BoundingBox ret;
+    using C = coord_t;
+
+    // It is important for Mx and My to be strictly less than half of the
+    // range of type C. width(), height() and area() will not overflow this way.
+    C Mx = C((std::numeric_limits<C>::lowest() + 2 * bed.center.x()) / 4.01);
+    C My = C((std::numeric_limits<C>::lowest() + 2 * bed.center.y()) / 4.01);
+
+    ret.max = bed.center - Point{Mx, My};
+    ret.min = bed.center + Point{Mx, My};
+
+    return ret;
 }
 
 } // namespace arr

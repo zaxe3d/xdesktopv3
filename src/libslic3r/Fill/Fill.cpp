@@ -1,3 +1,12 @@
+///|/ Copyright (c) Prusa Research 2016 - 2023 Lukáš Matěna @lukasmatena, Vojtěch Bubník @bubnikv, Pavel Mikuš @Godrak, Lukáš Hejl @hejllukas
+///|/ Copyright (c) SuperSlicer 2023 Remi Durand @supermerill
+///|/ Copyright (c) 2016 Sakari Kapanen @Flannelhead
+///|/ Copyright (c) Slic3r 2011 - 2015 Alessandro Ranellucci @alranel
+///|/ Copyright (c) 2013 Mark Hindess
+///|/ Copyright (c) 2011 Michael Moon
+///|/
+///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/
 #include <assert.h>
 #include <stdio.h>
 #include <memory>
@@ -16,10 +25,11 @@
 #include "FillLightning.hpp"
 #include "FillConcentric.hpp"
 #include "FillEnsuring.hpp"
+#include "Polygon.hpp"
 
 namespace Slic3r {
 
-static constexpr const float NarrowInfillAreaThresholdMM = 3.f;
+//static constexpr const float NarrowInfillAreaThresholdMM = 3.f;
 
 struct SurfaceFillParams
 {
@@ -305,47 +315,15 @@ std::vector<SurfaceFill> group_fills(const Layer &layer)
 		}
     }
 
-	// Detect narrow internal solid infill area and use ipEnsuring pattern instead.
-	{
-		std::vector<char> narrow_expolygons;
-		static constexpr const auto narrow_pattern = ipEnsuring;
-		for (size_t surface_fill_id = 0, num_old_fills = surface_fills.size(); surface_fill_id < num_old_fills; ++ surface_fill_id)
-			if (SurfaceFill &fill = surface_fills[surface_fill_id]; fill.surface.surface_type == stInternalSolid) {
-				size_t num_expolygons = fill.expolygons.size();
-				narrow_expolygons.clear();
-				narrow_expolygons.reserve(num_expolygons);
-				// Detect narrow expolygons.
-				int num_narrow = 0;
-				for (const ExPolygon &ex : fill.expolygons) {
-					bool narrow = offset_ex(ex, -scaled<float>(NarrowInfillAreaThresholdMM)).empty();
-					num_narrow += int(narrow);
-					narrow_expolygons.emplace_back(narrow);
-				}
-				if (num_narrow == num_expolygons) {
-					// All expolygons are narrow, change the fill pattern.
-					fill.params.pattern = narrow_pattern;
-				} else if (num_narrow > 0) {
-					// Some expolygons are narrow, split the fills.
-					params = fill.params;
-					params.pattern = narrow_pattern;
-					surface_fills.emplace_back(params);
-					SurfaceFill &old_fill = surface_fills[surface_fill_id];
-					SurfaceFill &new_fill = surface_fills.back();
-					new_fill.region_id 				= old_fill.region_id;
-					new_fill.surface.surface_type 	= stInternalSolid;
-					new_fill.surface.thickness 		= old_fill.surface.thickness;
-					new_fill.expolygons.reserve(num_narrow);
-					for (size_t i = 0; i < narrow_expolygons.size(); ++ i)
-						if (narrow_expolygons[i])
-							new_fill.expolygons.emplace_back(std::move(old_fill.expolygons[i]));
-					old_fill.expolygons.erase(std::remove_if(old_fill.expolygons.begin(), old_fill.expolygons.end(),
-						[&narrow_expolygons, ex_first = old_fill.expolygons.data()](const ExPolygon& ex) { return narrow_expolygons[&ex - ex_first]; }),
-						old_fill.expolygons.end());
-				}
-			}
-	}
+    // Use ipEnsuring pattern for all internal Solids.
+    {
+        for (size_t surface_fill_id = 0; surface_fill_id < surface_fills.size(); ++surface_fill_id)
+            if (SurfaceFill &fill = surface_fills[surface_fill_id]; fill.surface.surface_type == stInternalSolid) {
+                fill.params.pattern = ipEnsuring;
+            }
+    }
 
-	return surface_fills;
+    return surface_fills;
 }
 
 #ifdef SLIC3R_DEBUG_SLICE_PROCESSING
@@ -486,14 +464,6 @@ void Layer::make_fills(FillAdaptive::Octree* adaptive_fill_octree, FillAdaptive:
 
 	size_t first_object_layer_id = this->object()->get_layer(0)->id();
     for (SurfaceFill &surface_fill : surface_fills) {
-		//skip patterns for which additional input is nullptr
-		switch (surface_fill.params.pattern) {
-			case ipLightning: if (lightning_generator == nullptr) continue; break;
-			case ipAdaptiveCubic: if (adaptive_fill_octree == nullptr) continue; break;
-			case ipSupportCubic: if (support_fill_octree == nullptr) continue; break;
-			default: break;
-		}
-
         // Create the filler object.
         std::unique_ptr<Fill> f = std::unique_ptr<Fill>(Fill::new_from_type(surface_fill.params.pattern));
         f->set_bounding_box(bbox);
@@ -507,11 +477,8 @@ void Layer::make_fills(FillAdaptive::Octree* adaptive_fill_octree, FillAdaptive:
         f->print_config        = &this->object()->print()->config();
         f->print_object_config = &this->object()->config();
 
-		if (surface_fill.params.pattern == ipLightning) {
-			auto *lf = dynamic_cast<FillLightning::Filler*>(f.get());
-			lf->generator = lightning_generator;
-			lf->num_raft_layers = this->object()->slicing_parameters().raft_layers();
-		}
+        if (surface_fill.params.pattern == ipLightning)
+            dynamic_cast<FillLightning::Filler*>(f.get())->generator = lightning_generator;
 
         if (surface_fill.params.pattern == ipEnsuring) {
             auto *fill_ensuring = dynamic_cast<FillEnsuring *>(f.get());
@@ -576,12 +543,11 @@ void Layer::make_fills(FillAdaptive::Octree* adaptive_fill_octree, FillAdaptive:
 		        	flow_mm3_per_mm = new_flow.mm3_per_mm();
 		        	flow_width      = new_flow.width();
 		        }
-		        // Save into layer.
-				ExtrusionEntityCollection* eec = nullptr;
-				auto fill_begin = uint32_t(layerm.fills().size());
-		        layerm.m_fills.entities.push_back(eec = new ExtrusionEntityCollection());
-		        // Only concentric fills are not sorted.
-		        eec->no_sort = f->no_sort();
+                // Save into layer.
+                ExtrusionEntityCollection *eec        = new ExtrusionEntityCollection();
+                auto                       fill_begin = uint32_t(layerm.fills().size());
+                // Only concentric fills are not sorted.
+                eec->no_sort = f->no_sort();
                 if (params.use_arachne) {
                     for (const ThickPolyline &thick_polyline : thick_polylines) {
                         Flow new_flow = surface_fill.params.flow.with_spacing(float(f->spacing));
@@ -596,12 +562,19 @@ void Layer::make_fills(FillAdaptive::Octree* adaptive_fill_octree, FillAdaptive:
                         }
                     }
 
+                    if (!eec->empty())
+                        layerm.m_fills.entities.push_back(eec);
+                    else
+                        delete eec;
+
                     thick_polylines.clear();
                 } else {
                     extrusion_entities_append_paths(
                         eec->entities, std::move(polylines),
-                        surface_fill.params.extrusion_role,
-                        flow_mm3_per_mm, float(flow_width), surface_fill.params.flow.height());
+						ExtrusionAttributes{ surface_fill.params.extrusion_role,
+							ExtrusionFlow{ flow_mm3_per_mm, float(flow_width), surface_fill.params.flow.height() } 
+						});
+                    layerm.m_fills.entities.push_back(eec);
                 }
                 insert_fills_into_islands(*this, uint32_t(surface_fill.region_id), fill_begin, uint32_t(layerm.fills().size()));
 		    }
@@ -647,7 +620,7 @@ void Layer::make_fills(FillAdaptive::Octree* adaptive_fill_octree, FillAdaptive:
 #endif
 }
 
-Polylines Layer::generate_sparse_infill_polylines_for_anchoring() const
+Polylines Layer::generate_sparse_infill_polylines_for_anchoring(FillAdaptive::Octree* adaptive_fill_octree, FillAdaptive::Octree* support_fill_octree,  FillLightning::Generator* lightning_generator) const
 {
     std::vector<SurfaceFill>  surface_fills = group_fills(*this);
     const Slic3r::BoundingBox bbox          = this->object()->bounding_box();
@@ -656,14 +629,17 @@ Polylines Layer::generate_sparse_infill_polylines_for_anchoring() const
     Polylines sparse_infill_polylines{};
 
     for (SurfaceFill &surface_fill : surface_fills) {
-        // skip patterns for which additional input is nullptr
+		if (surface_fill.surface.surface_type != stInternal) {
+			continue;
+		}
+
         switch (surface_fill.params.pattern) {
-        case ipLightning: continue; break;
-        case ipAdaptiveCubic: continue; break;
-        case ipSupportCubic: continue; break;
         case ipCount: continue; break;
         case ipSupportBase: continue; break;
         case ipEnsuring: continue; break;
+        case ipLightning:
+		case ipAdaptiveCubic:
+        case ipSupportCubic:
         case ipRectilinear:
         case ipMonotonic:
         case ipMonotonicLines:
@@ -685,12 +661,15 @@ Polylines Layer::generate_sparse_infill_polylines_for_anchoring() const
         // Create the filler object.
         std::unique_ptr<Fill> f = std::unique_ptr<Fill>(Fill::new_from_type(surface_fill.params.pattern));
         f->set_bounding_box(bbox);
-        f->layer_id = this->id();
+        f->layer_id = this->id() - this->object()->get_layer(0)->id(); // We need to subtract raft layers.
         f->z        = this->print_z;
         f->angle    = surface_fill.params.angle;
-        // f->adapt_fill_octree   = (surface_fill.params.pattern == ipSupportCubic) ? support_fill_octree : adaptive_fill_octree;
+        f->adapt_fill_octree   = (surface_fill.params.pattern == ipSupportCubic) ? support_fill_octree : adaptive_fill_octree;
         f->print_config        = &this->object()->print()->config();
         f->print_object_config = &this->object()->config();
+
+        if (surface_fill.params.pattern == ipLightning)
+            dynamic_cast<FillLightning::Filler *>(f.get())->generator = lightning_generator;
 
         // calculate flow spacing for infill pattern generation
         double link_max_length = 0.;
@@ -940,8 +919,9 @@ void Layer::make_ironing()
 				eec->no_sort = true;
 		        extrusion_entities_append_paths(
 		            eec->entities, std::move(polylines),
-					ExtrusionRole::Ironing,
-		            flow_mm3_per_mm, extrusion_width, float(extrusion_height));
+					ExtrusionAttributes{ ExtrusionRole::Ironing,
+						ExtrusionFlow{ flow_mm3_per_mm, extrusion_width, float(extrusion_height) }
+					});
 				insert_fills_into_islands(*this, ironing_params.region_id, fill_begin, uint32_t(ironing_params.layerm->fills().size()));
 		    }
 		}

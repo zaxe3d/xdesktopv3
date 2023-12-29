@@ -1,3 +1,9 @@
+///|/ Copyright (c) Prusa Research 2018 - 2023 David Kocík @kocikdav, Lukáš Matěna @lukasmatena, Vojtěch Bubník @bubnikv, Tomáš Mészáros @tamasmeszaros, Oleksandra Iushchenko @YuSanka, Vojtěch Král @vojtechkral
+///|/ Copyright (c) 2020 Manuel Coenen
+///|/ Copyright (c) 2018 Martin Loidl @LoidlM
+///|/
+///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/
 #include "Http.hpp"
 
 #include <cstdlib>
@@ -71,11 +77,11 @@ struct CurlGlobalInit
 
             if (!bundle)
                 message = _u8L("Could not detect system SSL certificate store. "
-                               "XDesktop will be unable to establish secure "
+                               "PrusaSlicer will be unable to establish secure "
                                "network connections.");
             else
                 message = Slic3r::GUI::format(
-					_L("XDesktop detected system SSL certificate store in: %1%"),
+					_L("PrusaSlicer detected system SSL certificate store in: %1%"),
                     bundle);
 
             message += "\n" + Slic3r::GUI::format(
@@ -88,7 +94,7 @@ struct CurlGlobalInit
 #endif // OPENSSL_CERT_OVERRIDE
 
         if (CURLcode ec = ::curl_global_init(CURL_GLOBAL_DEFAULT)) {
-            message += _u8L("CURL init has failed. XDesktop will be unable to establish "
+            message += _u8L("CURL init has failed. PrusaSlicer will be unable to establish "
                             "network connections. See logs for additional details.");
 
             BOOST_LOG_TRIVIAL(error) << ::curl_easy_strerror(ec);
@@ -169,8 +175,9 @@ Http::priv::priv(const std::string &url)
 	set_timeout_connect(DEFAULT_TIMEOUT_CONNECT);
     set_timeout_max(DEFAULT_TIMEOUT_MAX);
 	::curl_easy_setopt(curl, CURLOPT_URL, url.c_str());   // curl makes a copy internally
-	::curl_easy_setopt(curl, CURLOPT_USERAGENT, SLIC3R_APP_NAME "/" XDESKTOP_VERSION);
+	::curl_easy_setopt(curl, CURLOPT_USERAGENT, SLIC3R_APP_NAME "/" SLIC3R_VERSION);
 	::curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, &error_buffer.front());
+	::curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 }
 
 Http::priv::~priv()
@@ -308,7 +315,7 @@ void Http::priv::set_put_body(const fs::path &path)
 	boost::system::error_code ec;
 	boost::uintmax_t filesize = file_size(path, ec);
 	if (!ec) {
-        putFile = std::make_unique<fs::ifstream>(path);
+        putFile = std::make_unique<fs::ifstream>(path, std::ios::binary);
         ::curl_easy_setopt(curl, CURLOPT_READDATA, (void *) (putFile.get()));
 		::curl_easy_setopt(curl, CURLOPT_INFILESIZE, filesize);
 	}

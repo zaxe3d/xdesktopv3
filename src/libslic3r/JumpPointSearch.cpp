@@ -1,3 +1,7 @@
+///|/ Copyright (c) Prusa Research 2022 - 2023 Pavel Mikuš @Godrak, Vojtěch Bubník @bubnikv
+///|/
+///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/
 #include "JumpPointSearch.hpp"
 #include "BoundingBox.hpp"
 #include "ExPolygon.hpp"
@@ -18,6 +22,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include <oneapi/tbb/scalable_allocator.h>
 
 //#define DEBUG_FILES
 #ifdef DEBUG_FILES
@@ -211,8 +217,8 @@ void JPSPathFinder::add_obstacles(const Layer *layer, const Point &global_origin
 
     this->print_z = layer->print_z;
     Lines obstacles;
-    obstacles.reserve(layer->malformed_lines.size());
-    for (const Line &l : layer->malformed_lines) { obstacles.push_back(Line{l.a + global_origin, l.b + global_origin}); }
+    obstacles.reserve(layer->curled_lines.size());
+    for (const Line &l : layer->curled_lines) { obstacles.push_back(Line{l.a + global_origin, l.b + global_origin}); }
     add_obstacles(obstacles);
 }
 
@@ -267,7 +273,7 @@ Polyline JPSPathFinder::find_path(const Point &p0, const Point &p1)
     using QNode = astar::QNode<JPSTracer<Pixel, decltype(cell_query)>>;
 
     std::unordered_map<size_t, QNode>   astar_cache{};
-    std::vector<Pixel>                  out_path;
+    std::vector<Pixel, PointsAllocator<Pixel>> out_path;
     std::vector<decltype(tracer)::Node> out_nodes;
 
     if (!astar::search_route(tracer, {start, {0, 0}}, std::back_inserter(out_nodes), astar_cache)) {
@@ -306,7 +312,7 @@ Polyline JPSPathFinder::find_path(const Point &p0, const Point &p1)
     svg.draw(scaled_point(start), "green", scale_(0.4));
 #endif
 
-    std::vector<Pixel> tmp_path;
+    std::vector<Pixel, PointsAllocator<Pixel>> tmp_path;
     tmp_path.reserve(out_path.size());
     // Some path found, reverse and remove points that do not change direction
     std::reverse(out_path.begin(), out_path.end());

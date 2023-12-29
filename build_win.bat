@@ -1,3 +1,8 @@
+@REM /|/ Copyright (c) 2022 Jebtrix @Jebtrix
+@REM /|/ Copyright (c) 2021 Justin Schuh @jschuh
+@REM /|/
+@REM /|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+@REM /|/
 @setlocal disableDelayedExpansion enableExtensions
 @IF "%PS_ECHO_ON%" NEQ "" (echo on) ELSE (echo off)
 @GOTO :MAIN
@@ -44,7 +49,7 @@
 @ECHO.
 @ECHO  Examples:
 @ECHO.
-@ECHO  Initial build:           build_win -d "c:\src\XDesktop-deps"
+@ECHO  Initial build:           build_win -d "c:\src\PrusaSlicer-deps"
 @ECHO  Build post deps change:  build_win -s all
 @ECHO  App dirty build:         build_win
 @ECHO  App dirty build ^& run:   build_win -r console
@@ -56,17 +61,21 @@ GOTO :END
 REM Script constants
 SET START_TIME=%TIME%
 SET PS_START_DIR=%CD%
-SET PS_SOLUTION_NAME=XDesktop
+SET PS_SOLUTION_NAME=PrusaSlicer
 SET PS_CHOICE_TIMEOUT=30
 SET PS_CUSTOM_RUN_FILE=custom_run.bat
 SET PS_DEPS_PATH_FILE_NAME=.DEPS_PATH.txt
 SET PS_DEPS_PATH_FILE=%~dp0deps\build\%PS_DEPS_PATH_FILE_NAME%
 SET PS_CONFIG_LIST="Debug;MinSizeRel;Release;RelWithDebInfo"
 
-REM The officially supported toolchain version is 16 (Visual Studio 2019)
-REM TODO: Update versions after Boost gets rolled to 1.78 or later
+REM Update this script for new versions by setting PS_VERSION_SUPPORTED to a
+REM new minimum version and setting PS_VERSION_EXCEEDED to the maximum supported
+REM version plus one.
+REM The officially supported toolchain versions are:
+REM   Minimum: 16 (Visual Studio 2019)
+REM   Maximum: 17 (Visual Studio 2022)
 SET PS_VERSION_SUPPORTED=16
-SET PS_VERSION_EXCEEDED=17
+SET PS_VERSION_EXCEEDED=18
 SET VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
 IF NOT EXIST "%VSWHERE%" SET VSWHERE=%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe
 FOR /F "tokens=4 USEBACKQ delims=." %%I IN (`"%VSWHERE%" -nologo -property productId`) DO SET PS_PRODUCT_DEFAULT=%%I

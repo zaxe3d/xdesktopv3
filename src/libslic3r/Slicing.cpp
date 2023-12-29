@@ -1,3 +1,7 @@
+///|/ Copyright (c) Prusa Research 2016 - 2023 Vojtěch Bubník @bubnikv, Enrico Turri @enricoturri1966, David Kocík @kocikdav, Lukáš Matěna @lukasmatena, Oleksandra Iushchenko @YuSanka
+///|/
+///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/
 #include <limits>
 
 #include "libslic3r.h"
@@ -186,7 +190,7 @@ std::vector<coordf_t> layer_height_profile_from_ranges(
     auto last_z = [&layer_height_profile]() {
         return layer_height_profile.empty() ? 0. : *(layer_height_profile.end() - 2);
     };
-    auto lh_append = [&layer_height_profile, last_z](coordf_t z, coordf_t layer_height) {
+    auto lh_append = [&layer_height_profile](coordf_t z, coordf_t layer_height) {
         if (! layer_height_profile.empty()) {
             bool last_z_matches = is_approx(*(layer_height_profile.end() - 2), z);
             bool last_h_matches = is_approx(layer_height_profile.back(), layer_height);

@@ -1,3 +1,8 @@
+///|/ Copyright (c) Prusa Research 2020 - 2023 Vojtěch Bubník @bubnikv, Lukáš Matěna @lukasmatena, Pavel Mikuš @Godrak
+///|/ Copyright (c) SuperSlicer 2023 Remi Durand @supermerill
+///|/
+///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/
 #include "SeamPlacer.hpp"
 
 #include "Color.hpp"
@@ -130,7 +135,7 @@ std::vector<float> raycast_visibility(const AABBTreeIndirect::Tree<3, float> &ra
         const indexed_triangle_set &triangles,
         const TriangleSetSamples &samples,
         size_t negative_volumes_start_index) {
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: raycast visibility of " << samples.positions.size() << " samples over " << triangles.indices.size()
             << " triangles: end";
 
@@ -214,7 +219,7 @@ std::vector<float> raycast_visibility(const AABBTreeIndirect::Tree<3, float> &ra
                 }
             });
 
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: raycast visibility of " << samples.positions.size() << " samples over " << triangles.indices.size()
             << " triangles: end";
 
@@ -437,7 +442,7 @@ Polygons extract_perimeter_polygons(const Layer *layer, std::vector<const LayerR
 
     if (polygons.empty()) { // If there are no perimeter polygons for whatever reason (disabled perimeters .. ) insert dummy point
         // it is easier than checking everywhere if the layer is not emtpy, no seam will be placed to this layer anyway
-        polygons.emplace_back(std::vector { Point { 0, 0 } });
+        polygons.emplace_back(Points{ { 0, 0 } });
         corresponding_regions_out.push_back(nullptr);
     }
 
@@ -619,7 +624,7 @@ std::pair<size_t, size_t> find_previous_and_next_perimeter_point(const std::vect
 // Computes all global model info - transforms object, performs raycasting
 void compute_global_occlusion(GlobalModelInfo &result, const PrintObject *po,
         std::function<void(void)> throw_if_canceled) {
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: gather occlusion meshes: start";
     auto obj_transform = po->trafo_centered();
     indexed_triangle_set triangle_set;
@@ -640,10 +645,10 @@ void compute_global_occlusion(GlobalModelInfo &result, const PrintObject *po,
     }
     throw_if_canceled();
 
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: gather occlusion meshes: end";
 
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: decimate: start";
     its_short_edge_collpase(triangle_set, SeamPlacer::fast_decimation_triangle_count_target);
     its_short_edge_collpase(negative_volumes_set, SeamPlacer::fast_decimation_triangle_count_target);
@@ -651,10 +656,10 @@ void compute_global_occlusion(GlobalModelInfo &result, const PrintObject *po,
     size_t negative_volumes_start_index = triangle_set.indices.size();
     its_merge(triangle_set, negative_volumes_set);
     its_transform(triangle_set, obj_transform);
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: decimate: end";
 
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: Compute visibility sample points: start";
 
     result.mesh_samples = sample_its_uniform_parallel(SeamPlacer::raycasting_visibility_samples_count,
@@ -677,20 +682,20 @@ void compute_global_occlusion(GlobalModelInfo &result, const PrintObject *po,
     float search_radius = sqrt(search_area / PI);
     result.mesh_samples_radius = search_radius;
 
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: Compute visiblity sample points: end";
     throw_if_canceled();
 
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: Mesh sample raidus: " << result.mesh_samples_radius;
 
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: build AABB tree: start";
     auto raycasting_tree = AABBTreeIndirect::build_aabb_tree_over_indexed_triangle_set(triangle_set.vertices,
             triangle_set.indices);
 
     throw_if_canceled();
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: build AABB tree: end";
     result.mesh_samples_visibility = raycast_visibility(raycasting_tree, triangle_set, result.mesh_samples,
             negative_volumes_start_index);
@@ -701,7 +706,7 @@ void compute_global_occlusion(GlobalModelInfo &result, const PrintObject *po,
 }
 
 void gather_enforcers_blockers(GlobalModelInfo &result, const PrintObject *po) {
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: build AABB trees for raycasting enforcers/blockers: start";
 
     auto obj_transform = po->trafo_centered();
@@ -725,7 +730,7 @@ void gather_enforcers_blockers(GlobalModelInfo &result, const PrintObject *po) {
     result.blockers_tree = AABBTreeIndirect::build_aabb_tree_over_indexed_triangle_set(result.blockers.vertices,
             result.blockers.indices);
 
-    BOOST_LOG_TRIVIAL(trace)
+    BOOST_LOG_TRIVIAL(debug)
     << "SeamPlacer: build AABB trees for raycasting enforcers/blockers: end";
 }
 
@@ -1428,29 +1433,29 @@ void SeamPlacer::init(const Print &print, std::function<void(void)> throw_if_can
                 compute_global_occlusion(global_model_info, po, throw_if_canceled_func);
             }
             throw_if_canceled_func();
-            BOOST_LOG_TRIVIAL(trace)
+            BOOST_LOG_TRIVIAL(debug)
             << "SeamPlacer: gather_seam_candidates: start";
             gather_seam_candidates(po, global_model_info);
-            BOOST_LOG_TRIVIAL(trace)
+            BOOST_LOG_TRIVIAL(debug)
             << "SeamPlacer: gather_seam_candidates: end";
             throw_if_canceled_func();
             if (configured_seam_preference == spAligned || configured_seam_preference == spNearest) {
-                BOOST_LOG_TRIVIAL(trace)
+                BOOST_LOG_TRIVIAL(debug)
                 << "SeamPlacer: calculate_candidates_visibility : start";
                 calculate_candidates_visibility(po, global_model_info);
-                BOOST_LOG_TRIVIAL(trace)
+                BOOST_LOG_TRIVIAL(debug)
                 << "SeamPlacer: calculate_candidates_visibility : end";
             }
         } // destruction of global_model_info (large structure, no longer needed)
         throw_if_canceled_func();
-        BOOST_LOG_TRIVIAL(trace)
+        BOOST_LOG_TRIVIAL(debug)
         << "SeamPlacer: calculate_overhangs and layer embdedding : start";
         calculate_overhangs_and_layer_embedding(po);
-        BOOST_LOG_TRIVIAL(trace)
+        BOOST_LOG_TRIVIAL(debug)
         << "SeamPlacer: calculate_overhangs and layer embdedding: end";
         throw_if_canceled_func();
         if (configured_seam_preference != spNearest) { // For spNearest, the seam is picked in the place_seam method with actual nozzle position information
-            BOOST_LOG_TRIVIAL(trace)
+            BOOST_LOG_TRIVIAL(debug)
             << "SeamPlacer: pick_seam_point : start";
             //pick seam point
             std::vector<PrintObjectSeamData::LayerSeams> &layers = m_seam_per_object[po].layers;
@@ -1466,15 +1471,15 @@ void SeamPlacer::init(const Print &print, std::function<void(void)> throw_if_can
                                     pick_seam_point(layer_perimeter_points, current, comparator);
                         }
                     });
-            BOOST_LOG_TRIVIAL(trace)
+            BOOST_LOG_TRIVIAL(debug)
             << "SeamPlacer: pick_seam_point : end";
         }
         throw_if_canceled_func();
         if (configured_seam_preference == spAligned || configured_seam_preference == spRear) {
-            BOOST_LOG_TRIVIAL(trace)
+            BOOST_LOG_TRIVIAL(debug)
             << "SeamPlacer: align_seam_points : start";
             align_seam_points(po, comparator);
-            BOOST_LOG_TRIVIAL(trace)
+            BOOST_LOG_TRIVIAL(debug)
             << "SeamPlacer: align_seam_points : end";
         }
 
@@ -1484,7 +1489,7 @@ void SeamPlacer::init(const Print &print, std::function<void(void)> throw_if_can
     }
 }
 
-void SeamPlacer::place_seam(const Layer *layer, ExtrusionLoop &loop, bool external_first,
+Point SeamPlacer::place_seam(const Layer *layer, const ExtrusionLoop &loop, bool external_first,
         const Point &last_pos) const {
     using namespace SeamPlacerImpl;
     const PrintObject *po = layer->object();
@@ -1587,7 +1592,7 @@ void SeamPlacer::place_seam(const Layer *layer, ExtrusionLoop &loop, bool extern
         //lastly, for internal perimeters, do the staggering if requested
         if (po->config().staggered_inner_seams && loop.length() > 0.0) {
             //fix depth, it is sometimes strongly underestimated
-            depth = std::max(loop.paths[projected_point.path_idx].width, depth);
+            depth = std::max(loop.paths[projected_point.path_idx].width(), depth);
 
             while (depth > 0.0f) {
                 auto next_point = get_next_loop_point(projected_point);
@@ -1605,14 +1610,7 @@ void SeamPlacer::place_seam(const Layer *layer, ExtrusionLoop &loop, bool extern
         }
     }
 
-    // Because the G-code export has 1um resolution, don't generate segments shorter than 1.5 microns,
-    // thus empty path segments will not be produced by G-code export.
-    if (!loop.split_at_vertex(seam_point, scaled<double>(0.0015))) {
-        // The point is not in the original loop.
-        // Insert it.
-        loop.split_at(seam_point, true);
-    }
-
+    return seam_point;
 }
 
 } // namespace Slic3r
