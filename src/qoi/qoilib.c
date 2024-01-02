@@ -1,4 +1,4 @@
-// PrusaSlicer specific: 
+// XDesktop specific: 
 // Include and compile QOI library.
 
 #define QOI_IMPLEMENTATION

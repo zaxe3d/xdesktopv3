@@ -3,7 +3,7 @@
 #/|/ Copyright (c) 2023 Mimoja @Mimoja
 #/|/ Copyright (c) 2022 ole00 @ole00
 #/|/
-#/|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+#/|/ XDesktop is released under the terms of the AGPLv3 or higher
 #/|/
 cmake_minimum_required(VERSION 3.13)
 project(libslic3r)
@@ -146,6 +146,8 @@ set(SLIC3R_SOURCES
     Format/AnycubicSLA.cpp
     Format/STEP.hpp
     Format/STEP.cpp
+    Format/ZaxeArchive.hpp
+    Format/ZaxeArchive.cpp
     Format/SVG.hpp
     Format/SVG.cpp
     Format/SLAArchiveFormatRegistry.hpp

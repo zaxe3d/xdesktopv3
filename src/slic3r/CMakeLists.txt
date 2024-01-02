@@ -5,7 +5,7 @@
 #/|/ Copyright (c) 2019 Spencer Owen @spuder
 #/|/ Copyright (c) 2019 Stephan Reichhelm @stephanr
 #/|/
-#/|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+#/|/ XDesktop is released under the terms of the AGPLv3 or higher
 #/|/
 cmake_minimum_required(VERSION 3.13)
 project(libslic3r_gui)
@@ -285,6 +285,12 @@ set(SLIC3R_GUI_SOURCES
     GUI/Downloader.hpp
     GUI/DownloaderFileGet.cpp
     GUI/DownloaderFileGet.hpp
+    GUI/NetworkMachineManager.hpp
+    GUI/NetworkMachineManager.cpp
+    GUI/Device.hpp
+    GUI/Device.cpp
+    GUI/CustomIPDialog.cpp
+    GUI/CustomIPDialog.hpp
     Utils/AppUpdater.cpp
     Utils/AppUpdater.hpp
     Utils/Http.cpp
@@ -331,6 +337,12 @@ set(SLIC3R_GUI_SOURCES
     Utils/WxFontUtils.hpp
     Utils/WifiScanner.hpp
     Utils/WifiScanner.cpp
+    Utils/NetworkMachine.cpp
+    Utils/NetworkMachine.hpp
+    Utils/BroadcastReceiver.cpp
+    Utils/BroadcastReceiver.hpp
+    Utils/WebSocket.cpp
+    Utils/WebSocket.hpp
 )
 
 find_package(NanoSVG REQUIRED)
@@ -363,6 +375,13 @@ endforeach()
 encoding_check(libslic3r_gui)
 
 target_link_libraries(libslic3r_gui libslic3r avrdude libcereal imgui GLEW::GLEW OpenGL::GL hidapi libcurl ${wxWidgets_LIBRARIES} NanoSVG::nanosvg NanoSVG::nanosvgrast)
+
+if (APPLE)
+    target_link_libraries(libslic3r_gui crypto) # link openssl
+else ()
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(libslic3r_gui OpenSSL::Crypto) # link openssl
+endif ()
 
 if (MSVC)
     target_link_libraries(libslic3r_gui Setupapi.lib)

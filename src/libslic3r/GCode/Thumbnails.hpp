@@ -1,6 +1,6 @@
 ///|/ Copyright (c) Prusa Research 2022 Lukáš Hejl @hejllukas, Vojtěch Bubník @bubnikv
 ///|/
-///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/ XDesktop is released under the terms of the AGPLv3 or higher
 ///|/
 #ifndef slic3r_GCodeThumbnails_hpp_
 #define slic3r_GCodeThumbnails_hpp_
@@ -40,6 +40,7 @@ std::unique_ptr<CompressedImageBuffer> compress_thumbnail(const ThumbnailData &d
 typedef std::vector<std::pair<GCodeThumbnailsFormat, Vec2d>> GCodeThumbnailDefinitionsList;
 
 using namespace std::literals;
+Vec2ds get_sizes_of_thumbnail_list(const GCodeThumbnailDefinitionsList& thumbnails_list, const ThumbnailErrors& errors);
 std::pair<GCodeThumbnailDefinitionsList, ThumbnailErrors> make_and_check_thumbnail_list(const std::string& thumbnails_string, const std::string_view def_ext = "PNG"sv);
 std::pair<GCodeThumbnailDefinitionsList, ThumbnailErrors> make_and_check_thumbnail_list(const ConfigBase &config);
 

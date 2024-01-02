@@ -135,6 +135,7 @@ set(REQUIRED_PACKAGES
     CURL
     EXPAT
     NLopt
+    OpenSSL
     GLEW
     TBB
     Qhull

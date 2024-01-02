@@ -1018,7 +1018,7 @@ void GCodeGenerator::_do_export(Print& print, GCodeOutputStream &file, Thumbnail
         // Write information on the generator.
         file.write_format("; %s\n\n", Slic3r::header_slic3r_generated().c_str());
 
-    if (! export_to_binary_gcode) {
+    if (m_config.printer_vendor != "Zaxe" && ! export_to_binary_gcode) {
         // if exporting gcode in ascii format, generate the thumbnails here
         auto [thumbnails, errors] = GCodeThumbnails::make_and_check_thumbnail_list(print.full_print_config());
 
@@ -1377,7 +1377,7 @@ void GCodeGenerator::_do_export(Print& print, GCodeOutputStream &file, Thumbnail
     file.write(m_writer.postamble());
 
     // From now to the end of G-code, the G-code find / replace post-processor will be disabled.
-    // Thus the PrusaSlicer generated config will NOT be processed by the G-code post-processor, see GH issue #7952.
+    // Thus the XDesktop generated config will NOT be processed by the G-code post-processor, see GH issue #7952.
     file.find_replace_supress();
 
     // adds tags for time estimators
@@ -1423,7 +1423,7 @@ void GCodeGenerator::_do_export(Print& print, GCodeOutputStream &file, Thumbnail
 
         // if exporting gcode in ascii format, config export is done here
         // Append full config, delimited by two 'phony' configuration keys prusaslicer_config = begin and prusaslicer_config = end.
-        // The delimiters are structured as configuration key / value pairs to be parsable by older versions of PrusaSlicer G-code viewer.
+        // The delimiters are structured as configuration key / value pairs to be parsable by older versions of XDesktop G-code viewer.
         {
             file.write("\n; prusaslicer_config = begin\n");
             std::string full_config;

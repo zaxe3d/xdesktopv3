@@ -12,7 +12,7 @@
 ///|/ Copyright (c) 2012 Henrik Brix Andersen @henrikbrixandersen
 ///|/ Copyright (c) 2012 Sam Wong
 ///|/
-///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/ XDesktop is released under the terms of the AGPLv3 or higher
 ///|/
 #ifndef slic3r_Plater_hpp_
 #define slic3r_Plater_hpp_
@@ -29,6 +29,8 @@
 #include "libslic3r/Preset.hpp"
 #include "libslic3r/BoundingBox.hpp"
 #include "libslic3r/GCode/GCodeProcessor.hpp"
+#include "libslic3r/Format/ZaxeArchive.hpp"
+#include "NetworkMachineManager.hpp"
 #include "Jobs/Job.hpp"
 #include "Jobs/Worker.hpp"
 #include "Search.hpp"
@@ -111,6 +113,7 @@ public:
     ObjectLayers*           obj_layers();
     wxScrolledWindow*       scrolled_panel();
     wxPanel*                presets_panel();
+    NetworkMachineManager*  machine_manager();
 
     ConfigOptionsGroup*     og_freq_chng_params(const bool is_fff);
     wxButton*               get_wiping_dialog_button();
@@ -191,6 +194,7 @@ public:
     void convert_gcode_to_ascii();
     void convert_gcode_to_binary();
     void refresh_print();
+    void reset_print();
 
     std::vector<size_t> load_files(const std::vector<boost::filesystem::path>& input_files, bool load_model = true, bool load_config = true, bool imperial_units = false);
     // To be called when providing a list of files to the GUI slic3r on command line.
@@ -283,9 +287,12 @@ public:
     void toggle_layers_editing(bool enable);
 
     void apply_cut_object_to_model(size_t init_obj_idx, const ModelObjectPtrs& cut_objects);
+    std::string get_gcode_path();
+    std::string get_zaxe_code_path();
+    const ZaxeArchive& get_zaxe_archive() const;
 
     void export_gcode(bool prefer_removable);
-    void export_stl_obj(bool extended = false, bool selection_only = false);
+    void export_stl_obj(bool extended = false, bool selection_only = false, bool zaxe_file_temp_export = false);
     void export_amf();
     bool export_3mf(const boost::filesystem::path& output_path = boost::filesystem::path());
     void reload_from_disk();
@@ -343,6 +350,7 @@ public:
     void show_action_buttons(const bool is_ready_to_slice) const;
     void show_action_buttons() const;
 
+    wxString get_filename();
     wxString get_project_filename(const wxString& extension = wxEmptyString) const;
     void set_project_filename(const wxString& filename);
 
@@ -365,6 +373,11 @@ public:
     PrinterTechnology   printer_technology() const;
     const DynamicPrintConfig * config() const;
     bool                set_printer_technology(PrinterTechnology printer_technology);
+    bool is_bed_level_active();
+    void set_bed_level_active(bool active);
+
+    // see if we need a zaxe file according to technology and selected printer model on config change.
+    void check_and_set_zaxe_file();
 
     void copy_selection_to_clipboard();
     void paste_from_clipboard();

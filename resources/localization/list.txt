@@ -64,6 +64,8 @@ src/slic3r/GUI/Gizmos/GLGizmoSlaSupports.cpp
 src/slic3r/GUI/Gizmos/GLGizmoSVG.cpp
 src/slic3r/GUI/Gizmos/GLGizmosManager.cpp
 src/slic3r/GUI/GLCanvas3D.cpp
+src/slic3r/GUI/CustomIPDialog.cpp
+src/slic3r/GUI/Device.cpp
 src/slic3r/GUI/GUI.cpp
 src/slic3r/GUI/GUI_App.cpp
 src/slic3r/GUI/GUI_Factories.cpp

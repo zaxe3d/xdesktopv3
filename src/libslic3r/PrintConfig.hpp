@@ -13,7 +13,7 @@
 ///|/ Copyright (c) 2015 Maksim Derbasov @ntfshard
 ///|/ Copyright (c) 2015 Alexander Rössler @machinekoder
 ///|/
-///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/ XDesktop is released under the terms of the AGPLv3 or higher
 ///|/
 // Configuration store of Slic3r.
 //
@@ -845,6 +845,7 @@ PRINT_CONFIG_CLASS_DERIVED_DEFINE(
     ((ConfigOptionString,             output_filename_format))
     ((ConfigOptionFloat,              perimeter_acceleration))
     ((ConfigOptionStrings,            post_process))
+    ((ConfigOptionString,             printer_vendor))
     ((ConfigOptionString,             printer_model))
     ((ConfigOptionString,             printer_notes))
     ((ConfigOptionFloat,              resolution))

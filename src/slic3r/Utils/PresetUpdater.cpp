@@ -1,7 +1,7 @@
 ///|/ Copyright (c) Prusa Research 2018 - 2023 Vojtěch Bubník @bubnikv, David Kocík @kocikdav, Oleksandra Iushchenko @YuSanka, Lukáš Matěna @lukasmatena, Enrico Turri @enricoturri1966, Vojtěch Král @vojtechkral
 ///|/ Copyright (c) 2020 Ondřej Nový @onovy
 ///|/
-///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/ XDesktop is released under the terms of the AGPLv3 or higher
 ///|/
 #include "PresetUpdater.hpp"
 
@@ -60,7 +60,7 @@ static const char *TMP_EXTENSION = ".download";
 namespace {
 void copy_file_fix(const fs::path &source, const fs::path &target)
 {
-	BOOST_LOG_TRIVIAL(debug) << format("PresetUpdater: Copying %1% -> %2%", source, target);
+	BOOST_LOG_TRIVIAL(trace) << format("PresetUpdater: Copying %1% -> %2%", source, target);
 	std::string error_message;
 	CopyFileResult cfr = copy_file(source.string(), target.string(), error_message, false);
 	if (cfr != CopyFileResult::SUCCESS) {
@@ -233,7 +233,7 @@ bool PresetUpdater::priv::get_file(const std::string &url, const fs::path &targe
 	fs::path tmp_path = target_path;
 	tmp_path += format(".%1%%2%", get_current_pid(), TMP_EXTENSION);
 
-	BOOST_LOG_TRIVIAL(info) << format("Get: `%1%`\n\t-> `%2%`\n\tvia tmp path `%3%`",
+	BOOST_LOG_TRIVIAL(trace) << format("Get: `%1%`\n\t-> `%2%`\n\tvia tmp path `%3%`",
 		url,
 		target_path.string(),
 		tmp_path.string());
@@ -244,7 +244,7 @@ bool PresetUpdater::priv::get_file(const std::string &url, const fs::path &targe
 		})
 		.on_error([&](std::string body, std::string error, unsigned http_status) {
 			(void)body;
-			BOOST_LOG_TRIVIAL(error) << format("Error getting: `%1%`: HTTP %2%, %3%",
+			BOOST_LOG_TRIVIAL(trace) << format("Error getting: `%1%`: HTTP %2%, %3%",
 				url,
 				http_status,
 				error);
@@ -276,10 +276,11 @@ void PresetUpdater::priv::get_missing_resource(const std::string& vendor, const 
 	if (filename.empty() || vendor.empty())
 		return;
 
-	if (!boost::starts_with(url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
+	if (!boost::starts_with(url, "https://software.zaxe.com/xdesktop-config/") &&
+		!boost::starts_with(url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
 		!boost::starts_with(url, "https://files.prusa3d.com/wp-content/uploads/repository/"))
 	{
-		throw Slic3r::CriticalException(GUI::format("URL outside prusa3d.com network: %1%", url));
+		throw Slic3r::CriticalException(GUI::format("URL outside network: %1%", url));
 	}
 
 	std::string escaped_filename = escape_string_url(filename);
@@ -288,19 +289,19 @@ void PresetUpdater::priv::get_missing_resource(const std::string& vendor, const 
 	const fs::path file_in_cache(cache_path / (vendor + "/" + filename));
 
 	if (fs::exists(file_in_vendor)) { // Already in vendor. No need to do anything.
-		BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in vendor folder. No need to download.";
+		//BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in vendor folder. No need to download.";
 		return;
 	}
 	if (fs::exists(file_in_rsrc)) { // In resources dir since installation. No need to do anything.
-		BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in resources folder. No need to download.";
+		///BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in resources folder. No need to download.";
 		return;
 	}
 	if (fs::exists(file_in_cache)) { // In cache/venodr_name/ dir. No need to do anything.
-		BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in cache folder. No need to download.";
+		//BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in cache folder. No need to download.";
 		return;
 	}
 
-	BOOST_LOG_TRIVIAL(info) << "Resources check could not find " << vendor << " / " << filename << " bed texture. Downloading.";
+	BOOST_LOG_TRIVIAL(debug) << "Resources check could not find " << vendor << " / " << filename << " bed texture. Downloading.";
 
 	const auto resource_url = format("%1%%2%%3%", url, url.back() == '/' ? "" : "/", escaped_filename); // vendor should already be in url 
 
@@ -322,20 +323,21 @@ void PresetUpdater::priv::get_or_copy_missing_resource(const std::string& vendor
 	const fs::path file_in_cache(cache_path / (vendor + "/" + filename));
 
 	if (fs::exists(file_in_vendor)) { // Already in vendor. No need to do anything.
-		BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in vendor folder. No need to download.";
+		//BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in vendor folder. No need to download.";
 		return;
 	}
 	if (fs::exists(file_in_rsrc)) { // In resources dir since installation. No need to do anything.
-		BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in resources folder. No need to download.";
+		//BOOST_LOG_TRIVIAL(info) << "Resource " << vendor << " / " << filename << " found in resources folder. No need to download.";
 		return;
 	}
 	if (!fs::exists(file_in_cache)) { // No file to copy. Download it to straight to the vendor dir.
-		if (!boost::starts_with(url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
+		if (!boost::starts_with(url, "https://software.zaxe.com/xdesktop-config/") &&
+			!boost::starts_with(url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
 			!boost::starts_with(url, "https://files.prusa3d.com/wp-content/uploads/repository/"))
 		{
 			throw Slic3r::CriticalException(GUI::format("URL outside prusa3d.com network: %1%", url));
 		}
-		BOOST_LOG_TRIVIAL(info) << "Downloading resources missing in cache directory: " << vendor << " / " << filename;
+		BOOST_LOG_TRIVIAL(trace) << "Downloading resources missing in cache directory: " << vendor << " / " << filename;
 
 		const auto resource_url = format("%1%%2%%3%", url, url.back() == '/' ? "" : "/", escaped_filename); // vendor should already be in url 
 
@@ -370,8 +372,9 @@ void PresetUpdater::priv::sync_config(const VendorMap vendors, const std::string
 		return;
 	}
 	BOOST_LOG_TRIVIAL(info) << "Downloading vedor profiles archive zip from " << index_archive_url;
-	//check if idx_url is leading to our site 
-	if (!boost::starts_with(index_archive_url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
+	//check if idx_url is leading to our site
+	if (!boost::starts_with(index_archive_url, "https://software.zaxe.com/xdesktop-config/") &&
+		!boost::starts_with(index_archive_url, "http://files.prusa3d.com/wp-content/uploads/repository/") &&
 		!boost::starts_with(index_archive_url, "https://files.prusa3d.com/wp-content/uploads/repository/"))
 	{
 		BOOST_LOG_TRIVIAL(error) << "Unsafe url path for vedor profiles archive zip. Download is rejected.";
@@ -460,7 +463,7 @@ void PresetUpdater::priv::sync_config(const VendorMap vendors, const std::string
 		const auto vendor_it = vendors.find(index.vendor());
 		if (vendor_it == vendors.end()) {
 			// Not installed vendor yet we need to check missing thumbnails (of new printers)
-			BOOST_LOG_TRIVIAL(debug) << "No such vendor: " << index.vendor();
+			BOOST_LOG_TRIVIAL(trace) << "No such vendor: " << index.vendor();
 			if (archive_it != vendors_with_status.end())
 				archive_it->second = VendorStatus::IN_CACHE;
 			continue;
@@ -790,7 +793,7 @@ void PresetUpdater::priv::check_install_indices() const
 			const auto path_in_cache = cache_path / path.filename();
 
 			if (! fs::exists(path_in_cache)) {
-				BOOST_LOG_TRIVIAL(info) << "Install index from resources: " << path.filename();
+				BOOST_LOG_TRIVIAL(trace) << "Install index from resources: " << path.filename();
 				copy_file_fix(path, path_in_cache);
 			} else {
 				Index idx_rsrc, idx_cache;
@@ -806,7 +809,7 @@ void PresetUpdater::priv::check_install_indices() const
 }
 
 // Generates a list of bundle updates that are to be performed.
-// Version of slic3r that was running the last time and which was read out from PrusaSlicer.ini is provided
+// Version of slic3r that was running the last time and which was read out from XDesktop.ini is provided
 // as a parameter.
 Updates PresetUpdater::priv::get_config_updates(const Semver &old_slic3r_version) const
 {
@@ -820,7 +823,7 @@ Updates PresetUpdater::priv::get_config_updates(const Semver &old_slic3r_version
 		auto bundle_path_idx = vendor_path / idx.path().filename();
 
 		if (! fs::exists(bundle_path)) {
-			BOOST_LOG_TRIVIAL(info) << format("Confing bundle not installed for vendor %1%, skipping: ", idx.vendor());
+			BOOST_LOG_TRIVIAL(trace) << format("Confing bundle not installed for vendor %1%, skipping: ", idx.vendor());
 			continue;
 		}
 
@@ -872,7 +875,7 @@ Updates PresetUpdater::priv::get_config_updates(const Semver &old_slic3r_version
 		}
 
 		if (recommended->config_version < vp.config_version) {
-			BOOST_LOG_TRIVIAL(warning) << format("Recommended config version for the currently running PrusaSlicer is older than the currently installed config for vendor %1%. This should not happen.", idx.vendor());
+			BOOST_LOG_TRIVIAL(warning) << format("Recommended config version for the currently running XDesktop is older than the currently installed config for vendor %1%. This should not happen.", idx.vendor());
 			continue;
 		}
 
@@ -881,13 +884,13 @@ Updates PresetUpdater::priv::get_config_updates(const Semver &old_slic3r_version
 			continue;
 		}
 
-		// Config bundle update situation. The recommended config bundle version for this PrusaSlicer version from the index from the cache is newer
+		// Config bundle update situation. The recommended config bundle version for this XDesktop version from the index from the cache is newer
 		// than the version of the currently installed config bundle.
 
 		// The config index inside the cache directory (given by idx.path()) is one of the following:
-		// 1) The last config index downloaded by any previously running PrusaSlicer instance
-		// 2) The last config index installed by any previously running PrusaSlicer instance (older or newer) from its resources.
-		// 3) The last config index installed by the currently running PrusaSlicer instance from its resources.
+		// 1) The last config index downloaded by any previously running XDesktop instance
+		// 2) The last config index installed by any previously running XDesktop instance (older or newer) from its resources.
+		// 3) The last config index installed by the currently running XDesktop instance from its resources.
 		// The config index is always the newest one (given by its newest config bundle referenced), and older config indices shall fully contain
 		// the content of the older config indices.
 
@@ -949,7 +952,7 @@ Updates PresetUpdater::priv::get_config_updates(const Semver &old_slic3r_version
 					found = true;
 				} else {
 					BOOST_LOG_TRIVIAL(warning) << format("The recommended config version for vendor `%1%` in resources does not match the recommended\n"
-			                                             " config version for this version of PrusaSlicer. Corrupted installation?", idx.vendor());
+			                                             " config version for this version of XDesktop. Corrupted installation?", idx.vendor());
 				}
 			}
 		}

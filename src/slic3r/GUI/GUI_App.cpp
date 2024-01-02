@@ -79,6 +79,7 @@
 #include "../Utils/WinRegistry.hpp"
 #include "slic3r/Config/Snapshot.hpp"
 #include "ConfigSnapshotDialog.hpp"
+#include "CustomIPDialog.hpp"
 #include "FirmwareDialog.hpp"
 #include "Preferences.hpp"
 #include "Tab.hpp"
@@ -176,8 +177,8 @@ public:
             memDC.SelectObject(bitmap);
 
             memDC.SetFont(m_action_font);
-            memDC.SetTextForeground(wxColour(237, 107, 33));
-            memDC.DrawText(text, int(m_scale * 60), m_action_line_y_position);
+            memDC.SetTextForeground(wxColour(0, 155, 223));
+            memDC.DrawText(text, int(m_scale * 30), m_action_line_y_position);
 
             memDC.SelectObject(wxNullBitmap);
             set_bitmap(bitmap);
@@ -188,84 +189,31 @@ public:
         }
     }
 
-    static wxBitmap MakeBitmap(wxBitmap bmp)
-    {
-        if (!bmp.IsOk())
-            return wxNullBitmap;
-
-        // create dark grey background for the splashscreen
-        // It will be 5/3 of the weight of the bitmap
-        int width = lround((double)5 / 3 * bmp.GetWidth());
-        int height = bmp.GetHeight();
-
-        wxImage image(width, height);
-        unsigned char* imgdata_ = image.GetData();
-        for (int i = 0; i < width * height; ++i) {
-            *imgdata_++ = 51;
-            *imgdata_++ = 51;
-            *imgdata_++ = 51;
-        }
-
-        wxBitmap new_bmp(image);
-
-        wxMemoryDC memDC;
-        memDC.SelectObject(new_bmp);
-        memDC.DrawBitmap(bmp, width - bmp.GetWidth(), 0, true);
-
-        return new_bmp;
-    }
-
     void Decorate(wxBitmap& bmp)
     {
         if (!bmp.IsOk())
             return;
 
-        // draw text to the box at the left of the splashscreen.
-        // this box will be 2/5 of the weight of the bitmap, and be at the left.
-        int width = lround(bmp.GetWidth() * 0.4);
+        // text margin on splash screen
+        wxCoord margin = int(m_scale * 30);
 
-        // load bitmap for logo
-        BitmapCache bmp_cache;
-        int logo_size = lround(width * 0.25);
-        wxBitmap* logo_bmp_ptr = bmp_cache.load_svg(wxGetApp().logo_name(), logo_size, logo_size);
-        if (logo_bmp_ptr == nullptr)
-            return;
-
-        wxBitmap logo_bmp = *logo_bmp_ptr;
-
-        wxCoord margin = int(m_scale * 20);
-
-        wxRect banner_rect(wxPoint(0, logo_size), wxPoint(width, bmp.GetHeight()));
-        banner_rect.Deflate(margin, 2 * margin);
+        wxRect version_rect(bmp.GetWidth() / 2, bmp.GetHeight() / 2, (bmp.GetWidth() / 2 - margin), bmp.GetHeight() / 2);
+        wxRect credits_rect(wxPoint(margin, margin), wxPoint(bmp.GetWidth(), bmp.GetHeight() - margin * 1.5));
 
         // use a memory DC to draw directly onto the bitmap
         wxMemoryDC memDc(bmp);
 
-        // draw logo
-        memDc.DrawBitmap(logo_bmp, margin, margin, true);
-
-        // draw the (white) labels inside of our black box (at the left of the splashscreen)
-        memDc.SetTextForeground(wxColour(255, 255, 255));
-
-        memDc.SetFont(m_constant_text.title_font);
-        memDc.DrawLabel(m_constant_text.title,   banner_rect, wxALIGN_TOP | wxALIGN_LEFT);
-
-        int title_height = memDc.GetTextExtent(m_constant_text.title).GetY();
-        banner_rect.SetTop(banner_rect.GetTop() + title_height);
-        banner_rect.SetHeight(banner_rect.GetHeight() - title_height);
+        // draw the dark labels at the left of the splashscreen
+        memDc.SetTextForeground(wxColor(128, 128, 128));
 
         memDc.SetFont(m_constant_text.version_font);
-        memDc.DrawLabel(m_constant_text.version, banner_rect, wxALIGN_TOP | wxALIGN_LEFT);
-        int version_height = memDc.GetTextExtent(m_constant_text.version).GetY();
+        memDc.DrawLabel(m_constant_text.version, version_rect, wxALIGN_TOP | wxALIGN_RIGHT);
 
         memDc.SetFont(m_constant_text.credits_font);
-        memDc.DrawLabel(m_constant_text.credits, banner_rect, wxALIGN_BOTTOM | wxALIGN_LEFT);
-        int credits_height = memDc.GetMultiLineTextExtent(m_constant_text.credits).GetY();
-        int text_height    = memDc.GetTextExtent("text").GetY();
+        memDc.DrawLabel(m_constant_text.credits, credits_rect, wxALIGN_CENTER_VERTICAL | wxALIGN_LEFT);
 
         // calculate position for the dynamic text
-        int logo_and_header_height = margin + logo_size + title_height + version_height;
-        m_action_line_y_position = logo_and_header_height + 0.5 * (bmp.GetHeight() - margin - credits_height - logo_and_header_height - text_height);
+        m_action_line_y_position = bmp.GetHeight() - margin;
     }
 
 private:
@@ -290,13 +238,13 @@ private:
             title = wxGetApp().is_editor() ? SLIC3R_APP_NAME : GCODEVIEWER_APP_NAME;
 
             // dynamically get the version to display
-            version = _L("Version") + " " + std::string(SLIC3R_VERSION);
+            version = _L("Version") + " " + std::string(XDESKTOP_VERSION);
 
             // credits infornation
-            credits = "\n" + title + " " +
-                _L("is based on Slic3r by Alessandro Ranellucci and the RepRap community.") + "\n\n" +
-                _L("Developed by Prusa Research.") + "\n\n" +
-                _L("Licensed under GNU AGPLv3.") + "\n\n\n\n\n\n\n";
+            credits =   title + " " +
+                        L("is based on PrusaSlicer and Slic3r by Alessandro Ranellucci and the RepRap community.") + "\n" +
+                        title + " " + _L("is licensed under the") + " " + _L("GNU Affero General Public License, version 3") + "\n\n\n\n\n\n\n" +
+                        _L("Contributions by Vojtech Bubnik, Enrico Turri, Oleksandra Iushchenko, Tamas Meszaros, Lukas Matena, Vojtech Kral, David Kocik and numerous others.");
 
             title_font = version_font = credits_font = init_font;
         }
@@ -310,13 +258,10 @@ private:
         // As default we use a system font for current display.
         // Scale fonts in respect to banner width
 
-        int text_banner_width = lround(0.4 * m_main_bitmap.GetWidth()) - roundl(m_scale * 50); // banner_width - margins
-
-        float title_font_scale = (float)text_banner_width / GetTextExtent(m_constant_text.title).GetX();
-        scale_font(m_constant_text.title_font, title_font_scale > 3.5f ? 3.5f : title_font_scale);
+        int text_banner_width = lround(0.75 * m_main_bitmap.GetWidth()) - roundl(m_scale * 50); // banner_width - margins
 
         float version_font_scale = (float)text_banner_width / GetTextExtent(m_constant_text.version).GetX();
-        scale_font(m_constant_text.version_font, version_font_scale > 2.f ? 2.f : version_font_scale);
+        scale_font(m_constant_text.version_font, version_font_scale > 1.5f ? 1.5f : version_font_scale);
 
         // The width of the credits information string doesn't respect to the banner width some times.
         // So, scale credits_font in the respect to the longest string width
@@ -488,8 +433,8 @@ static const FileWildcards file_wildcards_by_type[FT_SIZE] = {
     /* FT_STEP */    { "STEP files"sv,      { ".stp"sv, ".step"sv } },    
     /* FT_AMF */     { "AMF files"sv,       { ".amf"sv, ".zip.amf"sv, ".xml"sv } },
     /* FT_3MF */     { "3MF files"sv,       { ".3mf"sv } },
-    /* FT_GCODE */   { "G-code files"sv,    { ".gcode"sv, ".gco"sv, ".bgcode"sv, ".bgc"sv, ".g"sv, ".ngc"sv } },
-    /* FT_MODEL */   { "Known files"sv,     { ".stl"sv, ".obj"sv, ".3mf"sv, ".amf"sv, ".zip.amf"sv, ".xml"sv, ".step"sv, ".stp"sv, ".svg"sv } },
+    /* FT_GCODE */   { "G-code files"sv,    { ".gcode"sv, ".gco"sv, ".g"sv, ".ngc"sv } },
+    /* FT_MODEL */   { "Known files"sv,     { ".stl"sv, ".obj"sv, ".3mf"sv, ".amf"sv, ".zip.amf"sv, ".xml"sv, ".step"sv, ".stp"sv } },
     /* FT_PROJECT */ { "Project files"sv,   { ".3mf"sv, ".amf"sv, ".zip.amf"sv } },
     /* FT_FONTS */   { "Font files"sv,      { ".ttc"sv, ".ttf"sv } },
     /* FT_GALLERY */ { "Known files"sv,     { ".stl"sv, ".obj"sv } },
@@ -499,7 +444,7 @@ static const FileWildcards file_wildcards_by_type[FT_SIZE] = {
 
     /* FT_TEX */     { "Texture"sv,         { ".png"sv, ".svg"sv } },
 
-    /* FT_SL1 (deprecated, overriden by sla_wildcards) */     { "Masked SLA files"sv, { ".sl1"sv, ".sl1s"sv, ".pwmx"sv } },
+    /* FT_SL1 */     { "Masked SLA files"sv, { ".sl1"sv, ".sl1s"sv, ".pwmx"sv } },
 
     /* FT_ZIP */     { "Zip files"sv, { ".zip"sv } },
 };
@@ -746,8 +691,8 @@ static void generic_exception_handle()
         BOOST_LOG_TRIVIAL(error) << boost::format("std::bad_alloc exception: %1%") % ex.what();
         std::terminate();
     } catch (const boost::io::bad_format_string& ex) {
-        wxString errmsg = _L("PrusaSlicer has encountered a localization error. "
-                             "Please report to PrusaSlicer team, what language was active and in which scenario "
+        wxString errmsg = _L("XDesktop has encountered a localization error. "
+                             "Please report to XDesktop team, what language was active and in which scenario "
                              "this issue happened. Thank you.\n\nThe application will now terminate.");
         wxMessageBox(errmsg + "\n\n" + wxString(ex.what()), _L("Critical error"), wxOK | wxICON_ERROR);
         BOOST_LOG_TRIVIAL(error) << boost::format("Uncaught exception: %1%") % ex.what();
@@ -839,14 +784,14 @@ void GUI_App::post_init()
                 // The CallAfter is needed as well, without it, GL extensions did not show.
                 // Also, we only want to show this when the wizard does not, so the new user
                 // sees something else than "we want something" on the first start.
-                show_send_system_info_dialog_if_needed();   
+                //show_send_system_info_dialog_if_needed();   
             }  
             // app version check is asynchronous and triggers blocking dialog window, better call it last
             this->app_version_check(false);
         });
     }
 
-    // Set PrusaSlicer version and save to PrusaSlicer.ini or PrusaSlicerGcodeViewer.ini.
+    // Set XDesktop version and save to XDesktop.ini or XDesktopGcodeViewer.ini.
     app_config->set("version", SLIC3R_VERSION);
 
 #ifdef _WIN32
@@ -866,7 +811,7 @@ GUI_App::GUI_App(EAppMode mode)
 	, m_other_instance_message_handler(std::make_unique<OtherInstanceMessageHandler>())
     , m_downloader(std::make_unique<Downloader>())
 {
-	//app config initializes early becasuse it is used in instance checking in PrusaSlicer.cpp
+	//app config initializes early becasuse it is used in instance checking in XDesktop.cpp
 	this->init_app_config();
     // init app downloader after path to datadir is set
     m_app_updater = std::make_unique<AppUpdater>();
@@ -907,14 +852,14 @@ bool GUI_App::init_opengl()
     return status;
 }
 
-// gets path to PrusaSlicer.ini, returns semver from first line comment
+// gets path to XDesktop.ini, returns semver from first line comment
 static boost::optional<Semver> parse_semver_from_ini(std::string path)
 {
     std::ifstream stream(path);
     std::stringstream buffer;
     buffer << stream.rdbuf();
     std::string body = buffer.str();
-    size_t start = body.find("PrusaSlicer ");
+    size_t start = body.find("XDesktop ");
     if (start == std::string::npos)
         return boost::none;
     body = body.substr(start + 12);
@@ -926,7 +871,7 @@ static boost::optional<Semver> parse_semver_from_ini(std::string path)
 
 void GUI_App::init_app_config()
 {
-	// Profiles for the alpha are stored into the PrusaSlicer-alpha directory to not mix with the current release.
+	// Profiles for the alpha are stored into the XDesktop-alpha directory to not mix with the current release.
 
     SetAppName(SLIC3R_APP_KEY);
 //	SetAppName(SLIC3R_APP_KEY "-alpha");
@@ -965,12 +910,12 @@ void GUI_App::init_app_config()
         if (!error.empty()) {
             // Error while parsing config file. We'll customize the error message and rethrow to be displayed.
             if (is_editor()) {
-                throw Slic3r::RuntimeError(format("Error parsing PrusaSlicer config file, it is probably corrupted. "
+                throw Slic3r::RuntimeError(format("Error parsing XDesktop config file, it is probably corrupted. "
                         "Try to manually delete the file to recover from the error. Your user profiles will not be affected."
                         "\n\n%1%\n\n%2%", app_config->config_path(), error));
             }
             else {
-                throw Slic3r::RuntimeError(format("Error parsing PrusaGCodeViewer config file, it is probably corrupted. "
+                throw Slic3r::RuntimeError(format("Error parsing XDesktopGCodeViewer config file, it is probably corrupted. "
                         "Try to manually delete the file to recover from the error."
                         "\n\n%1%\n\n%2%", app_config->config_path(), error));
             }
@@ -1060,12 +1005,12 @@ std::string GUI_App::check_older_app_config(Semver current_version, bool backup)
         if (!error.empty()) {
             // Error while parsing config file. We'll customize the error message and rethrow to be displayed.
             if (is_editor()) {
-                throw Slic3r::RuntimeError(format("Error parsing PrusaSlicer config file, it is probably corrupted. "
+                throw Slic3r::RuntimeError(format("Error parsing XDesktop config file, it is probably corrupted. "
                         "Try to manually delete the file to recover from the error. Your user profiles will not be affected."
                         "\n\n%1%\n\n%2%", app_config->config_path(), error));
             }
             else {
-                throw Slic3r::RuntimeError(format("Error parsing PrusaGCodeViewer config file, it is probably corrupted. "
+                throw Slic3r::RuntimeError(format("Error parsing XDesktopGCodeViewer config file, it is probably corrupted. "
                         "Try to manually delete the file to recover from the error."
                         "\n\n%1%\n\n%2%", app_config->config_path(), error));
             }
@@ -1116,11 +1061,11 @@ bool GUI_App::on_init_inner()
     // Win32 32bit build.
     if (wxPlatformInfo::Get().GetArchName().substr(0, 2) == "64") {
         RichMessageDialog dlg(nullptr,
-            _L("You are running a 32 bit build of PrusaSlicer on 64-bit Windows."
-                "\n32 bit build of PrusaSlicer will likely not be able to utilize all the RAM available in the system."
-                "\nPlease download and install a 64 bit build of PrusaSlicer from https://www.prusa3d.cz/prusaslicer/."
+            _L("You are running a 32 bit build of XDesktop on 64-bit Windows."
+                "\n32 bit build of XDesktop will likely not be able to utilize all the RAM available in the system."
+                "\nPlease download and install a 64 bit build of XDesktop from https://www.prusa3d.cz/prusaslicer/."
                 "\nDo you wish to continue?"),
-            "PrusaSlicer", wxICON_QUESTION | wxYES_NO);
+            "XDesktop", wxICON_QUESTION | wxYES_NO);
         if (dlg.ShowModal() != wxID_YES)
             return false;
     }
@@ -1204,7 +1149,7 @@ bool GUI_App::on_init_inner()
             RichMessageDialog
                 dlg(nullptr,
                     wxString::Format(_L("%s\nDo you want to continue?"), msg),
-                    "PrusaSlicer", wxICON_QUESTION | wxYES_NO);
+                    "XDesktop", wxICON_QUESTION | wxYES_NO);
             dlg.ShowCheckBox(_L("Remember my choice"));
             if (dlg.ShowModal() != wxID_YES) return false;
 
@@ -1218,7 +1163,7 @@ bool GUI_App::on_init_inner()
     SplashScreen* scrn = nullptr;
     if (app_config->get_bool("show_splash_screen")) {
         // make a bitmap with dark grey banner on the left side
-        wxBitmap bmp = SplashScreen::MakeBitmap(wxBitmap(from_u8(var(is_editor() ? "splashscreen.jpg" : "splashscreen-gcodepreview.jpg")), wxBITMAP_TYPE_JPEG));
+        wxBitmap bmp = wxBitmap(from_u8(var(is_editor() ? "splashscreen.jpg" : "splashscreen-gcodepreview.jpg")), wxBITMAP_TYPE_JPEG);
 
         // Detect position (display) to show the splash screen
         // Now this position is equal to the mainframe position
@@ -1238,7 +1183,7 @@ bool GUI_App::on_init_inner()
         }
 
         // create splash screen with updated bmp
-        scrn = new SplashScreen(bmp.IsOk() ? bmp : get_bmp_bundle("PrusaSlicer", 400)->GetPreferredBitmapSizeAtScale(1.0), 
+        scrn = new SplashScreen(bmp.IsOk() ? bmp : get_bmp_bundle("XDesktop", 400)->GetPreferredBitmapSizeAtScale(1.0), 
                                 wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 4000, splashscreen_pos);
 
         if (!default_splashscreen_pos)
@@ -1421,8 +1366,8 @@ bool GUI_App::on_init_inner()
     {
         wxString preferences_item = _L("Restore window position on start");
         InfoDialog dialog(nullptr,
-            _L("PrusaSlicer started after a crash"),
-            format_wxstr(_L("PrusaSlicer crashed last time when attempting to set window position.\n"
+            _L("XDesktop started after a crash"),
+            format_wxstr(_L("XDesktop crashed last time when attempting to set window position.\n"
                 "We are sorry for the inconvenience, it unfortunately happens with certain multiple-monitor setups.\n"
                 "More precise reason for the crash: \"%1%\".\n"
                 "For more information see our GitHub issue tracker: \"%2%\" and \"%3%\"\n\n"
@@ -1870,7 +1815,7 @@ void GUI_App::check_printer_presets()
     for (const std::string& preset_name : preset_names)
         msg_text += "\n    \"" + from_u8(preset_name) + "\",";
     msg_text.RemoveLast();
-    msg_text += "\n\n" + _L("But since this version of PrusaSlicer we don't show this information in Printer Settings anymore.\n"
+    msg_text += "\n\n" + _L("But since this version of XDesktop we don't show this information in Printer Settings anymore.\n"
                             "Settings will be available in physical printers settings.") + "\n\n" +
                          _L("By default new Printer devices will be named as \"Printer N\" during its creation.\n"
                             "Note: This name can be changed later from the physical printers settings");
@@ -2082,7 +2027,7 @@ void GUI_App::load_gcode(wxWindow* parent, wxString& input_file) const
 {
     input_file.Clear();
     wxFileDialog dialog(parent ? parent : GetTopWindow(),
-        _L("Choose one file (GCODE/GCO/G/BGCODE/BGC/NGC):"),
+        _L("Choose one file (GCODE/GCO/G/BGCODE/BGC/NGC/zaxe):"),
         app_config->get_last_dir(), "",
         file_wildcards(FT_GCODE), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
@@ -2197,7 +2142,7 @@ int GUI_App::GetSingleChoiceIndex(const wxString& message,
 // select language from the list of installed languages
 bool GUI_App::select_language()
 {
-	wxArrayString translations = wxTranslations::Get()->GetAvailableTranslations(SLIC3R_APP_KEY);
+	wxArrayString translations = wxTranslations::Get()->GetAvailableTranslations("PrusaSlicer");
     std::vector<const wxLanguageInfo*> language_infos;
     language_infos.emplace_back(wxLocale::GetLanguageInfo(wxLANGUAGE_ENGLISH));
     for (size_t i = 0; i < translations.GetCount(); ++ i) {
@@ -2265,10 +2210,10 @@ bool GUI_App::load_language(wxString language, bool initial)
     if (initial) {
     	// There is a static list of lookup path prefixes in wxWidgets. Add ours.
 	    wxFileTranslationsLoader::AddCatalogLookupPathPrefix(from_u8(localization_dir()));
-    	// Get the active language from PrusaSlicer.ini, or empty string if the key does not exist.
+    	// Get the active language from XDesktop.ini, or empty string if the key does not exist.
         language = app_config->get("translation_language");
         if (! language.empty())
-        	BOOST_LOG_TRIVIAL(trace) << boost::format("translation_language provided by PrusaSlicer.ini: %1%") % language;
+        	BOOST_LOG_TRIVIAL(trace) << boost::format("translation_language provided by XDesktop.ini: %1%") % language;
 
         // Get the system language.
         {
@@ -2284,7 +2229,7 @@ bool GUI_App::load_language(wxString language, bool initial)
 #ifdef __WXOSX__
             // ysFIXME - temporary workaround till it isn't fixed in wxWidgets:
             // Use English as an initial language, because of under OSX it try to load "inappropriate" language for wxLANGUAGE_DEFAULT.
-            // For example in our case it's trying to load "en_CZ" and as a result PrusaSlicer catch warning message.
+            // For example in our case it's trying to load "en_CZ" and as a result XDesktop catch warning message.
             // But wxWidgets guys work on it.
             temp_locale.Init(wxLANGUAGE_ENGLISH);
 #else
@@ -2292,7 +2237,7 @@ bool GUI_App::load_language(wxString language, bool initial)
 #endif // __WXOSX__
 	    	// Set the current translation's language to default, otherwise GetBestTranslation() may not work (see the wxWidgets source code).
 	    	wxTranslations::Get()->SetLanguage(wxLANGUAGE_DEFAULT);
-	    	// Let the wxFileTranslationsLoader enumerate all translation dictionaries for PrusaSlicer
+	    	// Let the wxFileTranslationsLoader enumerate all translation dictionaries for XDesktop
 	    	// and try to match them with the system specific "preferred languages". 
 	    	// There seems to be a support for that on Windows and OSX, while on Linuxes the code just returns wxLocale::GetSystemLanguage().
 	    	// The last parameter gets added to the list of detected dictionaries. This is a workaround 
@@ -2321,12 +2266,12 @@ bool GUI_App::load_language(wxString language, bool initial)
 	}
 
 	if (language_info != nullptr && language_info->LayoutDirection == wxLayout_RightToLeft) {
-    	BOOST_LOG_TRIVIAL(trace) << boost::format("The following language code requires right to left layout, which is not supported by PrusaSlicer: %1%") % language_info->CanonicalName.ToUTF8().data();
+    	BOOST_LOG_TRIVIAL(trace) << boost::format("The following language code requires right to left layout, which is not supported by XDesktop: %1%") % language_info->CanonicalName.ToUTF8().data();
 		language_info = nullptr;
 	}
 
     if (language_info == nullptr) {
-        // PrusaSlicer does not support the Right to Left languages yet.
+        // XDesktop does not support the Right to Left languages yet.
         if (m_language_info_system != nullptr && m_language_info_system->LayoutDirection != wxLayout_RightToLeft)
             language_info = m_language_info_system;
         if (m_language_info_best != nullptr && m_language_info_best->LayoutDirection != wxLayout_RightToLeft)
@@ -2368,14 +2313,14 @@ bool GUI_App::load_language(wxString language, bool initial)
 
     if (! wxLocale::IsAvailable(language_info->Language)) {
     	// Loading the language dictionary failed.
-    	wxString message = "Switching PrusaSlicer to language " + language_info->CanonicalName + " failed.";
+    	wxString message = "Switching XDesktop to language " + language_info->CanonicalName + " failed.";
 #if !defined(_WIN32) && !defined(__APPLE__)
         // likely some linux system
         message += "\nYou may need to reconfigure the missing locales, likely by running the \"locale-gen\" and \"dpkg-reconfigure locales\" commands.\n";
 #endif
         if (initial)
         	message + "\n\nApplication will close.";
-        wxMessageBox(message, "PrusaSlicer - Switching language failed", wxOK | wxICON_ERROR);
+        wxMessageBox(message, "XDesktop - Switching language failed", wxOK | wxICON_ERROR);
         if (initial)
 			std::exit(EXIT_FAILURE);
 		else
@@ -2471,6 +2416,7 @@ void GUI_App::add_config_menu(wxMenuBar *menu)
     // Cmd+, is standard on OS X - what about other operating systems?
     if (is_editor()) {
         local_menu->Append(config_id_base + ConfigMenuWizard, config_wizard_name + dots, config_wizard_tooltip);
+        local_menu->Append(config_id_base + ConfigMenuCustomIPs, _L("Custom &IP Configuration") + dots, _L("Add / Remove manual devices by IP to machine carousel"));
         local_menu->Append(config_id_base + ConfigMenuSnapshots, _L("&Configuration Snapshots") + dots, _L("Inspect / activate configuration snapshots"));
         local_menu->Append(config_id_base + ConfigMenuTakeSnapshot, _L("Take Configuration &Snapshot"), _L("Capture a configuration snapshot"));
         local_menu->Append(config_id_base + ConfigMenuUpdateConf, _L("Check for Configuration Updates"), _L("Check for configuration updates"));
@@ -2576,6 +2522,12 @@ void GUI_App::add_config_menu(wxMenuBar *menu)
                 }
             }
             break;
+        case ConfigMenuCustomIPs:
+        {
+            CustomIPDialog dlg;
+            dlg.ShowModal();
+            break;
+        }
         case ConfigMenuPreferences:
         {
             open_preferences();
@@ -2935,7 +2887,7 @@ void GUI_App::OSXStoreOpenFiles(const wxArrayString &fileNames)
         if (is_gcode_file(into_u8(filename)))
             ++ num_gcodes;
     if (fileNames.size() == num_gcodes) {
-        // Opening PrusaSlicer by drag & dropping a G-Code onto PrusaSlicer icon in Finder,
+        // Opening XDesktop by drag & dropping a G-Code onto XDesktop icon in Finder,
         // just G-codes were passed. Switch to G-code viewer mode.
         m_app_mode = EAppMode::GCodeViewer;
         unlock_lockfile(get_instance_hash_string() + ".lock", data_dir() + "/cache/");
@@ -3169,7 +3121,7 @@ void GUI_App::show_desktop_integration_dialog()
 void GUI_App::show_downloader_registration_dialog()
 {
     InfoDialog msg(nullptr
-        , format_wxstr(_L("Welcome to %1% version %2%."), SLIC3R_APP_NAME, SLIC3R_VERSION)
+        , format_wxstr(_L("Welcome to %1% version %2%."), SLIC3R_APP_NAME, XDESKTOP_VERSION)
         , format_wxstr(_L(
             "Do you wish to register downloads from <b>Printables.com</b>"
             "\nfor this <b>%1% %2%</b> executable?"
@@ -3382,18 +3334,18 @@ bool GUI_App::open_browser_with_warning_dialog(const wxString& url, wxWindow* pa
     std::string option_key = "suppress_hyperlinks";
     if (force_remember_choice || app_config->get(option_key).empty()) {
         if (app_config->get(option_key).empty()) {
-            RichMessageDialog dialog(parent, _L("Open hyperlink in default browser?"), _L("PrusaSlicer: Open hyperlink"), wxICON_QUESTION | wxYES_NO);
+            RichMessageDialog dialog(parent, _L("Open hyperlink in default browser?"), _L("XDesktop: Open hyperlink"), wxICON_QUESTION | wxYES_NO);
             dialog.ShowCheckBox(_L("Remember my choice"));
             auto answer = dialog.ShowModal();
             launch = answer == wxID_YES;
             if (dialog.IsCheckBoxChecked()) {
                 wxString preferences_item = _L("Suppress to open hyperlink in browser");
                 wxString msg =
-                    _L("PrusaSlicer will remember your choice.") + "\n\n" +
+                    _L("XDesktop will remember your choice.") + "\n\n" +
                     _L("You will not be asked about it again on hyperlinks hovering.") + "\n\n" +
                     format_wxstr(_L("Visit \"Preferences\" and check \"%1%\"\nto changes your choice."), preferences_item);
 
-                MessageDialog msg_dlg(parent, msg, _L("PrusaSlicer: Don't ask me again"), wxOK | wxCANCEL | wxICON_INFORMATION);
+                MessageDialog msg_dlg(parent, msg, _L("XDesktop: Don't ask me again"), wxOK | wxCANCEL | wxICON_INFORMATION);
                 if (msg_dlg.ShowModal() == wxID_CANCEL)
                     return false;
                 app_config->set(option_key, answer == wxID_NO ? "1" : "0");
@@ -3405,7 +3357,7 @@ bool GUI_App::open_browser_with_warning_dialog(const wxString& url, wxWindow* pa
     // warning dialog doesn't containe a "Remember my choice" checkbox
     // and will be shown only when "Suppress to open hyperlink in browser" is ON.
     else if (app_config->get_bool(option_key)) {
-        MessageDialog dialog(parent, _L("Open hyperlink in default browser?"), _L("PrusaSlicer: Open hyperlink"), wxICON_QUESTION | wxYES_NO);
+        MessageDialog dialog(parent, _L("Open hyperlink in default browser?"), _L("XDesktop: Open hyperlink"), wxICON_QUESTION | wxYES_NO);
         launch = dialog.ShowModal() == wxID_YES;
     }
 
@@ -3441,22 +3393,22 @@ bool GUI_App::open_browser_with_warning_dialog(const wxString& url, wxWindow* pa
 #ifdef __WXMSW__
 void GUI_App::associate_3mf_files()
 {
-    associate_file_type(L".3mf", L"Prusa.Slicer.1", L"PrusaSlicer", true);
+    associate_file_type(L".3mf", L"Prusa.Slicer.1", L"XDesktop", true);
 }
 
 void GUI_App::associate_stl_files()
 {
-    associate_file_type(L".stl", L"Prusa.Slicer.1", L"PrusaSlicer", true);
+    associate_file_type(L".stl", L"Prusa.Slicer.1", L"XDesktop", true);
 }
 
 void GUI_App::associate_gcode_files()
 {
-    associate_file_type(L".gcode", L"PrusaSlicer.GCodeViewer.1", L"PrusaSlicerGCodeViewer", true);
+    associate_file_type(L".gcode", L"XDesktop.GCodeViewer.1", L"XDesktopGCodeViewer", true);
 }
 
 void GUI_App::associate_bgcode_files()
 {
-    associate_file_type(L".bgcode", L"PrusaSlicer.GCodeViewer.1", L"PrusaSlicerGCodeViewer", true);
+    associate_file_type(L".bgcode", L"XDesktop.GCodeViewer.1", L"XDesktopGCodeViewer", true);
 }
 #endif // __WXMSW__
 
@@ -3468,14 +3420,14 @@ void GUI_App::on_version_read(wxCommandEvent& evt)
         BOOST_LOG_TRIVIAL(info) << "Version online: " << evt.GetString() << ". User does not wish to be notified.";
         return;
     }
-    if (*Semver::parse(SLIC3R_VERSION) >= *Semver::parse(into_u8(evt.GetString()))) {
+    if (*Semver::parse(XDESKTOP_VERSION) >= *Semver::parse(into_u8(evt.GetString()))) {
         if (m_app_updater->get_triggered_by_user())
         {
             std::string text = (*Semver::parse(into_u8(evt.GetString())) == Semver()) 
                 ? _u8L("Check for application update has failed.")
                 : Slic3r::format(_u8L("You are currently running the latest released version %1%."), evt.GetString());
 
-            if (*Semver::parse(SLIC3R_VERSION) > *Semver::parse(into_u8(evt.GetString())))
+            if (*Semver::parse(XDESKTOP_VERSION) > *Semver::parse(into_u8(evt.GetString())))
                 text = Slic3r::format(_u8L("There are no new released versions online. The latest release version is %1%."), evt.GetString());
 
             this->plater_->get_notification_manager()->push_version_notification(NotificationType::NoNewReleaseAvailable
@@ -3518,7 +3470,7 @@ void GUI_App::app_updater(bool from_user)
     assert(!app_data.target_path.empty());
 
     // dialog with new version info
-    AppUpdateAvailableDialog dialog(*Semver::parse(SLIC3R_VERSION), *app_data.version, from_user);
+    AppUpdateAvailableDialog dialog(*Semver::parse(XDESKTOP_VERSION), *app_data.version, from_user);
     auto dialog_result = dialog.ShowModal();
     // checkbox "do not show again"
     if (dialog.disable_version_check()) {

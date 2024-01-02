@@ -1,6 +1,6 @@
 ///|/ Copyright (c) Prusa Research 2017 - 2023 Oleksandra Iushchenko @YuSanka, Vojtěch Bubník @bubnikv, Pavel Mikuš @Godrak, David Kocík @kocikdav, Lukáš Matěna @lukasmatena, Enrico Turri @enricoturri1966, Lukáš Hejl @hejllukas, Filip Sykala @Jony01, Vojtěch Král @vojtechkral
 ///|/
-///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/ XDesktop is released under the terms of the AGPLv3 or higher
 ///|/
 #include "libslic3r/libslic3r.h"
 #include "libslic3r/Utils.hpp"
@@ -34,17 +34,16 @@ namespace Slic3r {
 
 static const std::string VENDOR_PREFIX = "vendor:";
 static const std::string MODEL_PREFIX = "model:";
-// Because of a crash in PrusaSlicer 2.3.0/2.3.1 when showing an update notification with some locales, we don't want PrusaSlicer 2.3.0/2.3.1
-// to show this notification. On the other hand, we would like PrusaSlicer 2.3.2 to show an update notification of the upcoming PrusaSlicer 2.4.0.
-// Thus we will let PrusaSlicer 2.3.2 and couple of follow-up versions to download the version number from an alternate file until the PrusaSlicer 2.3.0/2.3.1
+// Because of a crash in XDesktop 2.3.0/2.3.1 when showing an update notification with some locales, we don't want XDesktop 2.3.0/2.3.1
+// to show this notification. On the other hand, we would like XDesktop 2.3.2 to show an update notification of the upcoming XDesktop 2.4.0.
+// Thus we will let XDesktop 2.3.2 and couple of follow-up versions to download the version number from an alternate file until the XDesktop 2.3.0/2.3.1
 // are phased out, then we will revert to the original name.
 // For 2.6.0-alpha1 we have switched back to the original. The file should contain data for AppUpdater.cpp
-static const std::string VERSION_CHECK_URL = "https://files.prusa3d.com/wp-content/uploads/repository/PrusaSlicer-settings-master/live/PrusaSlicer.version";
-//static const std::string VERSION_CHECK_URL = "https://files.prusa3d.com/wp-content/uploads/repository/PrusaSlicer-settings-master/live/PrusaSlicer.version2";
+static const std::string VERSION_CHECK_URL = "https://software.zaxe.com/xdesktop.version";
 // Url to index archive zip that contains latest indicies
-static const std::string INDEX_ARCHIVE_URL= "https://files.prusa3d.com/wp-content/uploads/repository/vendor_indices.zip";
+static const std::string INDEX_ARCHIVE_URL= "https://software.zaxe.com/xdesktop-config/vendor_indices.zip";
 // Url to folder with vendor profile files. Used when downloading new profiles that are not in resources folder.
-static const std::string PROFILE_FOLDER_URL = "https://files.prusa3d.com/wp-content/uploads/repository/PrusaSlicer-settings-master/live/";
+static const std::string PROFILE_FOLDER_URL = "https://software.zaxe.com/xdesktop-config/live";
 
 const std::string AppConfig::SECTION_FILAMENTS = "filaments";
 const std::string AppConfig::SECTION_MATERIALS = "sla_materials";
@@ -205,7 +204,7 @@ void AppConfig::set_defaults()
         set("restore_win_position", "1");       // allowed values - "1", "0", "crashed_at_..."
 
     if (get("show_hints").empty())
-        set("show_hints", "1");
+        set("show_hints", "0");
 
     if (get("allow_auto_color_change").empty())
         set("allow_auto_color_change", "1");
@@ -351,7 +350,7 @@ std::string AppConfig::load(const std::string &path)
 #endif // WIN32
             BOOST_LOG_TRIVIAL(info) << format(R"(Failed to parse configuration file "%1%": %2%)", path, ex.what());
         if (!recovered) {
-            // Report the initial error of parsing PrusaSlicer.ini.
+            // Report the initial error of parsing XDesktop.ini.
             // Error while parsing config file. We'll customize the error message and rethrow to be displayed.
             // ! But to avoid the use of _utf8 (related to use of wxWidgets) 
             // we will rethrow this exception from the place of load() call, if returned value wouldn't be empty
@@ -490,7 +489,7 @@ void AppConfig::save()
 #endif
 
     // Rename the config atomically.
-    // On Windows, the rename is likely NOT atomic, thus it may fail if PrusaSlicer crashes on another thread in the meanwhile.
+    // On Windows, the rename is likely NOT atomic, thus it may fail if XDesktop crashes on another thread in the meanwhile.
     // To cope with that, we already made a backup of the config on Windows.
     rename_file(path_pid, path);
     m_dirty = false;
@@ -633,6 +632,43 @@ bool AppConfig::set_recent_projects(const std::vector<std::string>& recent_proje
     std::map<std::string, std::string> src;
     for (unsigned int i = 0; i < (unsigned int)recent_projects.size(); ++i)
         src[std::to_string(i + 1)] = recent_projects[i];
+
+    if (src != dst) {
+        dst = std::move(src);
+        m_dirty = true;
+        return true;
+    } else
+        return false;
+}
+
+std::vector<std::string> AppConfig::get_custom_ips() const
+{
+    std::vector<std::string> ret;
+    const auto it = m_storage.find("custom_ips");
+    if (it != m_storage.end())
+    {
+        for (const std::map<std::string, std::string>::value_type& item : it->second)
+        {
+            ret.push_back(item.second);
+        }
+    }
+    return ret;
+}
+
+bool AppConfig::set_custom_ips(const std::vector<std::string>& custom_ips)
+{
+    static constexpr const char *section = "custom_ips";
+    auto it_section = m_storage.find(section);
+    if (it_section == m_storage.end()) {
+        if (custom_ips.empty())
+            return false;
+        it_section = m_storage.insert({ std::string(section), {} }).first;
+    }
+    auto &dst = it_section->second;
+
+    std::map<std::string, std::string> src;
+    for (unsigned int i = 0; i < (unsigned int)custom_ips.size(); ++i)
+        src[std::to_string(i + 1)] = custom_ips[i];
 
     if (src != dst) {
         dst = std::move(src);

@@ -1,7 +1,7 @@
 ///|/ Copyright (c) Prusa Research 2018 - 2023 David Kocík @kocikdav, Oleksandra Iushchenko @YuSanka, Lukáš Matěna @lukasmatena, Vojtěch Bubník @bubnikv, Enrico Turri @enricoturri1966, Vojtěch Král @vojtechkral
 ///|/ Copyright (c) 2022 Sebastian Nadorp @snadorp
 ///|/
-///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/ XDesktop is released under the terms of the AGPLv3 or higher
 ///|/
 #ifndef slic3r_ConfigWizard_private_hpp_
 #define slic3r_ConfigWizard_private_hpp_
@@ -76,13 +76,13 @@ struct Bundle
 	VendorProfile* vendor_profile{ nullptr };
 	//bool is_in_resources{ false };
     BundleLocation location;
-	bool is_prusa_bundle{ false };
+	bool is_zaxe_bundle{ false };
 
 	Bundle() = default;
 	Bundle(Bundle&& other);
 
 	// Returns false if not loaded. Reason for that is logged as boost::log error.
-	bool load(fs::path source_path, BundleLocation location, bool is_prusa_bundle = false);
+	bool load(fs::path source_path, BundleLocation location, bool is_zaxe_bundle = false);
 
 	const std::string& vendor_id() const { return vendor_profile->id; }
 };
@@ -91,8 +91,8 @@ struct BundleMap : std::map<std::string /* = vendor ID */, Bundle>
 {
 	static BundleMap load();
 
-	Bundle& prusa_bundle();
-	const Bundle& prusa_bundle() const;
+	Bundle& zaxe_bundle();
+	const Bundle& zaxe_bundle() const;
 };
 
 struct Materials;

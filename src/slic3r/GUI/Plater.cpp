@@ -128,6 +128,7 @@
 #include "ProjectDirtyStateManager.hpp"
 #include "Gizmos/GLGizmoSimplify.hpp" // create suggestion notification
 #include "Gizmos/GLGizmoSVG.hpp" // Drop SVG file
+#include "NetworkMachineManager.hpp"
 #include "Gizmos/GLGizmoCut.hpp"
 #include "FileArchiveDialog.hpp"
 
@@ -407,7 +408,11 @@ FreqChangedParams::FreqChangedParams(wxWindow* parent) :
         Tab* tab_print = wxGetApp().get_tab(Preset::TYPE_PRINT);
         if (!tab_print) return;
 
-        if (opt_key == "fill_density") {
+        if (opt_key == "fill_density" || opt_key == "bed_level") {
+            if (opt_key == "bed_level") {
+                wxGetApp().plater()->set_bed_level_active(boost::any_cast<bool>(value));
+                wxGetApp().plater()->reset_print();
+            }
             tab_print->update_dirty();
             tab_print->reload_config();
             tab_print->update();
@@ -506,6 +511,15 @@ FreqChangedParams::FreqChangedParams(wxWindow* parent) :
     def.gui_type = ConfigOptionDef::GUIType::undefined;
     def.set_default_value(new ConfigOptionBool{ m_brim_width > 0.0 ? true : false });
     option = Option(def, "brim");
+    option.opt.sidetext = "";
+    line.append_option(option);
+
+    def.label = "G29";
+    def.type = coBool;
+    def.tooltip = L("This flag enables/disables the mesh leveling after homing. If unchecked will use the previous bed leveling mesh. This can greatly reduce initial time to start the file.");
+    def.gui_type = ConfigOptionDef::GUIType::undefined;
+    def.set_default_value(new ConfigOptionBool{ true });
+    option = Option(def, "bed_level");
     option.opt.sidetext = "";
     line.append_option(option);
 
@@ -696,6 +710,7 @@ struct Sidebar::priv
     ObjectLayers        *object_layers{ nullptr };
     ObjectInfo *object_info;
     SlicedInfo *sliced_info;
+    NetworkMachineManager *machine_manager{ nullptr };
 
     wxButton *btn_export_gcode;
     wxButton *btn_reslice;
@@ -724,6 +739,7 @@ Sidebar::priv::~priv()
     delete object_settings;
     delete frequently_changed_parameters;
     delete object_layers;
+    delete machine_manager;
 }
 
 void Sidebar::priv::show_preset_comboboxes()
@@ -992,10 +1008,22 @@ Sidebar::Sidebar(Plater *parent)
 
     btns_sizer->Add(p->btn_reslice, 1, wxEXPAND | wxTOP | wxBOTTOM, margin_5);
     btns_sizer->Add(complect_btns_sizer, 1, wxEXPAND | wxTOP | wxBOTTOM, margin_5);
+    auto *mm_label = new wxStaticText(this, wxID_ANY, "..::" + _L("Zaxe Machine Carousel") + "::..",
+                                      wxDefaultPosition, wxSize(-1, 30), wxTE_CENTER);
+    wxGetApp().UpdateDarkUI(mm_label);
+
+    wxFont label_font = wxGetApp().bold_font();
+    label_font.SetPointSize(14);
+    mm_label->SetFont(label_font);
+    p->machine_manager = new NetworkMachineManager(this);
 
     auto *sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(p->scrolled, 1, wxEXPAND);
-    sizer->Add(btns_sizer, 0, wxEXPAND | wxLEFT, margin_5);
+    sizer->Add(mm_label, 0, wxLEFT | wxRIGHT | wxCENTRE);
+    sizer->Add(p->machine_manager, 6, wxEXPAND);
+    sizer->AddSpacer(10);
+    sizer->Add(btns_sizer, 0, wxEXPAND | wxLEFT, 10);
+    sizer->AddSpacer(10);
+    sizer->Add(p->scrolled, 3, wxEXPAND);
     SetSizer(sizer);
 
     // Events
@@ -1301,6 +1329,11 @@ ObjectLayers* Sidebar::obj_layers()
     return p->object_layers;
 }
 
+NetworkMachineManager* Sidebar::machine_manager()
+{
+    return p->machine_manager;
+}
+
 wxScrolledWindow* Sidebar::scrolled_panel()
 {
     return p->scrolled;
@@ -1554,6 +1587,8 @@ void Sidebar::enable_buttons(bool enable)
     p->btn_send_gcode->Enable(enable);
 //    p->btn_eject_device->Enable(enable);
 	p->btn_export_gcode_removable->Enable(enable);
+    if (!enable && p->machine_manager != nullptr) // deactivate print now buttons on Zaxe carousel.
+        p->machine_manager->enablePrintNowButton(false);
 }
 
 bool Sidebar::show_reslice(bool show)          const { return p->btn_reslice->Show(show); }
@@ -1823,13 +1858,13 @@ struct Plater::priv
                         if (dialog.IsCheckBoxChecked()) {
                             wxString preferences_item = _L("Ask for unsaved changes in project");
                             wxString msg =
-                                _L("PrusaSlicer will remember your choice.") + "\n\n" +
+                                _L("XDesktop will remember your choice.") + "\n\n" +
                                 _L("You will not be asked about it again, when: \n"
-                                    "- Closing PrusaSlicer,\n"
+                                    "- Closing XDesktop,\n"
                                     "- Loading or creating a new project") + "\n\n" +
                                 format_wxstr(_L("Visit \"Preferences\" and check \"%1%\"\nto changes your choice."), preferences_item);
 
-                            MessageDialog msg_dlg(mainframe, msg, _L("PrusaSlicer: Don't ask me again"), wxOK | wxCANCEL | wxICON_INFORMATION);
+                            MessageDialog msg_dlg(mainframe, msg, _L("XDesktop: Don't ask me again"), wxOK | wxCANCEL | wxICON_INFORMATION);
                             if (msg_dlg.ShowModal() == wxID_CANCEL)
                                 return wxID_CANCEL;
 
@@ -1902,7 +1937,7 @@ struct Plater::priv
     std::vector<size_t> load_model_objects(const ModelObjectPtrs& model_objects, bool allow_negative_z = false, bool call_selection_changed = true);
 
     fs::path get_export_file_path(GUI::FileType file_type);
-    wxString get_export_file(GUI::FileType file_type);
+    wxString get_export_file(GUI::FileType file_type, bool zaxe_file_temp_export = false);
 
     const Selection& get_selection() const;
     Selection& get_selection();
@@ -1976,6 +2011,9 @@ struct Plater::priv
 		}
 	}
     void export_gcode(fs::path output_path, bool output_path_on_removable_media, PrintHostJob upload_job);
+    std::string get_zaxe_code_path();
+    std::string get_gcode_path();
+    const ZaxeArchive& get_zaxe_archive() const;
     void reload_from_disk();
     bool replace_volume_with_stl(int object_idx, int volume_idx, const fs::path& new_path, const wxString& snapshot = "");
     void replace_with_stl();
@@ -2043,6 +2081,7 @@ struct Plater::priv
 
     void bring_instance_forward() const;
 
+    wxString get_filename();
     // returns the path to project file with the given extension (none if extension == wxEmptyString)
     // extension should contain the leading dot, i.e.: ".3mf"
     wxString get_project_filename(const wxString& extension = wxEmptyString) const;
@@ -2058,6 +2097,7 @@ struct Plater::priv
     std::string                 last_output_dir_path;
     bool                        inside_snapshot_capture() { return m_prevent_snapshots != 0; }
 	bool                        process_completed_with_error { false };
+    bool                        bed_level_active { true };
    
 private:
     bool layers_height_allowed() const;
@@ -2492,8 +2532,8 @@ void Plater::notify_about_installed_presets()
     const auto& names = wxGetApp().preset_bundle->tmp_installed_presets;
     // show notification about temporarily installed presets
     if (!names.empty()) {
-        std::string notif_text = into_u8(_L_PLURAL("The preset below was temporarily installed on the active instance of PrusaSlicer",
-            "The presets below were temporarily installed on the active instance of PrusaSlicer", names.size())) + ":";
+        std::string notif_text = into_u8(_L_PLURAL("The preset below was temporarily installed on the active instance of XDesktop",
+            "The presets below were temporarily installed on the active instance of XDesktop", names.size())) + ":";
         for (const std::string& name : names)
             notif_text += "\n - " + name;
         get_notification_manager()->push_notification(NotificationType::CustomNotification,
@@ -2503,7 +2543,7 @@ void Plater::notify_about_installed_presets()
 
 std::vector<size_t> Plater::priv::load_files(const std::vector<fs::path>& input_files, bool load_model, bool load_config, bool imperial_units/* = false*/)
 {
-     if (input_files.empty()) { return std::vector<size_t>(); }
+    if (input_files.empty()) { return std::vector<size_t>(); }
 
     auto *nozzle_dmrs = config->opt<ConfigOptionFloats>("nozzle_diameter");
 
@@ -2702,9 +2742,9 @@ std::vector<size_t> Plater::priv::load_files(const std::vector<fs::path>& input_
                     if (answer_convert_from_meters == wxOK_DEFAULT) {
                         RichMessageDialog dlg(q, format_wxstr(_L_PLURAL(
                             "The dimensions of the object from file %s seem to be defined in meters.\n"
-                            "The internal unit of PrusaSlicer is a millimeter. Do you want to recalculate the dimensions of the object?",
+                            "The internal unit of XDesktop is a millimeter. Do you want to recalculate the dimensions of the object?",
                             "The dimensions of some objects from file %s seem to be defined in meters.\n"
-                            "The internal unit of PrusaSlicer is a millimeter. Do you want to recalculate the dimensions of these objects?", model.objects.size()), from_path(filename)) + "\n",
+                            "The internal unit of XDesktop is a millimeter. Do you want to recalculate the dimensions of these objects?", model.objects.size()), from_path(filename)) + "\n",
                             _L("The object is too small"), wxICON_QUESTION | wxYES_NO);
                         dlg.ShowCheckBox(_L("Apply to all the remaining small objects being loaded."));
                         int answer = dlg.ShowModal();
@@ -2724,9 +2764,9 @@ std::vector<size_t> Plater::priv::load_files(const std::vector<fs::path>& input_
                     if (answer_convert_from_imperial_units == wxOK_DEFAULT) {
                         RichMessageDialog dlg(q, format_wxstr(_L_PLURAL(
                             "The dimensions of the object from file %s seem to be defined in inches.\n"
-                            "The internal unit of PrusaSlicer is a millimeter. Do you want to recalculate the dimensions of the object?",
+                            "The internal unit of XDesktop is a millimeter. Do you want to recalculate the dimensions of the object?",
                             "The dimensions of some objects from file %s seem to be defined in inches.\n"
-                            "The internal unit of PrusaSlicer is a millimeter. Do you want to recalculate the dimensions of these objects?", model.objects.size()), from_path(filename)) + "\n",
+                            "The internal unit of XDesktop is a millimeter. Do you want to recalculate the dimensions of these objects?", model.objects.size()), from_path(filename)) + "\n",
                             _L("The object is too small"), wxICON_QUESTION | wxYES_NO);
                         dlg.ShowCheckBox(_L("Apply to all the remaining small objects being loaded."));
                         int answer = dlg.ShowModal();
@@ -2977,7 +3017,7 @@ fs::path Plater::priv::get_export_file_path(GUI::FileType file_type)
     return output_file;
 }
 
-wxString Plater::priv::get_export_file(GUI::FileType file_type)
+wxString Plater::priv::get_export_file(GUI::FileType file_type, bool zaxe_file_temp_export)
 {
     wxString wildcard;
     switch (file_type) {
@@ -2985,6 +3025,7 @@ wxString Plater::priv::get_export_file(GUI::FileType file_type)
         case FT_AMF:
         case FT_3MF:
         case FT_GCODE:
+        case FT_ZAXE:
         case FT_OBJ:
         case FT_OBJECT:
             wildcard = file_wildcards(file_type);
@@ -3024,6 +3065,12 @@ wxString Plater::priv::get_export_file(GUI::FileType file_type)
             break;
         }
         default: break;
+    }
+
+    if (zaxe_file_temp_export) {
+        boost::filesystem::path temp_model_path(wxStandardPaths::Get().GetTempDir().utf8_str().data());
+        temp_model_path /= "model.stl";
+        return temp_model_path.string();
     }
 
     std::string out_dir = (boost::filesystem::path(output_file).parent_path()).string();
@@ -3137,7 +3184,7 @@ bool Plater::priv::delete_object_from_model(size_t obj_idx)
         InfoDialog dialog(q, _L("Delete object which is a part of cut object"), 
                              _L("You try to delete an object which is a part of a cut object.") + "\n" + 
                                 _L("This action will break a cut information.\n"
-                                "After that PrusaSlicer can't guarantee model consistency"), 
+                                "After that XDesktop can't guarantee model consistency"), 
                                 false, wxYES | wxCANCEL | wxCANCEL_DEFAULT | wxICON_WARNING);
         dialog.SetButtonLabel(wxID_YES, _L("Delete object"));
         if (dialog.ShowModal() == wxID_CANCEL)
@@ -3527,10 +3574,25 @@ bool Plater::priv::restart_background_process(unsigned int state)
     return false;
 }
 
+std::string Plater::priv::get_gcode_path()
+{
+    return  background_process.gcode_path();
+}
+
+std::string Plater::priv::get_zaxe_code_path()
+{
+    return  background_process.zaxe_archive_path();
+}
+
+const ZaxeArchive& Plater::priv::get_zaxe_archive() const
+{
+    return  background_process.zaxe_archive();
+}
+
 void Plater::priv::export_gcode(fs::path output_path, bool output_path_on_removable_media, PrintHostJob upload_job)
 {
     wxCHECK_RET(!(output_path.empty() && upload_job.empty()), "export_gcode: output_path and upload_job empty");
-    
+
     if (model.objects.empty())
         return;
 
@@ -4412,6 +4474,9 @@ void Plater::priv::on_process_completed(SlicingProcessCompletedEvent &evt)
 
     this->sidebar->show_sliced_info_sizer(evt.success());
 
+    if (sidebar->machine_manager() != nullptr) // activate print now buttons on Zaxe carousel.
+        sidebar->machine_manager()->enablePrintNowButton(true);
+
     // This updates the "Slice now", "Export G-code", "Arrange" buttons status.
     // Namely, it refreshes the "Out of print bed" property of all the ModelObjects, and it enables
     // the "Slice now" and "Export G-code" buttons based on their "out of bed" status.
@@ -4607,6 +4672,11 @@ ThumbnailsList Plater::priv::generate_thumbnails(const ThumbnailsParams& params,
             thumbnails.pop_back();
     }
     return thumbnails;
+}
+
+wxString Plater::priv::get_filename()
+{
+    return this->background_process.output_filename();
 }
 
 wxString Plater::priv::get_project_filename(const wxString& extension) const
@@ -4994,6 +5064,9 @@ void Plater::priv::show_action_buttons(const bool ready_to_slice_) const
     DynamicPrintConfig* selected_printer_config = wxGetApp().preset_bundle->physical_printers.get_selected_printer_config();
     const auto print_host_opt = selected_printer_config ? selected_printer_config->option<ConfigOptionString>("print_host") : nullptr;
     const bool send_gcode_shown = print_host_opt != nullptr && !print_host_opt->value.empty();
+
+    if (ready_to_slice && sidebar->machine_manager() != nullptr) // deactivate print now buttons on Zaxe carousel.
+        sidebar->machine_manager()->enablePrintNowButton(false);
     
     // when a background processing is ON, export_btn and/or send_btn are showing
     if (get_config_bool("background_processing"))
@@ -5733,6 +5806,11 @@ void Plater::refresh_print()
     p->preview->refresh_print();
 }
 
+void Plater::reset_print()
+{
+    p->background_process.reset();
+}
+
 std::vector<size_t> Plater::load_files(const std::vector<fs::path>& input_files, bool load_model, bool load_config, bool imperial_units /*= false*/) { return p->load_files(input_files, load_model, load_config, imperial_units); }
 
 // To be called when providing a list of files to the GUI slic3r on command line.
@@ -5830,7 +5908,7 @@ LoadProjectsDialog::LoadProjectsDialog(const std::vector<fs::path>& paths)
     id++;
     // all new window
     if (instances_allowed) {
-        btn = new wxRadioButton(this, wxID_ANY, _L("Start a new instance of PrusaSlicer"), wxDefaultPosition, wxDefaultSize, id == 0 ? wxRB_GROUP : 0);
+        btn = new wxRadioButton(this, wxID_ANY, _L("Start a new instance of XDesktop"), wxDefaultPosition, wxDefaultSize, id == 0 ? wxRB_GROUP : 0);
         btn->SetValue(id == m_action);
         btn->Bind(wxEVT_RADIOBUTTON, [this, id, contains_projects](wxCommandEvent&) {
             m_action = id;
@@ -5911,7 +5989,7 @@ bool Plater::preview_zip_archive(const boost::filesystem::path& archive_path)
         std::vector<std::pair<fs::path, size_t>> selected_paths;
         FileArchiveDialog dlg(static_cast<wxWindow*>(wxGetApp().mainframe), &archive, selected_paths);
         if (dlg.ShowModal() == wxID_OK)
-        {      
+        {
             std::string archive_path_string = archive_path.string();
             archive_path_string = archive_path_string.substr(0, archive_path_string.size() - 4);
             fs::path archive_dir(wxStandardPaths::Get().GetTempDir().utf8_str().data());
@@ -6185,7 +6263,7 @@ ProjectDropDialog::ProjectDropDialog(const std::string& filename)
     choices.Add(_L("Import 3D models only"));
     choices.Add(_L("Import config only"));
     if (!single_instance_only)
-        choices.Add(_L("Start new PrusaSlicer instance"));
+        choices.Add(_L("Start new XDesktop instance"));
 
     main_sizer->Add(new wxStaticText(this, wxID_ANY,
         get_wraped_wxString(_L("Select an action to apply to the file") + ": " + from_u8(filename))), 0, wxEXPAND | wxALL, 10);
@@ -6787,14 +6865,15 @@ void Plater::export_gcode(bool prefer_removable)
 			start_dir = appconfig.get_last_output_dir(default_output_file.parent_path().string(), false);
 	}
 
+    const bool isZaxe = wxGetApp().preset_bundle->printers.is_selected_preset_zaxe();
+
     fs::path output_path;
     {
-        std::string ext = default_output_file.extension().string();
-        wxFileDialog dlg(this, (printer_technology() == ptFFF) ? _L("Save G-code file as:") : _L("Save SL1 / SL1S file as:"),
+        std::string ext = isZaxe ? ".zaxe" : (printer_technology() == ptFFF ? ".gcode" : default_output_file.extension().string());
+        wxFileDialog dlg(this, (printer_technology() == ptFFF) ? (isZaxe ? _L("Save Zaxe file as:") : _L("Save G-code file as:")) : _L("Save SL1 / SL1S file as:"),
             start_dir,
-            from_path(default_output_file.filename()),
-            printer_technology() == ptFFF ? GUI::file_wildcards(FT_GCODE, ext) :
-                                            GUI::sla_wildcards(p->sla_print.printer_config().sla_archive_format.value.c_str()),
+            from_path(default_output_file.stem()),
+            GUI::file_wildcards((printer_technology() == ptFFF) ? (isZaxe ? FT_ZAXE : FT_GCODE): FT_SL1, ext),
             wxFD_SAVE | wxFD_OVERWRITE_PROMPT
         );
         if (dlg.ShowModal() == wxID_OK) {
@@ -6844,11 +6923,11 @@ void Plater::export_gcode(bool prefer_removable)
 	}
 }
 
-void Plater::export_stl_obj(bool extended, bool selection_only)
+void Plater::export_stl_obj(bool extended, bool selection_only, bool zaxe_file_temp_export)
 {
     if (p->model.objects.empty()) { return; }
 
-    wxString path = p->get_export_file(FT_OBJECT);
+    wxString path = p->get_export_file(FT_STL, zaxe_file_temp_export);
     if (path.empty()) { return; }
     const std::string path_u8 = into_u8(path);
 
@@ -7001,6 +7080,10 @@ void Plater::export_stl_obj(bool extended, bool selection_only)
         for (const ModelObject* o : p->model.objects) {
             mesh.merge(mesh_to_export(*o, -1));
         }
+        if (zaxe_file_temp_export) // center to model not the plate if within Zaxe file.
+            mesh.translate(
+                Vec3f{static_cast<float>(-p->bed.build_volume().bed_center()[0]),
+                static_cast<float>(-p->bed.build_volume().bed_center()[1]), 0});
     }
 
     if (path.Lower().EndsWith(".stl"))
@@ -7579,6 +7662,7 @@ void Plater::on_config_change(const DynamicPrintConfig &config)
         }
         else if (opt_key == "printer_model") {
             p->reset_gcode_toolpaths();
+            this->check_and_set_zaxe_file();
             // update to force bed selection(for texturing)
             bed_shape_changed = true;
             update_scheduled = true;
@@ -7719,6 +7803,11 @@ std::vector<std::string> Plater::get_colors_for_color_print(const GCodeProcessor
     return colors;
 }
 
+wxString Plater::get_filename()
+{
+    return p->get_filename();
+}
+
 wxString Plater::get_project_filename(const wxString& extension) const
 {
     return p->get_project_filename(extension);
@@ -7850,6 +7939,23 @@ PrinterTechnology Plater::printer_technology() const
 
 const DynamicPrintConfig * Plater::config() const { return p->config; }
 
+void Plater::check_and_set_zaxe_file()
+{
+    const bool isZaxe = wxGetApp().preset_bundle->printers.is_selected_preset_zaxe();
+    p->label_btn_export = p->printer_technology == ptFFF && !isZaxe ?  L("Export G-code") : L("Export");
+    p->label_btn_send   = p->printer_technology == ptFFF && !isZaxe ? L("Send G-code") : L("Send to printer");
+}
+
+bool Plater::is_bed_level_active()
+{
+    return p->bed_level_active;
+}
+
+void Plater::set_bed_level_active(bool active)
+{
+    p->bed_level_active = active;
+}
+
 bool Plater::set_printer_technology(PrinterTechnology printer_technology)
 {
     p->printer_technology = printer_technology;
@@ -7866,8 +7972,7 @@ bool Plater::set_printer_technology(PrinterTechnology printer_technology)
         }
     }
 
-    p->label_btn_export = printer_technology == ptFFF ? L("Export G-code") : L("Export");
-    p->label_btn_send   = printer_technology == ptFFF ? L("Send G-code")   : L("Send to printer");
+    check_and_set_zaxe_file(); // see if we need a zaxe file according to technology and selected printer model.
 
     if (wxGetApp().mainframe != nullptr)
         wxGetApp().mainframe->update_menubar();
@@ -8250,6 +8355,9 @@ void Plater::clear_undo_redo_stack_main() { p->undo_redo_stack_main().clear(); }
 void Plater::enter_gizmos_stack() { p->enter_gizmos_stack(); }
 void Plater::leave_gizmos_stack() { p->leave_gizmos_stack(); }
 bool Plater::inside_snapshot_capture() { return p->inside_snapshot_capture(); }
+std::string Plater::get_gcode_path() { return p->get_gcode_path(); }
+std::string Plater::get_zaxe_code_path() { return p->get_zaxe_code_path(); }
+const ZaxeArchive& Plater::get_zaxe_archive() const { return p->get_zaxe_archive(); };
 
 void Plater::toggle_render_statistic_dialog()
 {

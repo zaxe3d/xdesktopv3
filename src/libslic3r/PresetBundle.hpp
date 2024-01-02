@@ -1,7 +1,7 @@
 ///|/ Copyright (c) Prusa Research 2017 - 2023 Oleksandra Iushchenko @YuSanka, Enrico Turri @enricoturri1966, Lukáš Matěna @lukasmatena, Vojtěch Bubník @bubnikv, David Kocík @kocikdav, Vojtěch Král @vojtechkral
 ///|/ Copyright (c) 2019 John Drake @foxox
 ///|/
-///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/ XDesktop is released under the terms of the AGPLv3 or higher
 ///|/
 #ifndef slic3r_PresetBundle_hpp_
 #define slic3r_PresetBundle_hpp_
@@ -167,7 +167,7 @@ public:
     bool                        transfer_and_save(Preset::Type type, const std::string& preset_from_name, const std::string& preset_to_name,
                                                   const std::string& new_name, const std::vector<std::string>& options);
 
-    static const char *PRUSA_BUNDLE;
+    static const char *ZAXE_BUNDLE;
 
     static std::array<Preset::Type, 3>  types_list(PrinterTechnology pt) {
         if (pt == ptFFF)

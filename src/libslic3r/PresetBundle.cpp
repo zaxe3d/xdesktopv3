@@ -2,7 +2,7 @@
 ///|/ Copyright (c) SuperSlicer 2021 Remi Durand @supermerill
 ///|/ Copyright (c) 2019 John Drake @foxox
 ///|/
-///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/ XDesktop is released under the terms of the AGPLv3 or higher
 ///|/
 #include <cassert>
 
@@ -42,7 +42,7 @@ static std::vector<std::string> s_project_options {
     "wiping_volumes_matrix"
 };
 
-const char *PresetBundle::PRUSA_BUNDLE = "PrusaResearch";
+const char *PresetBundle::ZAXE_BUNDLE = "Zaxe";
 
 PresetBundle::PresetBundle() :
     prints(Preset::TYPE_PRINT, Preset::print_options(), static_cast<const PrintRegionConfig&>(FullPrintConfig::defaults())),
@@ -216,7 +216,7 @@ static void copy_dir(const boost::filesystem::path& from_dir, const boost::files
     }
 }
 
-// Import newer configuration from alternate PrusaSlicer configuration directory.
+// Import newer configuration from alternate XDesktop configuration directory.
 // AppConfig from the alternate location is already loaded.
 // User profiles are being merged (old files are not being deleted),
 // while old vendors and cache folders are being deleted before newer are copied.
@@ -224,7 +224,7 @@ void PresetBundle::import_newer_configs(const std::string& from)
 {
     boost::filesystem::path data_dir = boost::filesystem::path(Slic3r::data_dir());
     // Clean-up vendors from the target directory, as the existing vendors will not be referenced
-    // by the copied PrusaSlicer.ini
+    // by the copied XDesktop.ini
     try {
         boost::filesystem::remove_all(data_dir / "cache");
     } catch (const std::exception &ex) {
@@ -556,7 +556,7 @@ bool PresetBundle::transfer_and_save(Preset::Type type, const std::string& prese
 void PresetBundle::load_installed_filaments(AppConfig &config)
 {
     if (! config.has_section(AppConfig::SECTION_FILAMENTS)) {
-		// Compatibility with the PrusaSlicer 2.1.1 and older, where the filament profiles were not installable yet.
+		// Compatibility with the XDesktop 2.1.1 and older, where the filament profiles were not installable yet.
 		// Find all filament profiles, which are compatible with installed printers, and act as if these filament profiles
 		// were installed.
         std::unordered_set<const Preset*> compatible_filaments;
@@ -580,7 +580,7 @@ void PresetBundle::load_installed_sla_materials(AppConfig &config)
 {
     if (! config.has_section(AppConfig::SECTION_MATERIALS)) {
         std::unordered_set<const Preset*> comp_sla_materials;
-		// Compatibility with the PrusaSlicer 2.1.1 and older, where the SLA material profiles were not installable yet.
+		// Compatibility with the XDesktop 2.1.1 and older, where the SLA material profiles were not installable yet.
 		// Find all SLA material profiles, which are compatible with installed printers, and act as if these SLA material profiles
 		// were installed.
         for (const Preset &printer : printers)

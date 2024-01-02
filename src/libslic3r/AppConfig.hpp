@@ -1,6 +1,6 @@
 ///|/ Copyright (c) Prusa Research 2017 - 2023 Vojtěch Bubník @bubnikv, David Kocík @kocikdav, Lukáš Matěna @lukasmatena, Filip Sykala @Jony01, Enrico Turri @enricoturri1966, Oleksandra Iushchenko @YuSanka, Vojtěch Král @vojtechkral
 ///|/
-///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/ XDesktop is released under the terms of the AGPLv3 or higher
 ///|/
 #ifndef slic3r_AppConfig_hpp_
 #define slic3r_AppConfig_hpp_
@@ -156,6 +156,9 @@ public:
 
     std::vector<std::string> get_recent_projects() const;
     bool set_recent_projects(const std::vector<std::string>& recent_projects);
+
+	std::vector<std::string> get_custom_ips() const;
+	bool set_custom_ips(const std::vector<std::string>& custom_ips);
 
 	bool set_mouse_device(const std::string& name, double translation_speed, double translation_deadzone, float rotation_speed, float rotation_deadzone, double zoom_speed, bool swap_yz);
 	std::vector<std::string> get_mouse_device_names() const;

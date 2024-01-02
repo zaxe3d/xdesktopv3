@@ -1,6 +1,6 @@
 ///|/ Copyright (c) Prusa Research 2022 Enrico Turri @enricoturri1966, Vojtěch Bubník @bubnikv
 ///|/
-///|/ PrusaSlicer is released under the terms of the AGPLv3 or higher
+///|/ XDesktop is released under the terms of the AGPLv3 or higher
 ///|/
 #include "Thumbnails.hpp"
 #include "../miniz_extension.hpp"
@@ -122,6 +122,22 @@ std::unique_ptr<CompressedImageBuffer> compress_thumbnail(const ThumbnailData &d
         case GCodeThumbnailsFormat::QOI:
             return compress_thumbnail_qoi(data);
     }
+}
+
+Vec2ds get_sizes_of_thumbnail_list(const GCodeThumbnailDefinitionsList& thumbnails_list, const ThumbnailErrors& errors)
+{
+    if (errors != enum_bitmask<ThumbnailError>()) {
+        std::string error_str = format("Invalid thumbnails value:");
+        error_str += GCodeThumbnails::get_error_string(errors);
+        throw Slic3r::ExportError(error_str);
+    }
+    Vec2ds sizes;
+    if (!thumbnails_list.empty()) {
+        sizes.reserve(thumbnails_list.size());
+        for (const auto& [format, size] : thumbnails_list)
+            sizes.emplace_back(size);
+    }
+    return sizes;
 }
 
 std::pair<GCodeThumbnailDefinitionsList, ThumbnailErrors> make_and_check_thumbnail_list(const std::string& thumbnails_string, const std::string_view def_ext /*= "PNG"sv*/)

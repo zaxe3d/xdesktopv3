@@ -28085,3 +28085,101 @@ msgstr "zlib hatası %d"
 #: ../src/richtext/richtextbulletspage.cpp:288
 msgid "~"
 msgstr "~"
+
+#: src/slic3r/GUI/Device.cpp:25 src/slic3r/GUI/Device.cpp:408
+msgid "Material: "
+msgstr "Materyal: "
+
+#: src/slic3r/GUI/Device.cpp:26 src/slic3r/GUI/Device.cpp:418
+msgid "Nozzle: "
+msgstr "Nozül: "
+
+#: src/slic3r/GUI/Device.cpp:27
+msgid "IP Address: "
+msgstr "IP Adresi: "
+
+#: src/slic3r/GUI/Device.cpp:28
+msgid "Please take your print!"
+msgstr "Lütfen baskınızı alınız!"
+
+#: src/slic3r/GUI/Device.cpp:29
+msgid "Device is in error state!"
+msgstr "Cihaz hata durumunda!"
+
+#: src/slic3r/GUI/Device.cpp:30 src/slic3r/GUI/Device.cpp:445
+msgid "Elapsed / Estimated time: "
+msgstr "Geçen / Tahmini süre: "
+
+#: src/slic3r/GUI/Device.cpp:31
+msgid "File: "
+msgstr "Dosya: "
+
+#: src/slic3r/GUI/Device.cpp:33
+msgid "Unload"
+msgstr "Çıkart"
+
+#: src/slic3r/GUI/Device.cpp:34
+msgid "Print Now!"
+msgstr "Baskı Al!"
+
+#: src/slic3r/GUI/Device.cpp:200
+msgid "Device model does NOT match. Please reslice with the correct model."
+msgstr ""
+"Cihaz modeli eşleşmiyor. Lütfen doğru cihaz modelini seçip tekrar "
+"dilimleyiniz."
+
+#: src/slic3r/GUI/Device.cpp:200
+msgid "Wrong device model"
+msgstr "Hatalı cihaz modeli"
+
+#: src/slic3r/GUI/Device.cpp:202
+msgid ""
+"Materials don't match with this device. Please reslice with the correct "
+"material."
+msgstr ""
+"Cihazdaki materyal ile baskıda ki materyal uyuşmuyor. Lütfen cihazdaki "
+"materyal ile tekrar dilimleyiniz."
+
+#: src/slic3r/GUI/Device.cpp:202
+msgid "Wrong material type"
+msgstr "Yanlış materyal"
+
+#: src/slic3r/GUI/Device.cpp:204
+msgid ""
+"Currently installed nozzle on device doesn't match with this slice. Please "
+"reslice with the correct nozzle."
+msgstr ""
+"Cihazdaki nozül ile baskıda ki nozül uyuşmuyor. Lütfen cihazdaki nozül ile "
+"tekrar dilimleyiniz."
+
+#: src/slic3r/GUI/Device.cpp:204
+msgid "Wrong nozzle type"
+msgstr "Yanlış nozül tipi"
+
+#: src/slic3r/GUI/Device.cpp:275
+msgid "Bed is occupied..."
+msgstr "Tabla dolu..."
+
+#: src/slic3r/GUI/Device.cpp:277
+msgid "Heating..."
+msgstr "Isıtılıyor..."
+
+#: src/slic3r/GUI/Device.cpp:285
+msgid "Uploading..."
+msgstr "Gönderiliyor..."
+
+#: src/slic3r/GUI/Device.cpp:288
+msgid "Paused..."
+msgstr "Duraklatıldı..."
+
+#: src/slic3r/GUI/Device.cpp:291
+msgid "Calibrating..."
+msgstr "Kalibre ediliyor..."
+
+#: src/slic3r/GUI/Device.cpp:456
+msgid "Are you sure?"
+msgstr "Emin misiniz?"
+
+#: src/slic3r/GUI/Device.cpp:456
+msgid "XDesktop: Confirmation"
+msgstr "XDesktop: Konfirmasyon"
