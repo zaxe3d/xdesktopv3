@@ -181,7 +181,7 @@ if (WIN32)
     endif()
     target_compile_definitions(XDesktop_app_gui PRIVATE -DSLIC3R_WRAPPER_NOCONSOLE)
     add_dependencies(XDesktop_app_gui XDesktop)
-    set_target_properties(XDesktop_app_gui PROPERTIES OUTPUT_NAME "xdesktop")
+    set_target_properties(XDesktop_app_gui PROPERTIES OUTPUT_NAME "XDesktop")
     target_link_libraries(XDesktop_app_gui PRIVATE boost_headeronly)
 
     add_executable(XDesktop_app_console XDesktop_app_msvc.cpp ${CMAKE_CURRENT_BINARY_DIR}/XDesktop.rc)
@@ -246,7 +246,7 @@ else ()
             VERBATIM)
     else ()
         add_custom_command(TARGET XDesktop POST_BUILD
-            COMMAND ln -sf xdestkop xdestkop-gcodeviewer
+            COMMAND ln -sf xdesktop xdesktop-gcodeviewer
             WORKING_DIRECTORY "$<TARGET_FILE_DIR:XDesktop>"
             COMMENT "Symlinking the G-code viewer to XDesktop"
             VERBATIM)
@@ -274,7 +274,7 @@ else ()
     install(TARGETS XDesktop RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
     # Install the symlink for gcodeviewer
-    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink xdestkop xdestkop-gcodeviewer WORKING_DIRECTORY \$ENV{DESTDIR}/${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR})")
+    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink xdesktop xdesktop-gcodeviewer WORKING_DIRECTORY \$ENV{DESTDIR}/${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR})")
     if (APPLE)
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../package/BuildMacOSImage.sh.in ${CMAKE_CURRENT_BINARY_DIR}/BuildMacOSImage.sh @ONLY)
     endif ()

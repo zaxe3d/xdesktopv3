@@ -15,11 +15,12 @@ add_cmake_project(Boost
     URL_HASH SHA256=9effa3d7f9d92b8e33e2b41d82f4358f97ff7c588d5918720339f2b254d914c6
     LIST_SEPARATOR |
     CMAKE_ARGS
-        -DBOOST_EXCLUDE_LIBRARIES:STRING=contract|fiber|numpy|stacktrace|wave|test
+        -DBOOST_EXCLUDE_LIBRARIES:STRING=contract|fiber|numpy|stacktrace|wave|test|zstd
         -DBOOST_LOCALE_ENABLE_ICU:BOOL=OFF # do not link to libicu, breaks compatibility between distros
         -DBUILD_TESTING:BOOL=OFF
         "${_context_abi_line}"
         "${_context_arch_line}"
+        -DBOOST_IOSTREAMS_ENABLE_ZSTD=OFF
 )
 
 set(DEP_Boost_DEPENDS ZLIB)
