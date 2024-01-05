@@ -108,6 +108,7 @@ void ZaxeArchive::export_print(
             { "name", boost::filesystem::path(zipper.get_filename()).stem().string() },
             { "checksum", generate_md5_checksum(temp_gcode_output_path) },
             { "bed_level", bed_level ? "on" : "off" },
+            { "arc_welder", "off" }, // backward compatibility
         };
         generate_info_file(m_infoconf, print); // generate info.json contents.
         zipper.add_entry("info.json");

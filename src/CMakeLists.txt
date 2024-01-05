@@ -131,7 +131,7 @@ if (NOT WIN32 AND NOT APPLE)
     set_target_properties(XDesktop PROPERTIES OUTPUT_NAME "xdesktop")
 endif ()
 
-target_link_libraries(XDesktop libslic3r libcereal)
+target_link_libraries(XDesktop libslic3r cereal)
 
 if (APPLE)
 #    add_compile_options(-stdlib=libc++)

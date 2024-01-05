@@ -156,7 +156,7 @@ if (UNIX)
     if (APPLE)
         # Deal with CURL on Apple (See issue #5984 on GH):
         # Mac SDK should include CURL from at least version 10.12
-        list(APPEND SYSTEM_PROVIDED_PACKAGES CURL)
+        # list(APPEND SYSTEM_PROVIDED_PACKAGES CURL) # disabled for ftp support Zaxe
     endif ()
 endif ()
 
