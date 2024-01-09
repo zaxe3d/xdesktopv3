@@ -1594,7 +1594,7 @@ void DownloaderUtils::Worker::deregister()
 #ifdef _WIN32
     std::string key_string = "";
     wxRegKey key_full(wxRegKey::HKCU, "Software\\Classes\\xdesktop\\shell\\open\\command");
-    if (!key_full.Exists()) {n
+    if (!key_full.Exists()) {
         return;
     }
     key_full = key_string;
