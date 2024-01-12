@@ -202,13 +202,13 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
         boost::replace_all(dM, "PLUS", "+");
         trim(pN);
         if (s == std::string::npos || pN.length() != dM.length() + s) {
-            wxMessageBox(L("Device model does NOT match. Please reslice with the correct model."), _L("Wrong device model"), wxICON_ERROR);
+            wxMessageBox(_L("Device model does NOT match. Please reslice with the correct model."), _L("Wrong device model"), wxOK | wxICON_ERROR);
         } else if (!this->nm->attr->isLite && this->nm->attr->material != "custom" && this->nm->attr->material.compare(archive.get_info("material")) != 0) {
-            wxMessageBox(L("Materials don't match with this device. Please reslice with the correct material."), _L("Wrong material type"), wxICON_ERROR);
+            wxMessageBox(_L("Materials don't match with this device. Please reslice with the correct material."), _L("Wrong material type"), wxICON_ERROR);
         } else if (!this->nm->states->filamentPresent && this->nm->attr->firmwareVersion.GetMajor() >= 3 && this->nm->attr->firmwareVersion.GetMinor() >= 5) {
-            wxMessageBox(L("Please put the filament through the material sensor first."), _L("Filament not present"), wxICON_ERROR);
+            wxMessageBox(_L("Please put the filament through the material sensor first."), _L("Filament not present"), wxICON_ERROR);
         } else if (!this->nm->attr->isLite && this->nm->attr->nozzle.compare(archive.get_info("nozzle_diameter")) != 0) {
-            wxMessageBox(L("Currently installed nozzle on device doesn't match with this slice. Please reslice with the correct nozzle."), _L("Wrong nozzle type"), wxICON_ERROR);
+            wxMessageBox(_L("Currently installed nozzle on device doesn't match with this slice. Please reslice with the correct nozzle."), _L("Wrong nozzle type"), wxICON_ERROR);
         } else {
             std::thread t([&]() {
                 if (this->nm->attr->isLite) {
