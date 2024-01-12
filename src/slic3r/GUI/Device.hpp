@@ -60,6 +60,7 @@ public:
 
     void setName(const string &name);
     void setMaterial(const string &material);
+    void setFilamentPresent(const bool present);
     void setNozzle(const string &nozzle);
     void setPin(const bool hasPin);
     void setFileStart();

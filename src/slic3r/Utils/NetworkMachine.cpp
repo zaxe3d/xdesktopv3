@@ -94,6 +94,8 @@ void NetworkMachine::onWSRead(string message)
             states->heating        = states->ptreeStringtoBool(pt, "is_heating");
             states->paused         = states->ptreeStringtoBool(pt, "is_paused");
             states->hasError       = states->ptreeStringtoBool(pt, "is_error");
+            states->filamentPresent= attr->firmwareVersion.GetMinor() >= 3 && attr->firmwareVersion.GetMinor() >= 5 // Z3 and FW>=3.5
+                                         ? states->ptreeStringtoBool(pt, "is_filament_present") : true;
         }
         if (event == "new_name")
             name = pt.get<string>("name", "Zaxe");

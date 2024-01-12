@@ -511,7 +511,6 @@ add_custom_target(gettext_merge_community_po_with_pot
 file(GLOB L10N_PO_FILES "${L10N_DIR}/*/PrusaSlicer*.po")
 # list of names of directories, which are licalized by PS internally
 #list(APPEND PS_L10N_DIRS "cs" "de" "es" "fr" "it" "ja" "pl")
-list(APPEND PS_L10N_DIRS "cs" "de" "es" "fr" "it" "ja" "pl" "tr")
 foreach(po_file ${L10N_PO_FILES})
     GET_FILENAME_COMPONENT(po_dir "${po_file}" DIRECTORY)
     GET_FILENAME_COMPONENT(po_dir_name "${po_dir}" NAME)

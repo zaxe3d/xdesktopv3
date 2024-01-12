@@ -205,6 +205,8 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
             wxMessageBox(L("Device model does NOT match. Please reslice with the correct model."), _L("Wrong device model"), wxICON_ERROR);
         } else if (!this->nm->attr->isLite && this->nm->attr->material != "custom" && this->nm->attr->material.compare(archive.get_info("material")) != 0) {
             wxMessageBox(L("Materials don't match with this device. Please reslice with the correct material."), _L("Wrong material type"), wxICON_ERROR);
+        } else if (!this->nm->states->filamentPresent && this->nm->attr->firmwareVersion.GetMajor() >= 3 && this->nm->attr->firmwareVersion.GetMinor() >= 5) {
+            wxMessageBox(L("Please put the filament through the material sensor first."), _L("Filament not present"), wxICON_ERROR);
         } else if (!this->nm->attr->isLite && this->nm->attr->nozzle.compare(archive.get_info("nozzle_diameter")) != 0) {
             wxMessageBox(L("Currently installed nozzle on device doesn't match with this slice. Please reslice with the correct nozzle."), _L("Wrong nozzle type"), wxICON_ERROR);
         } else {
@@ -310,6 +312,7 @@ void Device::updateStatus()
     m_btnPreheat->SetBitmapLabel(*(nm->states->preheat
                                     ? m_bitPreheatActive
                                     : m_bitPreheatDeactive));
+    setFilamentPresent(nm->states->filamentPresent);
 }
 
 void Device::updateStates()
@@ -411,6 +414,12 @@ void Device::setName(const string &name)
 void Device::setMaterial(const string &material)
 {
     m_txtDeviceMaterial->SetLabel(_L("Material: ") + NetworkMachineManager::MaterialName(nm->attr->material));
+}
+
+void Device::setFilamentPresent(const bool present)
+{
+    if (this->nm->attr->firmwareVersion.GetMajor() >= 3 && this->nm->attr->firmwareVersion.GetMinor() >= 5)
+        m_txtDeviceMaterial->SetForegroundColour(present ? DEVICE_COLOR_UPLOADING : DEVICE_COLOR_DANGER);
 }
 
 void Device::setPin(const bool hasPin)

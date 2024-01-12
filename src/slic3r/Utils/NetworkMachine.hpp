@@ -66,6 +66,7 @@ struct MachineStates { // states.
     bool heating;
     bool paused;
     bool hasError;
+    bool filamentPresent;
     inline bool ptreeStringtoBool(ptree pt, string prop) {
         return pt.get<string>(prop, "False") == "True";
     }
