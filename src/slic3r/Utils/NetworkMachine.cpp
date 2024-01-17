@@ -236,10 +236,13 @@ void NetworkMachine::ftpRun()
     ::curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
     ::curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void*>(&chunk));
     ::curl_easy_setopt(curl, CURLOPT_VERBOSE, get_logging_level() >= 5);
+    ::curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+    ::curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
+    ::curl_easy_setopt(curl, CURLOPT_FAILONERROR, 0);
     res = curl_easy_perform(curl);
-    ::curl_easy_cleanup(curl);
 
     if (CURLE_OK != res) {
+        ::curl_easy_cleanup(curl);
         BOOST_LOG_TRIVIAL(warning) << boost::format("Networkmachine - Couldn't connect to machine [%1% - %2%] for downloading avatar.") % name % ip;
         return;
     }
@@ -253,7 +256,7 @@ void NetworkMachine::ftpRun()
         evt.SetEventObject(this->m_evtHandler);
         wxPostEvent(this->m_evtHandler, evt);
     }
-
+    ::curl_easy_cleanup(curl);
     curl_global_cleanup();
 }
 

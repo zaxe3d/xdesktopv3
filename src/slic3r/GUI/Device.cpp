@@ -21,14 +21,14 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_progressBar(new CustomProgressBar(this, wxID_ANY, wxSize(-1, 5))),
     m_txtStatus(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_LEFT)),
     m_txtProgress(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
-    m_txtDeviceName(new wxStaticText(this, wxID_ANY, nm->name, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtDeviceName(new wxStaticText(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, _L("Material: ") + NetworkMachineManager::MaterialName(nm->attr->material), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "-" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtBedOccupiedMessage(new wxStaticText(this, wxID_ANY, _L("Please take your print!"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtErrorMessage(new wxStaticText(this, wxID_ANY, _L("Device is in error state!"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtFileTime(new wxStaticText(this, wxID_ANY, _L("Elapsed / Estimated time: ") + get_time_hms(std::to_string(nm->attr->startTime)) + " / " + nm->attr->estimatedTime, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + wxString(nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS).c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtFWVersion(new wxStaticText(this, wxID_ANY, nm->attr->firmwareVersion.GetVersionString(), wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
     m_btnUnload(new wxButton(this, wxID_ANY, _L("Unload"), wxDefaultPosition, wxSize(-1, 18), wxCENTER | wxCentreY)),
     m_btnPrintNow(new wxButton(this, wxID_ANY, _L("Print Now!"))),
@@ -408,7 +408,7 @@ void Device::updateProgress()
 
 void Device::setName(const string &name)
 {
-    m_txtDeviceName->SetLabel(name);
+    m_txtDeviceName->SetLabel(wxString(name.c_str(), wxConvUTF8));
 }
 
 void Device::setMaterial(const string &material)
@@ -434,7 +434,7 @@ void Device::setNozzle(const string &nozzle)
 
 void Device::setFileStart()
 {
-    m_txtFileName->SetLabel(nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS));
+    m_txtFileName->SetLabel(wxString(nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS).c_str(), wxConvUTF8));
     m_pausedSeconds = 0; // reset
 }
 
