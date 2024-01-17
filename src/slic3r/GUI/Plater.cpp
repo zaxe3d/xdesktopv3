@@ -514,7 +514,7 @@ FreqChangedParams::FreqChangedParams(wxWindow* parent) :
     option.opt.sidetext = "";
     line.append_option(option);
 
-    def.label = "G29";
+    def.label = L("Mesh level (G29)");
     def.type = coBool;
     def.tooltip = L("This flag enables/disables the mesh leveling after homing. If unchecked will use the previous bed leveling mesh. This can greatly reduce initial time to start the file.");
     def.gui_type = ConfigOptionDef::GUIType::undefined;
