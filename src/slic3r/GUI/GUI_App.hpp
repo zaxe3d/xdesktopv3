@@ -80,8 +80,9 @@ enum FileType
 
     FT_ZIP,
 
-    FT_SIZE,
     FT_ZAXE,
+
+    FT_SIZE,
 };
 
 extern wxString file_wildcards(FileType file_type, const std::string &custom_extension = {});
