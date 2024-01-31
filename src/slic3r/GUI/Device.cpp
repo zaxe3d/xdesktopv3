@@ -22,7 +22,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_txtStatus(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_LEFT)),
     m_txtProgress(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
     m_txtDeviceName(new wxStaticText(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, _L("Material: ") + NetworkMachineManager::MaterialName(nm->attr->material), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "-" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtBedOccupiedMessage(new wxStaticText(this, wxID_ANY, _L("Please take your print!"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
@@ -283,6 +283,9 @@ void Device::updateStatus()
     } else if (nm->states->heating) {
         statusTxt = _L("Heating...");
         m_progressBar->SetColour(DEVICE_COLOR_DANGER);
+    } else if (nm->states->paused) {
+        statusTxt = _L("Paused...");
+        m_progressBar->SetColour(DEVICE_COLOR_ZAXE_BLUE);
     } else if (nm->states->printing) {
         statusTxt = _L("Printing...");
         m_progressBar->SetColour(DEVICE_COLOR_ZAXE_BLUE);
@@ -291,9 +294,6 @@ void Device::updateStatus()
     } else if (nm->states->uploading) {
         statusTxt = _L("Uploading...");
         m_progressBar->SetColour(DEVICE_COLOR_UPLOADING);
-    } else if (nm->states->paused) {
-        statusTxt = _L("Paused...");
-        m_progressBar->SetColour(DEVICE_COLOR_ZAXE_BLUE);
     } else if (nm->states->calibrating) {
         statusTxt = _L("Calibrating...");
         m_progressBar->SetColour(DEVICE_COLOR_ORANGE);
@@ -331,7 +331,8 @@ void Device::updateStates()
 
         if (nm->states->printing) {
             if (nm->states->paused) {
-                m_btnResume->Show();
+                if (!nm->states->heating)
+                    m_btnResume->Show();
                 m_btnPause->Hide();
             } else if (!nm->states->heating) {
                 m_btnResume->Hide();
@@ -413,13 +414,15 @@ void Device::setName(const string &name)
 
 void Device::setMaterial(const string &material)
 {
-    m_txtDeviceMaterial->SetLabel(_L("Material: ") + NetworkMachineManager::MaterialName(nm->attr->material));
+    if (this->nm->attr->firmwareVersion.GetMajor() >= 3 && this->nm->attr->firmwareVersion.GetMinor() >= 5 && !nm->states->filamentPresent) {
+        m_txtDeviceMaterial->SetLabel(_L("Material: - (Not installed)"));
+    } else m_txtDeviceMaterial->SetLabel(_L("Material: ") + NetworkMachineManager::MaterialName(nm->attr->material));
+    m_expansionSizer->Layout();
 }
 
 void Device::setFilamentPresent(const bool present)
 {
-    if (this->nm->attr->firmwareVersion.GetMajor() >= 3 && this->nm->attr->firmwareVersion.GetMinor() >= 5)
-        m_txtDeviceMaterial->SetForegroundColour(present ? DEVICE_COLOR_UPLOADING : DEVICE_COLOR_DANGER);
+    setMaterial(nm->attr->material);
 }
 
 void Device::setPin(const bool hasPin)

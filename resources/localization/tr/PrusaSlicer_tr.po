@@ -11585,6 +11585,10 @@ msgstr ""
 msgid "Remove Selection"
 msgstr ""
 
+#: src/slic3r/GUI/Device.cpp:418
+msgid "Material: - (Not installed)"
+msgstr "Materyal: - (Yüklü değil)"
+
 #: src/slic3r/GUI/Device.cpp:25 src/slic3r/GUI/Device.cpp:416
 msgid "Material: "
 msgstr "Materyal: "
@@ -12069,11 +12073,11 @@ msgstr "%s başlat"
 
 #: src/slic3r/GUI/GUI_App.cpp:2419
 msgid "Custom &IP Configuration"
-msgstr ""
+msgstr "Özel IP Konfigürasyonu"
 
 #: src/slic3r/GUI/GUI_App.cpp:2419
 msgid "Add / Remove manual devices by IP to machine carousel"
-msgstr ""
+msgstr "Makine parkuruna manuel olarak IP eklemek / çıkartmak için"
 
 #: src/slic3r/GUI/GUI_App.cpp:2420
 msgid "&Configuration Snapshots"
