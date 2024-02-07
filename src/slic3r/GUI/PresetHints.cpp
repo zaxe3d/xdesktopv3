@@ -124,6 +124,7 @@ std::string PresetHints::maximum_volumetric_flow_description(const PresetBundle 
     const auto &support_material_extrusion_width    = *print_config.option<ConfigOptionFloatOrPercent>("support_material_extrusion_width");
     const auto &top_infill_extrusion_width          = *print_config.option<ConfigOptionFloatOrPercent>("top_infill_extrusion_width");
     const auto &first_layer_speed                   = *print_config.option<ConfigOptionFloatOrPercent>("first_layer_speed");
+    const auto &first_layer_infill_speed            = *print_config.option<ConfigOptionFloatOrPercent>("first_layer_infill_speed");
 
     // Index of an extruder assigned to a feature. If set to 0, an active extruder will be used for a multi-material print.
     // If different from idx_extruder, it will not be taken into account for this hint.
@@ -153,19 +154,25 @@ std::string PresetHints::maximum_volumetric_flow_description(const PresetBundle 
         const float                       lh  = float(first_layer ? first_layer_height : layer_height);
         double                            max_flow = 0.;
         std::string                       max_flow_extrusion_type;
-        auto                              limit_by_first_layer_speed = [&first_layer_speed, first_layer](double speed_normal, double speed_max) {
-            if (first_layer && first_layer_speed.value > 0)
-                // Apply the first layer limit.
-                speed_normal = first_layer_speed.get_abs_value(speed_normal);
-            return (speed_normal > 0.) ? speed_normal : speed_max;
-        };
+        auto                              limit_by_first_layer_speed =
+            [&first_layer_speed, &first_layer_infill_speed,
+             first_layer](double speed_normal, double speed_max,
+                          FlowRole flow_role) {
+                auto &_speed = (flow_role == frInfill) ?
+                                   first_layer_infill_speed :
+                                   first_layer_speed;
+                if (first_layer && _speed.value > 0)
+                    // Apply the first layer limit.
+                    speed_normal = _speed.get_abs_value(speed_normal);
+                return (speed_normal > 0.) ? speed_normal : speed_max;
+            };
         auto test_flow =
             [first_layer_extrusion_width_ptr, extrusion_width, nozzle_diameter, lh, bridging, bridge_speed, bridge_flow_ratio, limit_by_first_layer_speed, max_print_speed, &max_flow, &max_flow_extrusion_type]
             (FlowRole flow_role, const ConfigOptionFloatOrPercent &this_extrusion_width, double speed, const char *err_msg) {
             Flow flow = bridging ?
                 Flow::new_from_config_width(flow_role, first_positive(first_layer_extrusion_width_ptr, this_extrusion_width, extrusion_width), nozzle_diameter, lh) :
                 Flow::bridging_flow(nozzle_diameter * bridge_flow_ratio, nozzle_diameter);
-            double volumetric_flow = flow.mm3_per_mm() * (bridging ? bridge_speed : limit_by_first_layer_speed(speed, max_print_speed));
+            double volumetric_flow = flow.mm3_per_mm() * (bridging ? bridge_speed : limit_by_first_layer_speed(speed, max_print_speed, flow_role));
             if (max_flow < volumetric_flow) {
                 max_flow = volumetric_flow;
                 max_flow_extrusion_type = GUI::into_u8(_(err_msg));
