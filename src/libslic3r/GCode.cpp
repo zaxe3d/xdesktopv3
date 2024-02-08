@@ -3116,9 +3116,13 @@ std::string GCodeGenerator::_extrude(
     }
     if (m_volumetric_speed != 0. && speed == 0)
         speed = m_volumetric_speed / path_attr.mm3_per_mm;
-    if (this->on_first_layer())
-        speed = m_config.get_abs_value("first_layer_speed", speed);
-    else if (this->object_layer_over_raft())
+    if (this->on_first_layer()) {
+        if (path_attr.role.is_infill() && path_attr.role.is_solid_infill()) {
+            speed = m_config.get_abs_value("first_layer_infill_speed", speed);
+        } else {
+            speed = m_config.get_abs_value("first_layer_speed", speed);
+        }
+    } else if (this->object_layer_over_raft())
         speed = m_config.get_abs_value("first_layer_speed_over_raft", speed);
     if (m_config.max_volumetric_speed.value > 0) {
         // cap speed with max_volumetric_speed anyway (even if user is not using autospeed)
