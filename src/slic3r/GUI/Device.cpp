@@ -10,9 +10,9 @@
 namespace Slic3r {
 namespace GUI {
 
-Device::Device(NetworkMachine* nm, wxWindow* parent) :
+Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(parent->GetSize().GetWidth(), DEVICE_HEIGHT)),
-    nm(nm),
+    nm(_nm),
     m_mainSizer(new wxBoxSizer(wxVERTICAL)), // vertical sizer (device sizer - horizontal line (seperator).
     m_deviceSizer(new wxBoxSizer(wxHORIZONTAL)), // horizontal sizer (avatar | right pane).)
     m_filamentSizer(new wxBoxSizer(wxHORIZONTAL)), // horizontal sizer (filament | unload filament button).
@@ -21,7 +21,7 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_progressBar(new CustomProgressBar(this, wxID_ANY, wxSize(-1, 5))),
     m_txtStatus(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_LEFT)),
     m_txtProgress(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
-    m_txtDeviceName(new wxStaticText(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtDeviceName(new wxTextCtrl(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT | wxNO_BORDER | wxTE_PROCESS_ENTER)),
     m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "-" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
@@ -72,6 +72,26 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     m_btnResume->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->resume(); }); });
     m_btnUnload->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->unloadFilament(); }); });
     m_timer->Bind(wxEVT_TIMER, [this](wxTimerEvent &evt) { this->onTimer(evt); });
+
+    auto applyDeviceName = [&](auto &evt) {
+        auto val = m_txtDeviceName->GetValue().Strip(wxString::both);
+        if (val.empty()) {
+            m_txtDeviceName->SetValue(nm->name);
+        } else if (nm->name != val.ToStdString()) {
+            nm->changeName(val.char_str());
+        }
+        evt.Skip();
+    };
+    m_txtDeviceName->Bind(wxEVT_TEXT_ENTER, applyDeviceName);
+    m_txtDeviceName->Bind(wxEVT_KILL_FOCUS, applyDeviceName);
+
+    m_txtDeviceName->Bind(wxEVT_CHAR_HOOK, [&](wxKeyEvent &evt) {
+        if (evt.GetKeyCode() == WXK_ESCAPE) {
+            m_txtDeviceName->SetValue(nm->name);
+        } else {
+            evt.Skip();
+        }
+    });
 
     nm->setUploadProgressCallback([this](int progress) {
         if (progress <= 0 || progress >= 100) this->updateStates();
@@ -133,6 +153,8 @@ Device::Device(NetworkMachine* nm, wxWindow* parent) :
     wxBoxSizer* dnaabp = new wxBoxSizer(wxHORIZONTAL); // device name and action buttons
     m_txtDeviceName->SetFont(boldSmallFont);
     wxGetApp().UpdateDarkUI(m_txtDeviceName);
+    m_txtDeviceName->SetBackgroundColour(parent->GetBackgroundColour());
+    m_txtDeviceName->SetMaxLength(15);
     wxGetApp().UpdateDarkUI(m_txtFileName);
     wxGetApp().UpdateDarkUI(m_txtFileTime);
     wxGetApp().UpdateDarkUI(m_txtDeviceMaterial);
@@ -409,7 +431,7 @@ void Device::updateProgress()
 
 void Device::setName(const string &name)
 {
-    m_txtDeviceName->SetLabel(wxString(name.c_str(), wxConvUTF8));
+    m_txtDeviceName->SetValue(wxString(name.c_str(), wxConvUTF8));
 }
 
 void Device::setMaterial(const string &material)

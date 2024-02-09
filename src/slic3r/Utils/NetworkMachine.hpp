@@ -117,6 +117,7 @@ public:
     void uploadFTP(const char *filename, const char *uploadAs = "");
     void upload(const char *filename, const char *uploadAs = "");
     void downloadAvatar();
+    void changeName(const char *new_name);
 
     void shutdown() { m_running = false; }
 

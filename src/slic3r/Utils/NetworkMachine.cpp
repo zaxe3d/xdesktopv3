@@ -159,6 +159,15 @@ void NetworkMachine::togglePreheat()
     request("toggle_preheat");
 }
 
+void NetworkMachine::changeName(const char *new_name)
+{
+    BOOST_LOG_TRIVIAL(info) << "Changing device name from " << name << " to " << new_name;
+    ptree pt; // construct root obj.
+    pt.put("request", "change_name");
+    pt.put("name", new_name);
+    send(pt);
+}
+
 void NetworkMachine::request(const char* command)
 {
     ptree pt; // construct root obj.
