@@ -92,7 +92,7 @@ private:
     wxButton* m_btnPrintNow; // print now button.
     wxStaticText* m_txtStatus; // status text.
     wxStaticText* m_txtProgress; // progress text.
-    wxStaticText* m_txtDeviceName; // device name text.
+    wxTextCtrl* m_txtDeviceName; // device name text.
     wxStaticText* m_txtDeviceIP; // device IP text.
     wxStaticText* m_txtDeviceMaterial; // device material text.
     wxStaticText* m_txtDeviceNozzleDiameter; // device nozzle text.
