@@ -21,7 +21,8 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_progressBar(new CustomProgressBar(this, wxID_ANY, wxSize(-1, 5))),
     m_txtStatus(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_LEFT)),
     m_txtProgress(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
-    m_txtDeviceName(new wxTextCtrl(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT | wxNO_BORDER | wxTE_PROCESS_ENTER)),
+    m_txtDeviceName(new wxStaticText(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
+    m_txtCtrlDeviceName(new wxTextCtrl(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT | wxSIMPLE_BORDER | wxTE_PROCESS_ENTER)),
     m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "-" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
@@ -73,24 +74,30 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_btnUnload->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->unloadFilament(); }); });
     m_timer->Bind(wxEVT_TIMER, [this](wxTimerEvent &evt) { this->onTimer(evt); });
 
-    auto applyDeviceName = [&](auto &evt) {
-        auto val = m_txtDeviceName->GetValue().Strip(wxString::both);
-        if (val.empty()) {
-            m_txtDeviceName->SetValue(nm->name);
-        } else if (nm->name != val.ToStdString()) {
-            nm->changeName(val.char_str());
+    m_txtDeviceName->Bind(wxEVT_LEFT_UP, [&](auto &evt) {
+        toggleDeviceNameWidgets();
+        m_txtCtrlDeviceName->SetFocus();
+        m_txtCtrlDeviceName->SetInsertionPointEnd();
+    });
+
+    m_txtCtrlDeviceName->Bind(wxEVT_CHAR_HOOK, [&](auto &evt) {
+        if (evt.GetKeyCode() == WXK_ESCAPE) {
+            setName(nm->name);
+            toggleDeviceNameWidgets();
         }
         evt.Skip();
-    };
-    m_txtDeviceName->Bind(wxEVT_TEXT_ENTER, applyDeviceName);
-    m_txtDeviceName->Bind(wxEVT_KILL_FOCUS, applyDeviceName);
+    });
 
-    m_txtDeviceName->Bind(wxEVT_CHAR_HOOK, [&](wxKeyEvent &evt) {
-        if (evt.GetKeyCode() == WXK_ESCAPE) {
-            m_txtDeviceName->SetValue(nm->name);
-        } else {
-            evt.Skip();
-        }
+    m_txtCtrlDeviceName->Bind(wxEVT_TEXT_ENTER, [&](auto &evt) {
+        applyDeviceName();
+        toggleDeviceNameWidgets();
+        evt.Skip();
+    });
+
+    m_txtCtrlDeviceName->Bind(wxEVT_KILL_FOCUS, [&](auto &evt) {
+        applyDeviceName();
+        toggleDeviceNameWidgets();
+        evt.Skip();
     });
 
     nm->setUploadProgressCallback([this](int progress) {
@@ -153,8 +160,10 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     wxBoxSizer* dnaabp = new wxBoxSizer(wxHORIZONTAL); // device name and action buttons
     m_txtDeviceName->SetFont(boldSmallFont);
     wxGetApp().UpdateDarkUI(m_txtDeviceName);
-    m_txtDeviceName->SetBackgroundColour(parent->GetBackgroundColour());
-    m_txtDeviceName->SetMaxLength(15);
+    m_txtCtrlDeviceName->SetMaxLength(15);
+    m_txtCtrlDeviceName->Hide();
+    m_deviceNameTxtCtrlShown = false;
+    wxGetApp().UpdateDarkUI(m_txtCtrlDeviceName);
     wxGetApp().UpdateDarkUI(m_txtFileName);
     wxGetApp().UpdateDarkUI(m_txtFileTime);
     wxGetApp().UpdateDarkUI(m_txtDeviceMaterial);
@@ -168,6 +177,7 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     actionBtnsSizer->Add(m_btnCancel);
     actionBtnsSizer->Add(m_btnExpandCollapse);
     dnaabp->Add(m_txtDeviceName, expandFlag.Left());
+    dnaabp->Add(m_txtCtrlDeviceName, expandFlag.Left());
     dnaabp->Add(actionBtnsSizer, wxSizerFlags().Right());
     m_rightSizer->AddSpacer(10);
     m_rightSizer->Add(dnaabp, 0, wxEXPAND); // only grow horizontally.
@@ -431,7 +441,8 @@ void Device::updateProgress()
 
 void Device::setName(const string &name)
 {
-    m_txtDeviceName->SetValue(wxString(name.c_str(), wxConvUTF8));
+    m_txtDeviceName->SetLabel(wxString(name.c_str(), wxConvUTF8));
+    m_txtCtrlDeviceName->SetValue(wxString(name.c_str(), wxConvUTF8));
 }
 
 void Device::setMaterial(const string &material)
@@ -496,6 +507,34 @@ void Device::confirm(function<void()> cb)
     dialog.SetYesNoLabels(_L("Yes"), _L("No"));
     int res = dialog.ShowModal();
     if (res == wxID_YES) cb();
+}
+
+void Device::applyDeviceName()
+{
+    auto val = m_txtCtrlDeviceName->GetValue().Strip(wxString::both);
+    if (val.empty()) {
+        setName(nm->name);
+    } else if (nm->name != val.ToStdString()) {
+        nm->changeName(val.char_str());
+    }
+}
+
+void Device::toggleDeviceNameWidgets()
+{
+    if (m_deviceNameTxtCtrlShown) {
+        m_txtCtrlDeviceName->Hide();
+        m_txtDeviceName->Show();
+    } else {
+        m_txtDeviceName->Hide();
+        m_txtCtrlDeviceName->Show();
+    }
+
+    {
+        std::lock_guard<std::mutex> lck(m_deviceNameMtx);
+        m_deviceNameTxtCtrlShown = !m_deviceNameTxtCtrlShown;
+    }
+
+    m_mainSizer->Layout();
 }
 
 // Custom controls start.

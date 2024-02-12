@@ -6,6 +6,7 @@
 #include <wx/statline.h>
 #include <wx/gauge.h>
 #include <boost/log/trivial.hpp>
+#include <mutex>
 
 #include "../Utils/NetworkMachine.hpp"
 
@@ -92,7 +93,8 @@ private:
     wxButton* m_btnPrintNow; // print now button.
     wxStaticText* m_txtStatus; // status text.
     wxStaticText* m_txtProgress; // progress text.
-    wxTextCtrl* m_txtDeviceName; // device name text.
+    wxStaticText* m_txtDeviceName; // device name text.
+    wxTextCtrl* m_txtCtrlDeviceName; // device name text control.
     wxStaticText* m_txtDeviceIP; // device IP text.
     wxStaticText* m_txtDeviceMaterial; // device material text.
     wxStaticText* m_txtDeviceNozzleDiameter; // device nozzle text.
@@ -112,6 +114,11 @@ private:
     bool m_isExpanded;
 
     int m_pausedSeconds;
+
+    std::mutex m_deviceNameMtx;
+    bool m_deviceNameTxtCtrlShown;
+    void applyDeviceName();
+    void toggleDeviceNameWidgets();
 };
 } // namespace GUI
 } // namespace Slic3r
