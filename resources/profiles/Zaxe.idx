@@ -1,4 +1,5 @@
 min_slic3r_version = 2.6.0-alpha4
+1.1.0 Material update.
 1.0.10 Z3&Z3S bed model and texture update.
 1.0.9 Z3S nozzle update.
 1.0.8 added new materials FLEX and PETG for Z3S.
