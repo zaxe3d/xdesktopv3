@@ -79,6 +79,7 @@ struct MachineAttributes // attributes.
     string filamentColor;
     string printingFile;
     string material;
+    string materialLabel;
     string deviceModel;
     bool hasPin;
     bool hasNFCSpool;
@@ -101,6 +102,7 @@ struct MachineAttributes // attributes.
         ss << "filamentColor: " << filamentColor << std::endl;
         ss << "printingFile: " << printingFile << std::endl;
         ss << "material: " << material << std::endl;
+        ss << "materialLabel: " << materialLabel << std::endl;
         ss << "deviceModel: " << deviceModel << std::endl;
         ss << "hasPin: " << hasPin << std::endl;
         ss << "hasNFCSpool: " << hasNFCSpool << std::endl;

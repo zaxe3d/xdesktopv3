@@ -24,21 +24,6 @@ public:
     void enablePrintNowButton(bool enable);
     void addMachine(std::string ip, int port, std::string id);
 
-    static inline std::map<string, string> materialMap = {
-        { "zaxe_abs", "Zaxe ABS" },
-        { "zaxe_pla", "Zaxe PLA" },
-        { "zaxe_flex", "Zaxe FLEX" },
-        { "zaxe_petg", "Zaxe PETG" },
-        { "custom", "Custom" }
-    };
-    static string MaterialName(string& key)
-    {
-        map<string, string>::iterator iter = materialMap.find(key);
-        if (iter != materialMap.end())
-            return iter->second;
-        return key;
-    };
-
 private:
     // slots
     void onBroadcastReceived(wxCommandEvent &event);

@@ -60,7 +60,7 @@ public:
     NetworkMachine* nm; // network machine.
 
     void setName(const string &name);
-    void setMaterial(const string &material);
+    void setMaterialLabel(const string &material_label);
     void setFilamentPresent(const bool present);
     void setNozzle(const string &nozzle);
     void setPin(const bool hasPin);

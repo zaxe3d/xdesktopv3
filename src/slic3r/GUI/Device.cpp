@@ -445,17 +445,17 @@ void Device::setName(const string &name)
     m_txtCtrlDeviceName->SetValue(wxString(name.c_str(), wxConvUTF8));
 }
 
-void Device::setMaterial(const string &material)
+void Device::setMaterialLabel(const string &material_label)
 {
     if (this->nm->attr->firmwareVersion.GetMajor() >= 3 && this->nm->attr->firmwareVersion.GetMinor() >= 5 && !nm->states->filamentPresent) {
         m_txtDeviceMaterial->SetLabel(_L("Material: - (Not installed)"));
-    } else m_txtDeviceMaterial->SetLabel(_L("Material: ") + NetworkMachineManager::MaterialName(nm->attr->material));
+    } else m_txtDeviceMaterial->SetLabel(_L("Material: ") + material_label);
     m_expansionSizer->Layout();
 }
 
 void Device::setFilamentPresent(const bool present)
 {
-    setMaterial(nm->attr->material);
+    setMaterialLabel(nm->attr->materialLabel);
 }
 
 void Device::setPin(const bool hasPin)

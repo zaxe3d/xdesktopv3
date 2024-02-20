@@ -102,7 +102,7 @@ void NetworkMachineManager::onMachineMessage(MachineNewMessageEvent &event)
     } else if (event.event == "new_name") {
         m_deviceMap[event.nm->ip]->setName(event.nm->name);
     } else if (event.event == "material_change") {
-        m_deviceMap[event.nm->ip]->setMaterial(event.nm->attr->material);
+        m_deviceMap[event.nm->ip]->setMaterialLabel(event.nm->attr->materialLabel);
     } else if (event.event == "nozzle_change") {
         m_deviceMap[event.nm->ip]->setNozzle(event.nm->attr->nozzle);
     } else if (event.event == "pin_change") {
