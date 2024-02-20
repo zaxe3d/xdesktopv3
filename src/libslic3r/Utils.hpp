@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <system_error>
 #include <cmath>
+#include <algorithm>
 
 #include <boost/system/error_code.hpp>
 
@@ -323,6 +324,16 @@ inline bool is_there(const std::string &haystack, const std::vector<std::string>
         if (haystack.find(needle) != std::string::npos)
             return true;
     return false;
+}
+
+inline bool case_insensitive_compare(const std::string& str1, const std::string& str2) {
+    std::string str1Lower = str1;
+    std::string str2Lower = str2;
+    
+    std::transform(str1Lower.begin(), str1Lower.end(), str1Lower.begin(), ::tolower);
+    std::transform(str2Lower.begin(), str2Lower.end(), str2Lower.begin(), ::tolower);
+    
+    return str1Lower == str2Lower;
 }
 
 // Shorten the dhms time by removing the seconds, rounding the dhm to full minutes

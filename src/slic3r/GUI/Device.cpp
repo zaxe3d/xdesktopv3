@@ -239,7 +239,7 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
             wxMessageBox(_L("Materials don't match with this device. Please reslice with the correct material."), _L("Wrong material type"), wxICON_ERROR);
         } else if (!this->nm->states->filamentPresent && this->nm->attr->firmwareVersion.GetMajor() >= 3 && this->nm->attr->firmwareVersion.GetMinor() >= 5) {
             wxMessageBox(_L("Please put the filament through the material sensor first."), _L("Filament not present"), wxICON_ERROR);
-        } else if (!this->nm->attr->isLite && this->nm->attr->nozzle.compare(archive.get_info("nozzle_diameter")) != 0) {
+        } else if (!this->nm->attr->isLite && !case_insensitive_compare(this->nm->attr->nozzle, archive.get_info("nozzle_diameter"))) {
             wxMessageBox(_L("Currently installed nozzle on device doesn't match with this slice. Please reslice with the correct nozzle."), _L("Wrong nozzle type"), wxICON_ERROR);
         } else {
             std::thread t([&]() {

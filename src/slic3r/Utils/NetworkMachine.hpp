@@ -92,6 +92,30 @@ struct MachineAttributes // attributes.
     int startTime;
     int filamentRemaining;
     wxVersionInfo firmwareVersion;
+
+    inline std::string toString()
+    {
+        std::stringstream ss;
+        ss << "fileName: " << fileName << std::endl;
+        ss << "nozzle: " << nozzle << std::endl;
+        ss << "filamentColor: " << filamentColor << std::endl;
+        ss << "printingFile: " << printingFile << std::endl;
+        ss << "material: " << material << std::endl;
+        ss << "deviceModel: " << deviceModel << std::endl;
+        ss << "hasPin: " << hasPin << std::endl;
+        ss << "hasNFCSpool: " << hasNFCSpool << std::endl;
+        ss << "hasSnapshot: " << hasSnapshot << std::endl;
+        ss << "isLite: " << isLite << std::endl;
+        ss << "isHttp: " << isHttp << std::endl;
+        ss << "isNoneTLS: " << isNoneTLS << std::endl;
+        ss << "snapshotURL: " << snapshotURL << std::endl;
+        ss << "elapsedTime: " << elapsedTime << std::endl;
+        ss << "estimatedTime: " << estimatedTime << std::endl;
+        ss << "startTime: " << startTime << std::endl;
+        ss << "filamentRemaining: " << filamentRemaining << std::endl;
+        ss << "firmwareVersion: " << firmwareVersion.ToString() << std::endl;
+        return ss.str();
+    }
 };
 
 class NetworkMachine
