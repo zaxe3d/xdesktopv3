@@ -445,6 +445,11 @@ void Device::setName(const string &name)
     m_txtCtrlDeviceName->SetValue(wxString(name.c_str(), wxConvUTF8));
 }
 
+wxString Device::getName()
+{
+    return m_txtDeviceName->GetLabel();
+}
+
 void Device::setMaterial(const string &material)
 {
     if (this->nm->attr->firmwareVersion.GetMajor() >= 3 && this->nm->attr->firmwareVersion.GetMinor() >= 5 && !nm->states->filamentPresent) {

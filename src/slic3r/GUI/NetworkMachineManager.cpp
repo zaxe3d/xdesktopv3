@@ -7,7 +7,10 @@ namespace GUI {
 
 NetworkMachineManager::NetworkMachineManager(wxWindow* parent) :
     wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxSize(parent->GetSize().GetWidth(), -1)),
-    m_scrolledSizer(new wxBoxSizer(wxVERTICAL)),
+    m_mainSizer(new wxBoxSizer(wxVERTICAL)),
+    m_searchSizer(new wxBoxSizer(wxHORIZONTAL)),
+    m_deviceListSizer(new wxBoxSizer(wxVERTICAL)),
+    m_searchTextCtrl(new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(this->GetSize().GetWidth() / 2, -1))),
     m_broadcastReceiver(new BroadcastReceiver()),
     m_networkMContainer(new NetworkMachineContainer()),
     m_printNowButtonEnabled(false)
@@ -15,7 +18,17 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent) :
 #ifdef __WINDOWS__
     SetDoubleBuffered(true);
 #endif
-    SetSizer(m_scrolledSizer);
+
+    m_searchTextCtrl->SetHint("Search Printer");
+    m_searchTextCtrl->SetFont(wxGetApp().normal_font());
+    wxGetApp().UpdateDarkUI(m_searchTextCtrl);
+
+    m_searchSizer->Add(m_searchTextCtrl, 1, wxALL | wxALIGN_CENTRE, 5);
+
+    m_mainSizer->Add(m_searchSizer, 0, wxEXPAND | wxALL, 5);
+    m_mainSizer->Add(m_deviceListSizer, 1, wxEXPAND | wxALL, 5);
+
+    SetSizer(m_mainSizer);
     // As result of below line we can see the empty block at the bottom of the carousel
     //SetScrollbars(0, DEVICE_HEIGHT, 0, DEVICE_HEIGHT);
     // This fixes the above problem.
@@ -24,6 +37,24 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent) :
 
     // start listenting for devices here on the network.
     m_broadcastReceiver->Bind(EVT_BROADCAST_RECEIVED, &NetworkMachineManager::onBroadcastReceived, this);
+
+    m_searchTextCtrl->Bind(wxEVT_TEXT, [&](auto &evt) {
+        auto searchText = m_searchTextCtrl->GetValue();
+
+        for(auto& [ip, dev] : m_deviceMap){
+            if(dev->getName().Lower().Find(searchText.Lower()) == wxNOT_FOUND){
+                dev->Hide();
+            }else {
+                dev->Show();
+            }
+        }
+
+        m_mainSizer->Layout();
+        Refresh();
+        FitInside();
+        evt.Skip();
+    });
+
     // add custom ips here.
     auto ips = wxGetApp().app_config->get_custom_ips();
     for (int i = 0; i < ips.size(); i++)
@@ -72,8 +103,8 @@ void NetworkMachineManager::onMachineOpen(MachineEvent &event)
     shared_ptr<Device> d = make_shared<Device>(event.nm, this);
     d->enablePrintNowButton(m_printNowButtonEnabled);
     m_deviceMap[event.nm->ip] = d;
-    m_scrolledSizer->Add(d.get());
-    m_scrolledSizer->Layout();
+    m_deviceListSizer->Add(d.get());
+    m_deviceListSizer->Layout();
     FitInside();
     Refresh();
 }
@@ -84,7 +115,7 @@ void NetworkMachineManager::onMachineClose(MachineEvent &event)
     if (m_deviceMap.erase(event.nm->ip) == 0) return; // couldn't delete so don't continue...
     BOOST_LOG_TRIVIAL(info) << boost::format("NetworkMachineManager - Closing machine: [%1% - %2%].") % event.nm->name % event.nm->ip;
     this->m_networkMContainer->removeMachine(event.nm->ip);
-    m_scrolledSizer->Layout();
+    m_deviceListSizer->Layout();
     FitInside();
     Refresh();
 }

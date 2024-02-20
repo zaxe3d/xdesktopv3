@@ -51,7 +51,10 @@ private:
     NetworkMachineContainer* m_networkMContainer;
 
     // UI
-    wxSizer* m_scrolledSizer;
+    wxSizer* m_mainSizer;
+    wxSizer* m_searchSizer;
+    wxSizer* m_deviceListSizer;
+    wxTextCtrl* m_searchTextCtrl;
 
     boost::unordered_map<std::string, shared_ptr<Device>> m_deviceMap;
 
