@@ -56,6 +56,25 @@ void NetworkMachine::onWSRead(string message)
     ptree pt; // construct root obj.
     read_json(jsonStream, pt);
 
+    auto get_material_label = [&]() {
+        if (pt.get_optional<std::string>("material_label").is_initialized()) {
+            return pt.get<string>("material_label", "zaxe_abs");
+        }
+
+        std::map<std::string, std::string> materialMap =
+            {{"zaxe_abs", "Zaxe ABS"},
+             {"zaxe_pla", "Zaxe PLA"},
+             {"zaxe_flex", "Zaxe FLEX"},
+             {"zaxe_petg", "Zaxe PETG"},
+             {"custom", "Custom"}};
+
+        auto material = to_lower_copy(pt.get<string>("material", "zaxe_abs"));
+
+        if (auto iter = materialMap.find(material); iter != materialMap.end())
+            return iter->second;
+        return material;
+    };
+
     try {
         auto event = pt.get<string>("event");
         if (event == "ping" || event == "temperature_change") return; // ignore...
@@ -64,6 +83,7 @@ void NetworkMachine::onWSRead(string message)
             //name = pt.get<string>("name", name); // already got this from broadcast receiver. might be good for static ip.
             attr->deviceModel = to_lower_copy(pt.get<string>("device_model", "x1"));
             attr->material = to_lower_copy(pt.get<string>("material", "zaxe_abs"));
+            attr->materialLabel = get_material_label();
             attr->nozzle = pt.get<string>("nozzle", "0.4");
             attr->hasSnapshot = is_there(attr->deviceModel, {"z1", "z2", "z3"});
             attr->isLite = is_there(attr->deviceModel, {"lite", "x3"});
@@ -99,8 +119,10 @@ void NetworkMachine::onWSRead(string message)
         }
         if (event == "new_name")
             name = pt.get<string>("name", "Zaxe");
-        if (event == "material_change")
+        if (event == "material_change") {
             attr->material = to_lower_copy(pt.get<string>("material", "zaxe_abs"));
+            attr->materialLabel = get_material_label();
+        }
         if (event == "nozzle_change")
             attr->nozzle = pt.get<string>("nozzle", "0.4");
         if (event == "pin_change")
