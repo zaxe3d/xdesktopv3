@@ -5,8 +5,8 @@
 namespace Slic3r {
 namespace GUI {
 
-NetworkMachineManager::NetworkMachineManager(wxWindow* parent) :
-    wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxSize(parent->GetSize().GetWidth(), -1)),
+NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
+    wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxSize(size)),
     m_scrolledSizer(new wxBoxSizer(wxVERTICAL)),
     m_broadcastReceiver(new BroadcastReceiver()),
     m_networkMContainer(new NetworkMachineContainer()),

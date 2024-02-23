@@ -690,6 +690,8 @@ struct Sidebar::priv
 {
     Plater *plater;
 
+    wxSplitterWindow *splitter;
+    bool sash_pos_editing{false};
     wxScrolledWindow *scrolled;
     wxPanel* presets_panel; // Used for MSW better layouts
 
@@ -806,11 +808,21 @@ Sidebar::Sidebar(Plater *parent)
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(42 * wxGetApp().em_unit(), -1)), p(new priv(parent))
 {
     SetFont(wxGetApp().normal_font());
-    p->scrolled = new wxScrolledWindow(this);
-//    p->scrolled->SetScrollbars(0, 100, 1, 2); // ys_DELETE_after_testing. pixelsPerUnitY = 100 from https://github.com/prusa3d/PrusaSlicer/commit/8f019e5fa992eac2c9a1e84311c990a943f80b01, 
-    // but this cause the bad layout of the sidebar, when all infoboxes appear.
-    // As a result we can see the empty block at the bottom of the sidebar
-    // But if we set this value to 5, layout will be better
+
+    p->splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition,
+                                       wxDefaultSize,
+                                       wxSP_3D | wxSP_LIVE_UPDATE);
+
+    wxPanel *top_panel    = new wxPanel(p->splitter, wxID_ANY);
+    wxPanel *bottom_panel = new wxPanel(p->splitter, wxID_ANY);
+
+    p->scrolled = new wxScrolledWindow(bottom_panel);
+    //    p->scrolled->SetScrollbars(0, 100, 1, 2); //
+    //    ys_DELETE_after_testing. pixelsPerUnitY = 100 from
+    //    https://github.com/prusa3d/PrusaSlicer/commit/8f019e5fa992eac2c9a1e84311c990a943f80b01,
+    // but this cause the bad layout of the sidebar, when all infoboxes
+    // appear. As a result we can see the empty block at the bottom of the
+    // sidebar But if we set this value to 5, layout will be better
     p->scrolled->SetScrollRate(0, 5);
 
 #ifndef __APPLE__
@@ -913,17 +925,17 @@ Sidebar::Sidebar(Plater *parent)
     // Object Manipulations
     p->object_manipulation = new ObjectManipulation(p->scrolled);
     p->object_manipulation->Hide();
-    p->sizer_params->Add(p->object_manipulation->get_sizer(), 0, wxEXPAND | wxTOP, margin_5);
+    p->sizer_params->Add(p->object_manipulation->get_sizer(), 0, wxEXPAND | wxTOP | wxRIGHT, margin_5);
 
     // Frequently Object Settings
     p->object_settings = new ObjectSettings(p->scrolled);
     p->object_settings->Hide();
-    p->sizer_params->Add(p->object_settings->get_sizer(), 0, wxEXPAND | wxTOP, margin_5);
+    p->sizer_params->Add(p->object_settings->get_sizer(), 0, wxEXPAND | wxTOP | wxRIGHT, margin_5);
 
     // Object Layers
     p->object_layers = new ObjectLayers(p->scrolled);
     p->object_layers->Hide();
-    p->sizer_params->Add(p->object_layers->get_sizer(), 0, wxEXPAND | wxTOP, margin_5);
+    p->sizer_params->Add(p->object_layers->get_sizer(), 0, wxEXPAND | wxTOP | wxRIGHT, margin_5);
 
     // Info boxes
     p->object_info = new ObjectInfo(p->scrolled);
@@ -946,23 +958,23 @@ Sidebar::Sidebar(Plater *parent)
 
     // rescalable bitmap buttons "Send to printer" and "Remove device" 
 
-    auto init_scalable_btn = [this](ScalableButton** btn, const std::string& icon_name, wxString tooltip = wxEmptyString)
+    auto init_scalable_btn = [&](ScalableButton** btn, auto _parent, const std::string& icon_name, wxString tooltip = wxEmptyString)
     {
 #ifdef __APPLE__
         int bmp_px_cnt = 16;
 #else
         int bmp_px_cnt = 32;
 #endif //__APPLE__
-        ScalableBitmap bmp = ScalableBitmap(this, icon_name, bmp_px_cnt);
-        *btn = new ScalableButton(this, wxID_ANY, bmp, "", wxBU_EXACTFIT);
+        ScalableBitmap bmp = ScalableBitmap(_parent, icon_name, bmp_px_cnt);
+        *btn = new ScalableButton(_parent, wxID_ANY, bmp, "", wxBU_EXACTFIT);
         wxGetApp().SetWindowVariantForButton((*btn));
 
 #ifdef _WIN32
-        (*btn)->Bind(wxEVT_ENTER_WINDOW, [tooltip, btn, this](wxMouseEvent& event) {
+        (*btn)->Bind(wxEVT_ENTER_WINDOW, [tooltip, btn, &](wxMouseEvent& event) {
             p->show_rich_tip(tooltip, *btn);
             event.Skip();
         });
-        (*btn)->Bind(wxEVT_LEAVE_WINDOW, [btn, this](wxMouseEvent& event) {
+        (*btn)->Bind(wxEVT_LEAVE_WINDOW, [btn, &](wxMouseEvent& event) {
             p->hide_rich_tip(*btn);
             event.Skip();
         });
@@ -972,9 +984,15 @@ Sidebar::Sidebar(Plater *parent)
         (*btn)->Hide();
     };
 
-    init_scalable_btn(&p->btn_send_gcode   , "export_gcode", _L("Send to printer") + " " +GUI::shortkey_ctrl_prefix() + "Shift+G");
-//    init_scalable_btn(&p->btn_eject_device, "eject_sd"       , _L("Remove device ") + GUI::shortkey_ctrl_prefix() + "T");
-	init_scalable_btn(&p->btn_export_gcode_removable, "export_to_sd", _L("Export to SD card / Flash drive") + " " + GUI::shortkey_ctrl_prefix() + "U");
+    init_scalable_btn(&p->btn_send_gcode, bottom_panel, "export_gcode",
+                      _L("Send to printer") + " " +
+                          GUI::shortkey_ctrl_prefix() + "Shift+G");
+    //    init_scalable_btn(&p->btn_eject_device, "eject_sd"       ,
+    //    _L("Remove device ") + GUI::shortkey_ctrl_prefix() + "T");
+    init_scalable_btn(&p->btn_export_gcode_removable, bottom_panel,
+                      "export_to_sd",
+                      _L("Export to SD card / Flash drive") + " " +
+                          GUI::shortkey_ctrl_prefix() + "U");
 
     // regular buttons "Slice now" and "Export G-code" 
 
@@ -984,16 +1002,16 @@ Sidebar::Sidebar(Plater *parent)
 #else
     const int scaled_height = p->btn_export_gcode_removable->GetBitmapHeight() + 4;
 #endif
-    auto init_btn = [this](wxButton **btn, wxString label, const int button_height) {
-        *btn = new wxButton(this, wxID_ANY, label, wxDefaultPosition,
+    auto init_btn = [&](wxButton **btn, auto _parent, wxString label, const int button_height) {
+        *btn = new wxButton(_parent, wxID_ANY, label, wxDefaultPosition,
                             wxSize(-1, button_height), wxBU_EXACTFIT);
         wxGetApp().SetWindowVariantForButton((*btn));
         (*btn)->SetFont(wxGetApp().bold_font());
         wxGetApp().UpdateDarkUI((*btn), true);
     };
 
-    init_btn(&p->btn_export_gcode, _L("Export G-code") + dots , scaled_height);
-    init_btn(&p->btn_reslice     , _L("Slice now")            , scaled_height);
+    init_btn(&p->btn_export_gcode, bottom_panel, _L("Export G-code") + dots , scaled_height);
+    init_btn(&p->btn_reslice     , bottom_panel, _L("Slice now")            , scaled_height);
 
     enable_buttons(false);
 
@@ -1004,7 +1022,6 @@ Sidebar::Sidebar(Plater *parent)
     complect_btns_sizer->Add(p->btn_send_gcode, 0, wxLEFT, margin_5);
 	complect_btns_sizer->Add(p->btn_export_gcode_removable, 0, wxLEFT, margin_5);
 //    complect_btns_sizer->Add(p->btn_eject_device);
-	
 
     btns_sizer->Add(p->btn_reslice, 1, wxEXPAND | wxTOP | wxBOTTOM, margin_5);
     btns_sizer->Add(complect_btns_sizer, 1, wxEXPAND | wxTOP | wxBOTTOM, margin_5);
@@ -1015,16 +1032,44 @@ Sidebar::Sidebar(Plater *parent)
     wxFont label_font = wxGetApp().bold_font();
     label_font.SetPointSize(14);
     mm_label->SetFont(label_font);
-    p->machine_manager = new NetworkMachineManager(this);
+    p->machine_manager = new NetworkMachineManager(top_panel,
+                                                   wxSize(GetSize().GetWidth(),
+                                                          -1));
+
+    auto *top_sizer = new wxBoxSizer(wxVERTICAL);
+    top_sizer->Add(p->machine_manager, wxEXPAND);
+    top_panel->SetSizer(top_sizer);
+
+    auto *bottom_sizer = new wxBoxSizer(wxVERTICAL);
+    bottom_sizer->Add(btns_sizer, 0, wxEXPAND | wxLEFT);
+    bottom_sizer->AddSpacer(10);
+    bottom_sizer->Add(p->scrolled, 1, wxEXPAND);
+    bottom_panel->SetSizer(bottom_sizer);
+
+    double      sash_gravity{0.5f};
+    std::string config_section{"machine_carousel"};
+    std::string sash_gravity_key{"sash_gravity"};
+    auto        app_cfg = get_app_config();
+    if (app_cfg->has(config_section, sash_gravity_key)) {
+        try {
+            sash_gravity = std::stod(
+                app_cfg->get(config_section, sash_gravity_key));
+        } catch (...) {
+            BOOST_LOG_TRIVIAL(warning)
+                << "Cannot read " << config_section
+                << "::" << sash_gravity_key
+                << " from config, default value will be used...";
+        }
+    }
 
     auto *sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(mm_label, 0, wxLEFT | wxRIGHT | wxCENTRE);
-    sizer->Add(p->machine_manager, 6, wxEXPAND);
-    sizer->AddSpacer(10);
-    sizer->Add(btns_sizer, 0, wxEXPAND | wxLEFT, 10);
-    sizer->AddSpacer(10);
-    sizer->Add(p->scrolled, 3, wxEXPAND);
+    sizer->Add(p->splitter, 1, wxEXPAND | wxALL, 1);
     SetSizer(sizer);
+
+    p->splitter->SplitHorizontally(top_panel, bottom_panel);
+    p->splitter->SetMinimumPaneSize(20);
+    p->splitter->SetSashGravity(sash_gravity);
 
     // Events
     p->btn_export_gcode->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { p->plater->export_gcode(false); });
@@ -1055,6 +1100,41 @@ Sidebar::Sidebar(Plater *parent)
     p->btn_send_gcode->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { p->plater->send_gcode(); });
 //    p->btn_eject_device->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { p->plater->eject_drive(); });
 	p->btn_export_gcode_removable->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { p->plater->export_gcode(true); });
+
+    p->splitter->Bind(wxEVT_SPLITTER_SASH_POS_CHANGING, [&](auto &evt) {
+        p->sash_pos_editing = true;
+        evt.Skip();
+    });
+
+    p->splitter
+        ->Bind(wxEVT_SPLITTER_SASH_POS_CHANGED,
+               [&, _section = config_section,
+                _key = sash_gravity_key](auto &evt) {
+                   if (!p->sash_pos_editing) return;
+                   p->sash_pos_editing = false;
+
+                   auto new_win1_height =
+                       p->splitter->GetWindow1()->GetSize().GetHeight();
+                   auto new_win2_height =
+                       p->splitter->GetWindow2()->GetSize().GetHeight();
+                   if (new_win1_height < p->splitter->GetMinimumPaneSize() ||
+                       new_win2_height < p->splitter->GetMinimumPaneSize())
+                       return;
+
+                   double new_gravity = static_cast<double>(new_win1_height) /
+                                        static_cast<double>(new_win1_height +
+                                                            new_win2_height);
+
+                   std::stringstream stream;
+                   stream << std::fixed << std::setprecision(2)
+                          << new_gravity;
+                   std::string gravity_str = stream.str();
+                   BOOST_LOG_TRIVIAL(info)
+                       << _section << "::" << _key << " " << gravity_str;
+                   get_app_config()->set(_section, _key, gravity_str);
+                   get_app_config()->save();
+                   evt.Skip();
+               });
 }
 
 Sidebar::~Sidebar() {}
@@ -1343,6 +1423,10 @@ wxPanel* Sidebar::presets_panel()
 {
     return p->presets_panel;
 }
+
+wxSplitterWindow *Sidebar::splitter_window() { return p->splitter; }
+
+void Sidebar::refresh_splitter_window() { splitter_window()->Refresh(); }
 
 ConfigOptionsGroup* Sidebar::og_freq_chng_params(const bool is_fff)
 {
@@ -1634,6 +1718,7 @@ void Sidebar::update_mode()
     p->object_list->unselect_objects();
     p->object_list->update_selections();
 
+    refresh_splitter_window();
     Layout();
 }
 
@@ -5067,7 +5152,12 @@ void Plater::priv::show_action_buttons(const bool ready_to_slice_) const
 
     if (ready_to_slice && sidebar->machine_manager() != nullptr) // deactivate print now buttons on Zaxe carousel.
         sidebar->machine_manager()->enablePrintNowButton(false);
-    
+
+    auto refresh_sidebar = [&]() {
+        sidebar->refresh_splitter_window();
+        sidebar->Layout();
+    };
+
     // when a background processing is ON, export_btn and/or send_btn are showing
     if (get_config_bool("background_processing"))
     {
@@ -5077,7 +5167,7 @@ void Plater::priv::show_action_buttons(const bool ready_to_slice_) const
 			sidebar->show_send(send_gcode_shown) |
 			sidebar->show_export_removable(removable_media_status.has_removable_drives))
 //			sidebar->show_eject(removable_media_status.has_eject))
-            sidebar->Layout();
+            refresh_sidebar();
     }
     else
     {
@@ -5089,7 +5179,7 @@ void Plater::priv::show_action_buttons(const bool ready_to_slice_) const
             sidebar->show_send(send_gcode_shown && !ready_to_slice) |
 			sidebar->show_export_removable(!ready_to_slice && removable_media_status.has_removable_drives))
 //            sidebar->show_eject(!ready_to_slice && removable_media_status.has_eject))
-            sidebar->Layout();
+            refresh_sidebar();
     }
 }
 
@@ -8029,6 +8119,8 @@ void Plater::changed_mesh(int obj_idx)
     update();
     p->object_list_changed();
     p->schedule_background_process();
+    
+    p->sidebar->refresh_splitter_window();
 }
 
 void Plater::changed_object(ModelObject &object){
