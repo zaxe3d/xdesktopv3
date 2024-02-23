@@ -18,7 +18,7 @@ namespace GUI {
 class NetworkMachineManager : public wxScrolledWindow
 {
 public:
-    NetworkMachineManager(wxWindow *parent);
+    NetworkMachineManager(wxWindow *parent, wxSize size);
     virtual ~NetworkMachineManager(); // avoid leakage on possible children.
 
     void enablePrintNowButton(bool enable);

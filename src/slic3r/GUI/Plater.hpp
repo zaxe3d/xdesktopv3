@@ -22,6 +22,7 @@
 #include <boost/filesystem/path.hpp>
 
 #include <wx/panel.h>
+#include <wx/splitter.h>
 
 #include "Selection.hpp"
 
@@ -114,6 +115,8 @@ public:
     wxScrolledWindow*       scrolled_panel();
     wxPanel*                presets_panel();
     NetworkMachineManager*  machine_manager();
+    wxSplitterWindow*       splitter_window();
+    void                    refresh_splitter_window();
 
     ConfigOptionsGroup*     og_freq_chng_params(const bool is_fff);
     wxButton*               get_wiping_dialog_button();
