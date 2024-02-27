@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-08 15:30+0300\n"
+"POT-Creation-Date: 2024-02-27 11:32+0300\n"
 "PO-Revision-Date: 2024-01-12 12:12+0300\n"
 "Last-Translator: Mehmet Sutas <msutas@gmail.com>\n"
 "Language-Team: \n"
@@ -7738,7 +7738,7 @@ msgstr ""
 #: src/slic3r/GUI/ConfigWizard.cpp:1277 src/slic3r/GUI/ConfigWizard.cpp:2748
 #: src/slic3r/GUI/ConfigWizard.cpp:2882 src/slic3r/GUI/DoubleSlider.cpp:2595
 #: src/slic3r/GUI/DoubleSlider.cpp:2616 src/slic3r/GUI/GUI.cpp:253
-#: src/slic3r/GUI/GUI_App.cpp:3502 src/slic3r/GUI/Plater.cpp:5688
+#: src/slic3r/GUI/GUI_App.cpp:3496 src/slic3r/GUI/Plater.cpp:5688
 #: src/slic3r/GUI/Plater.cpp:5766 src/slic3r/GUI/UpdateDialogs.cpp:209
 #: src/slic3r/GUI/UpdateDialogs.cpp:217 src/slic3r/GUI/UpdateDialogs.cpp:222
 #: src/slic3r/GUI/UpdateDialogs.cpp:227 src/slic3r/GUI/UpdateDialogs.cpp:234
@@ -11601,49 +11601,49 @@ msgstr ""
 msgid "Remove Selection"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:26 src/slic3r/GUI/Device.cpp:435
+#: src/slic3r/GUI/Device.cpp:27 src/slic3r/GUI/Device.cpp:468
 msgid "Nozzle: "
 msgstr "Nozül: "
 
-#: src/slic3r/GUI/Device.cpp:27
+#: src/slic3r/GUI/Device.cpp:28
 msgid "IP Address: "
 msgstr "IP Adresi: "
 
-#: src/slic3r/GUI/Device.cpp:28
+#: src/slic3r/GUI/Device.cpp:29
 msgid "Please take your print!"
 msgstr "Lütfen baskınızı alınız!"
 
-#: src/slic3r/GUI/Device.cpp:29
+#: src/slic3r/GUI/Device.cpp:30
 msgid "Device is in error state!"
 msgstr "Cihaz hata durumunda!"
 
-#: src/slic3r/GUI/Device.cpp:30 src/slic3r/GUI/Device.cpp:462
+#: src/slic3r/GUI/Device.cpp:31 src/slic3r/GUI/Device.cpp:495
 msgid "Elapsed / Estimated time: "
 msgstr "Geçen / Tahmini süre: "
 
-#: src/slic3r/GUI/Device.cpp:31
+#: src/slic3r/GUI/Device.cpp:32
 msgid "File: "
 msgstr "Dosya: "
 
-#: src/slic3r/GUI/Device.cpp:33
+#: src/slic3r/GUI/Device.cpp:34
 msgid "Unload"
 msgstr "Çıkart"
 
-#: src/slic3r/GUI/Device.cpp:34
+#: src/slic3r/GUI/Device.cpp:35
 msgid "Print Now!"
 msgstr "Baskı Al!"
 
-#: src/slic3r/GUI/Device.cpp:205
+#: src/slic3r/GUI/Device.cpp:237
 msgid "Device model does NOT match. Please reslice with the correct model."
 msgstr ""
 "Cihaz modeli eşleşmiyor. Lütfen doğru cihaz modelini seçip tekrar "
 "dilimleyiniz."
 
-#: src/slic3r/GUI/Device.cpp:205
+#: src/slic3r/GUI/Device.cpp:237
 msgid "Wrong device model"
 msgstr "Hatalı cihaz modeli"
 
-#: src/slic3r/GUI/Device.cpp:207
+#: src/slic3r/GUI/Device.cpp:239
 msgid ""
 "Materials don't match with this device. Please reslice with the correct "
 "material."
@@ -11651,19 +11651,19 @@ msgstr ""
 "Cihazdaki materyal ile baskıda ki materyal uyuşmuyor. Lütfen cihazdaki "
 "materyal ile tekrar dilimleyiniz."
 
-#: src/slic3r/GUI/Device.cpp:207
+#: src/slic3r/GUI/Device.cpp:239
 msgid "Wrong material type"
 msgstr "Yanlış materyal"
 
-#: src/slic3r/GUI/Device.cpp:209
+#: src/slic3r/GUI/Device.cpp:241
 msgid "Please put the filament through the material sensor first."
 msgstr "Lütfen önce filamenti, filament sensörünün içinden geçiriniz."
 
-#: src/slic3r/GUI/Device.cpp:209
+#: src/slic3r/GUI/Device.cpp:241
 msgid "Filament not present"
 msgstr "Filament takılı değil"
 
-#: src/slic3r/GUI/Device.cpp:211
+#: src/slic3r/GUI/Device.cpp:243
 msgid ""
 "Currently installed nozzle on device doesn't match with this slice. Please "
 "reslice with the correct nozzle."
@@ -11671,55 +11671,55 @@ msgstr ""
 "Cihazdaki nozül ile baskıda ki nozül uyuşmuyor. Lütfen cihazdaki nozül ile "
 "tekrar dilimleyiniz."
 
-#: src/slic3r/GUI/Device.cpp:211
+#: src/slic3r/GUI/Device.cpp:243
 msgid "Wrong nozzle type"
 msgstr "Yanlış nozül tipi"
 
-#: src/slic3r/GUI/Device.cpp:282
+#: src/slic3r/GUI/Device.cpp:314
 msgid "Bed is occupied..."
 msgstr "Tabla dolu..."
 
-#: src/slic3r/GUI/Device.cpp:284
+#: src/slic3r/GUI/Device.cpp:316
 msgid "Heating..."
 msgstr "Isıtılıyor..."
 
-#: src/slic3r/GUI/Device.cpp:287
+#: src/slic3r/GUI/Device.cpp:319
 msgid "Paused..."
 msgstr "Duraklatıldı..."
 
-#: src/slic3r/GUI/Device.cpp:290
+#: src/slic3r/GUI/Device.cpp:322
 msgid "Printing..."
 msgstr "Yazdırılıyor..."
 
-#: src/slic3r/GUI/Device.cpp:295
+#: src/slic3r/GUI/Device.cpp:327
 msgid "Uploading..."
 msgstr "Gönderiliyor..."
 
-#: src/slic3r/GUI/Device.cpp:298
+#: src/slic3r/GUI/Device.cpp:330
 msgid "Calibrating..."
 msgstr "Kalibre ediliyor..."
 
-#: src/slic3r/GUI/Device.cpp:418
+#: src/slic3r/GUI/Device.cpp:451
 msgid "Material: - (Not installed)"
 msgstr "Materyal: - (Yüklü değil)"
 
-#: src/slic3r/GUI/Device.cpp:419
+#: src/slic3r/GUI/Device.cpp:452
 msgid "Material: "
 msgstr "Materyal: "
 
-#: src/slic3r/GUI/Device.cpp:473
+#: src/slic3r/GUI/Device.cpp:506
 msgid "Are you sure?"
 msgstr "Emin misiniz?"
 
-#: src/slic3r/GUI/Device.cpp:473
+#: src/slic3r/GUI/Device.cpp:506
 msgid "XDesktop: Confirmation"
 msgstr "XDesktop: Konfirmasyon"
 
-#: src/slic3r/GUI/Device.cpp:474
+#: src/slic3r/GUI/Device.cpp:507
 msgid "Yes"
 msgstr "Evet"
 
-#: src/slic3r/GUI/Device.cpp:474
+#: src/slic3r/GUI/Device.cpp:507
 msgid "No"
 msgstr "Hayır"
 
@@ -11941,7 +11941,7 @@ msgstr ""
 "%s\n"
 "Devam etmek istiyor musunuz?"
 
-#: src/slic3r/GUI/GUI_App.cpp:1153 src/slic3r/GUI/GUI_App.cpp:3338
+#: src/slic3r/GUI/GUI_App.cpp:1153 src/slic3r/GUI/GUI_App.cpp:3332
 #: src/slic3r/GUI/Plater.cpp:1855 src/slic3r/GUI/UnsavedChangesDialog.cpp:920
 msgid "Remember my choice"
 msgstr "Seçimimi hatırla"
@@ -12298,27 +12298,27 @@ msgstr ""
 msgid "Select a gcode file:"
 msgstr "Bir gcode dosyası seçin:"
 
-#: src/slic3r/GUI/GUI_App.cpp:3337 src/slic3r/GUI/GUI_App.cpp:3360
+#: src/slic3r/GUI/GUI_App.cpp:3331 src/slic3r/GUI/GUI_App.cpp:3354
 msgid "Open hyperlink in default browser?"
 msgstr "Köprüyü varsayılan tarayıcıda mı açılsın?"
 
-#: src/slic3r/GUI/GUI_App.cpp:3337 src/slic3r/GUI/GUI_App.cpp:3360
+#: src/slic3r/GUI/GUI_App.cpp:3331 src/slic3r/GUI/GUI_App.cpp:3354
 msgid "XDesktop: Open hyperlink"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3342 src/slic3r/GUI/Preferences.cpp:638
+#: src/slic3r/GUI/GUI_App.cpp:3336 src/slic3r/GUI/Preferences.cpp:638
 msgid "Suppress to open hyperlink in browser"
 msgstr "Tarayıcıda köprü açmayı bastır"
 
-#: src/slic3r/GUI/GUI_App.cpp:3344 src/slic3r/GUI/Plater.cpp:1861
+#: src/slic3r/GUI/GUI_App.cpp:3338 src/slic3r/GUI/Plater.cpp:1861
 msgid "XDesktop will remember your choice."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3345
+#: src/slic3r/GUI/GUI_App.cpp:3339
 msgid "You will not be asked about it again on hyperlinks hovering."
 msgstr "Bağlantıların üzerinde gezdiğinizde artık sorulmayacak."
 
-#: src/slic3r/GUI/GUI_App.cpp:3346 src/slic3r/GUI/Plater.cpp:1865
+#: src/slic3r/GUI/GUI_App.cpp:3340 src/slic3r/GUI/Plater.cpp:1865
 #, boost-format
 msgid ""
 "Visit \"Preferences\" and check \"%1%\"\n"
@@ -12327,49 +12327,49 @@ msgstr ""
 "\"Tercihler\" i ziyaret edin ve \"%1%\" üzerinden\n"
 "seçiminizi değiştirin."
 
-#: src/slic3r/GUI/GUI_App.cpp:3348 src/slic3r/GUI/Plater.cpp:1867
+#: src/slic3r/GUI/GUI_App.cpp:3342 src/slic3r/GUI/Plater.cpp:1867
 #: src/slic3r/GUI/UnsavedChangesDialog.cpp:937
 msgid "XDesktop: Don't ask me again"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3427
+#: src/slic3r/GUI/GUI_App.cpp:3421
 msgid "Check for application update has failed."
 msgstr "Uygulama güncelleştirmesini denetleme başarısız oldu."
 
-#: src/slic3r/GUI/GUI_App.cpp:3428
+#: src/slic3r/GUI/GUI_App.cpp:3422
 #, boost-format
 msgid "You are currently running the latest released version %1%."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3431
+#: src/slic3r/GUI/GUI_App.cpp:3425
 #, boost-format
 msgid ""
 "There are no new released versions online. The latest release version is %1%."
 msgstr "Yeni sürüm mevcut değildir. En son sürüm %1%."
 
-#: src/slic3r/GUI/GUI_App.cpp:3492
+#: src/slic3r/GUI/GUI_App.cpp:3486
 #, boost-format
 msgid "Downloading %1%"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3502
+#: src/slic3r/GUI/GUI_App.cpp:3496
 msgid "Downloading of the new version is in progress. Do you want to continue?"
 msgstr ""
 "Yeni sürümün indirilmesi zaten devam ediyor. Devam etmek istiyor musunuz?"
 
-#: src/slic3r/GUI/GUI_App.cpp:3520
+#: src/slic3r/GUI/GUI_App.cpp:3514
 msgid ""
 "Could not start URL download. Destination folder is not set. Please choose "
 "destination folder in Configuration Wizard."
 msgstr ""
 
 #. TRN Text of notification when Slicer starts and usb stick with printer settings ini file is present
-#: src/slic3r/GUI/GUI_App.cpp:3542 src/slic3r/GUI/Plater.cpp:2359
+#: src/slic3r/GUI/GUI_App.cpp:3536 src/slic3r/GUI/Plater.cpp:2359
 msgid "Printer configuration file detected on removable media."
 msgstr ""
 
 #. TRN Text of hypertext of notification when Slicer starts and usb stick with printer settings ini file is present
-#: src/slic3r/GUI/GUI_App.cpp:3544 src/slic3r/GUI/Plater.cpp:2361
+#: src/slic3r/GUI/GUI_App.cpp:3538 src/slic3r/GUI/Plater.cpp:2361
 msgid "Write Wi-Fi credentials."
 msgstr ""
 
@@ -18880,6 +18880,10 @@ msgstr "Geçerli mod %s"
 msgctxt "Mode"
 msgid "Advanced"
 msgstr "Gelişmiş"
+
+#: src/slic3r/GUI/NetworkMachineManager.cpp:37
+msgid "Can not find a Zaxe on the network"
+msgstr "Ağa bağlı bir Zaxe bulunamadı"
 
 #: src/slic3r/Utils/AppUpdater.cpp:47
 #, boost-format
