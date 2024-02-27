@@ -2,8 +2,7 @@
 #include "GUI_App.hpp"
 #include "MainFrame.hpp" // for wxGetApp().app_config
 #include "I18N.hpp"
-
-#include <wx/artprov.h>
+#include "libslic3r/Utils.hpp"
 
 namespace Slic3r {
 namespace GUI {
@@ -41,12 +40,16 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
     label_font.SetPointSize(14);
     noDeviceFoundText->SetFont(label_font);
 
+    wxBitmap        warningBitmap(Slic3r::resources_dir() +
+                                      "/icons/no-connection.png",
+                                  wxBITMAP_TYPE_PNG);
     wxStaticBitmap *warningIcon = new wxStaticBitmap(this, wxID_ANY,
-                                                     wxArtProvider::GetBitmap(
-                                                         wxART_WARNING));
+                                                     warningBitmap,
+                                                     wxDefaultPosition,
+                                                     wxSize(35, 35));
 
     m_warningSizer = new wxBoxSizer(wxHORIZONTAL);
-    m_warningSizer->Add(warningIcon, 0, wxALIGN_CENTER | wxALL, 1);
+    m_warningSizer->Add(warningIcon, 0, wxALIGN_CENTER | wxALL, 5);
     m_warningSizer->Add(noDeviceFoundText, 0, wxALIGN_CENTER | wxALL, 1);
     m_warningSizer->Show(m_deviceMap.empty());
 
