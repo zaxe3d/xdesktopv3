@@ -1,6 +1,9 @@
 #include "NetworkMachineManager.hpp"
 #include "GUI_App.hpp"
 #include "MainFrame.hpp" // for wxGetApp().app_config
+#include "I18N.hpp"
+
+#include <wx/artprov.h>
 
 namespace Slic3r {
 namespace GUI {
@@ -28,6 +31,26 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
     auto ips = wxGetApp().app_config->get_custom_ips();
     for (int i = 0; i < ips.size(); i++)
         addMachine(ips[i], 9294, "Zaxe (m.)");
+
+    wxStaticText *noDeviceFoundText(
+        new wxStaticText(this, wxID_ANY,
+                         _L("Can not find a Zaxe on the network"),
+                         wxDefaultPosition, wxDefaultSize));
+    wxGetApp().UpdateDarkUI(noDeviceFoundText);
+    wxFont label_font = wxGetApp().normal_font();
+    label_font.SetPointSize(14);
+    noDeviceFoundText->SetFont(label_font);
+
+    wxStaticBitmap *warningIcon = new wxStaticBitmap(this, wxID_ANY,
+                                                     wxArtProvider::GetBitmap(
+                                                         wxART_WARNING));
+
+    m_warningSizer = new wxBoxSizer(wxHORIZONTAL);
+    m_warningSizer->Add(warningIcon, 0, wxALIGN_CENTER | wxALL, 1);
+    m_warningSizer->Add(noDeviceFoundText, 0, wxALIGN_CENTER | wxALL, 1);
+    m_warningSizer->Show(m_deviceMap.empty());
+
+    m_scrolledSizer->Add(m_warningSizer, 0, wxALIGN_CENTER);
 }
 
 void NetworkMachineManager::enablePrintNowButton(bool enable)
@@ -72,6 +95,7 @@ void NetworkMachineManager::onMachineOpen(MachineEvent &event)
     shared_ptr<Device> d = make_shared<Device>(event.nm, this);
     d->enablePrintNowButton(m_printNowButtonEnabled);
     m_deviceMap[event.nm->ip] = d;
+    m_warningSizer->Show(m_deviceMap.empty());
     m_scrolledSizer->Add(d.get());
     m_scrolledSizer->Layout();
     FitInside();
@@ -84,6 +108,7 @@ void NetworkMachineManager::onMachineClose(MachineEvent &event)
     if (m_deviceMap.erase(event.nm->ip) == 0) return; // couldn't delete so don't continue...
     BOOST_LOG_TRIVIAL(info) << boost::format("NetworkMachineManager - Closing machine: [%1% - %2%].") % event.nm->name % event.nm->ip;
     this->m_networkMContainer->removeMachine(event.nm->ip);
+    m_warningSizer->Show(m_deviceMap.empty());
     m_scrolledSizer->Layout();
     FitInside();
     Refresh();

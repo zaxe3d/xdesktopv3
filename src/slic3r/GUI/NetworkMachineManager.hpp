@@ -37,6 +37,7 @@ private:
 
     // UI
     wxSizer* m_scrolledSizer;
+    wxBoxSizer* m_warningSizer;
 
     boost::unordered_map<std::string, shared_ptr<Device>> m_deviceMap;
 
