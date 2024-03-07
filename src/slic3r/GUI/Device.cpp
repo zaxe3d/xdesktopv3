@@ -32,6 +32,7 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + wxString(nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS).c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
     m_txtFWVersion(new wxStaticText(this, wxID_ANY, nm->attr->firmwareVersion.GetVersionString(), wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
     m_btnUnload(new wxButton(this, wxID_ANY, _L("Unload"), wxDefaultPosition, wxSize(-1, 18), wxCENTER | wxCentreY)),
+    m_btnPressureAdvanceCalibration(new wxButton(this, wxID_ANY, _L("PA Calibration"), wxDefaultPosition, wxSize(-1, 18), wxCENTER | wxCentreY)),
     m_btnPrintNow(new wxButton(this, wxID_ANY, _L("Print Now!"))),
     m_avatar(new RoundedPanel(this, wxID_ANY, "", wxSize(60, 60), wxColour(169, 169, 169), wxColour("WHITE"))),
     m_bitPreheatActive(new wxBitmap()),
@@ -46,24 +47,27 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_mainSizer->Add(m_deviceSizer, 1, wxEXPAND | wxRIGHT, 25); // only expand horizontally in vertical sizer.
 
     // action buttons with bitmaps.
-    wxBitmap bitSayHi;
-    bitSayHi.LoadFile(Slic3r::resources_dir() + "/icons/device/hi.png", wxBITMAP_TYPE_PNG);
+    wxBitmap bitSayHi(Slic3r::resources_dir() + "/icons/device/hi.png", wxBITMAP_TYPE_PNG);
     m_btnSayHi = new wxBitmapButton(this, wxID_ANY, bitSayHi, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+    
     m_bitPreheatActive->LoadFile(Slic3r::resources_dir() + "/icons/device/preheat_active.png", wxBITMAP_TYPE_PNG);
     m_bitPreheatDeactive->LoadFile(Slic3r::resources_dir() + "/icons/device/preheat.png", wxBITMAP_TYPE_PNG);
     m_btnPreheat = new wxBitmapButton(this, wxID_ANY, *m_bitPreheatDeactive, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
-    wxBitmap bitPause;
-    bitPause.LoadFile(Slic3r::resources_dir() + "/icons/device/pause.png", wxBITMAP_TYPE_PNG);
+
+    wxBitmap bitPause(Slic3r::resources_dir() + "/icons/device/pause.png", wxBITMAP_TYPE_PNG);
     m_btnPause = new wxBitmapButton(this, wxID_ANY, bitPause, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
-    wxBitmap bitResume;
-    bitResume.LoadFile(Slic3r::resources_dir() + "/icons/device/resume.png", wxBITMAP_TYPE_PNG);
+
+    wxBitmap bitResume(Slic3r::resources_dir() + "/icons/device/resume.png", wxBITMAP_TYPE_PNG);
     m_btnResume = new wxBitmapButton(this, wxID_ANY, bitResume, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
-    wxBitmap bitCancel;
-    bitCancel.LoadFile(Slic3r::resources_dir() + "/icons/device/stop.png", wxBITMAP_TYPE_PNG);
+
+    wxBitmap bitCancel(Slic3r::resources_dir() + "/icons/device/stop.png", wxBITMAP_TYPE_PNG);
     m_btnCancel = new wxBitmapButton(this, wxID_ANY, bitCancel, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+
     m_bitExpanded->LoadFile(Slic3r::resources_dir() + "/icons/device/collapse.png", wxBITMAP_TYPE_PNG);
     m_bitCollapsed->LoadFile(Slic3r::resources_dir() + "/icons/device/expand.png", wxBITMAP_TYPE_PNG);
     m_btnExpandCollapse = new wxBitmapButton(this, wxID_ANY, *m_bitCollapsed, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+
+    m_dlgPressureAdvanceCalibration = new PressureAdvanceCalibrationDialog(this, wxID_ANY);
 
     // Actions
     m_btnSayHi->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->nm->sayHi(); });
@@ -72,6 +76,9 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_btnPause->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->pause(); }); });
     m_btnResume->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->resume(); }); });
     m_btnUnload->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->confirm([this] { this->nm->unloadFilament(); }); });
+    m_btnPressureAdvanceCalibration->Bind(wxEVT_BUTTON, [&](const auto &evt) {
+        m_dlgPressureAdvanceCalibration->ShowModal();
+    });
     m_timer->Bind(wxEVT_TIMER, [this](wxTimerEvent &evt) { this->onTimer(evt); });
 
     m_txtDeviceName->Bind(wxEVT_LEFT_UP, [&](auto &evt) {
@@ -215,6 +222,12 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     // Unload button
     m_btnUnload->SetFont(xsmallFont);
     // Unload button end...
+
+    // Pressure advance button
+    m_btnPressureAdvanceCalibration->Hide();
+    m_btnPressureAdvanceCalibration->SetFont(xsmallFont);
+    // Pressure advance  button end...
+
     // FW version
     m_txtFWVersion->SetFont(xsmallFont);
     m_txtFWVersion->SetForegroundColour("GREY");
@@ -224,36 +237,11 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_btnPrintNow->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) {
         this->m_btnPrintNow->Enable(false);
         BOOST_LOG_TRIVIAL(info) << "Print now pressed on " << this->nm->name;
-        const ZaxeArchive& archive = wxGetApp().plater()->get_zaxe_archive();
-
-        vector<string> sPV;
-        split(sPV, GUI::wxGetApp().preset_bundle->printers.get_selected_preset().name, is_any_of("-"));
-        string pN = sPV[0]; // ie: Zaxe Z3S - 0.6mm nozzle -> Zaxe Z3S
-        string dM = to_upper_copy(this->nm->attr->deviceModel);
-        auto s = pN.find(dM);
-        boost::replace_all(dM, "PLUS", "+");
-        trim(pN);
-        if (s == std::string::npos || pN.length() != dM.length() + s) {
-            wxMessageBox(_L("Device model does NOT match. Please reslice with the correct model."), _L("Wrong device model"), wxOK | wxICON_ERROR);
-        } else if (!this->nm->attr->isLite && this->nm->attr->material != "custom" && this->nm->attr->material.compare(archive.get_info("material")) != 0) {
-            wxMessageBox(_L("Materials don't match with this device. Please reslice with the correct material."), _L("Wrong material type"), wxICON_ERROR);
-        } else if (!this->nm->states->filamentPresent && this->nm->attr->firmwareVersion.GetMajor() >= 3 && this->nm->attr->firmwareVersion.GetMinor() >= 5) {
-            wxMessageBox(_L("Please put the filament through the material sensor first."), _L("Filament not present"), wxICON_ERROR);
-        } else if (!this->nm->attr->isLite && !case_insensitive_compare(this->nm->attr->nozzle, archive.get_info("nozzle_diameter"))) {
-            wxMessageBox(_L("Currently installed nozzle on device doesn't match with this slice. Please reslice with the correct nozzle."), _L("Wrong nozzle type"), wxICON_ERROR);
-        } else {
-            std::thread t([&]() {
-                if (this->nm->attr->isLite) {
-                    this->nm->upload(wxGetApp().plater()->get_gcode_path().c_str(),
-                                     translate_chars(wxGetApp().plater()->get_filename().ToStdString()).c_str());
-                } else this->nm->upload(wxGetApp().plater()->get_zaxe_code_path().c_str());
-            });
-            t.detach(); // crusial. otherwise blocks main thread.
-        }
+        this->print();
         this->m_btnPrintNow->Enable(true);
     });
     // Print now button end.
-    m_btnExpandCollapse->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) {
+    m_btnExpandCollapse->Bind(wxEVT_BUTTON, [&](const wxCommandEvent &evt) {
         if (m_isExpanded) {
             SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT));
             m_expansionSizer->ShowItems(false);
@@ -268,6 +256,7 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
             } else {
                 m_btnUnload->Hide();
             }
+            refreshCalibButton();
         }
         m_expansionSizer->Layout();
         GetParent()->Layout();
@@ -283,6 +272,7 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_expansionSizer->Add(m_txtFileTime, 0, wxBOTTOM);
     m_filamentSizer->Add(m_txtDeviceMaterial, 0, wxLEFT);
     m_filamentSizer->Add(m_btnUnload, 0, wxLEFT, 10);
+    m_filamentSizer->Add(m_btnPressureAdvanceCalibration, 0, wxLEFT, 10);
     m_expansionSizer->Add(m_filamentSizer, 0, wxTOP);
     m_expansionSizer->Add(m_txtDeviceNozzleDiameter, 0, wxBOTTOM);
     m_expansionSizer->Add(m_txtDeviceIP, 0, wxBOTTOM);
@@ -402,8 +392,9 @@ void Device::updateStates()
             m_btnPreheat->Show();
             m_btnPrintNow->Show();
             m_txtBedOccupiedMessage->Hide();
-            if (is_there(this->nm->attr->deviceModel, {"z"}) && m_isExpanded)
+            if (is_there(this->nm->attr->deviceModel, {"z"}) && m_isExpanded){
                 m_btnUnload->Show();
+            } 
         }
     }
 
@@ -428,6 +419,8 @@ void Device::updateStates()
 
     m_rightSizer->Layout();
     updateStatus();
+
+    m_dlgPressureAdvanceCalibration->checkState();
     //Thaw();
 }
 
@@ -499,6 +492,77 @@ void Device::onTimer(wxTimerEvent& event)
             // make it look paused by incrementing and subtracting from the counter.
             (nm->states->paused ? m_pausedSeconds++ : m_pausedSeconds))
         + " / " + nm->attr->estimatedTime);
+}
+
+void Device::onModeChanged() {
+    if(m_isExpanded) {
+        refreshCalibButton(); 
+        GetParent()->Layout();
+        GetParent()->FitInside();
+    }
+}
+
+void Device::refreshCalibButton()
+{
+    m_btnPressureAdvanceCalibration->Show(
+        is_there(this->nm->attr->deviceModel, {"z"}) &&
+        wxGetApp().get_mode() >= comAdvanced);
+}
+
+bool Device::print()
+{
+    const ZaxeArchive &archive = wxGetApp().plater()->get_zaxe_archive();
+
+    vector<string> sPV;
+    split(sPV,
+          GUI::wxGetApp().preset_bundle->printers.get_selected_preset().name,
+          is_any_of("-"));
+    string pN = sPV[0]; // ie: Zaxe Z3S - 0.6mm nozzle -> Zaxe Z3S
+    string dM = to_upper_copy(this->nm->attr->deviceModel);
+    auto   s  = pN.find(dM);
+    boost::replace_all(dM, "PLUS", "+");
+    trim(pN);
+    if (s == std::string::npos || pN.length() != dM.length() + s) {
+        wxMessageBox(_L("Device model does NOT match. Please reslice with "
+                        "the correct model."),
+                     _L("Wrong device model"), wxOK | wxICON_ERROR);
+    } else if (!this->nm->attr->isLite &&
+               this->nm->attr->material != "custom" &&
+               this->nm->attr->material.compare(
+                   archive.get_info("material")) != 0) {
+        wxMessageBox(_L("Materials don't match with this device. Please "
+                        "reslice with the correct material."),
+                     _L("Wrong material type"), wxICON_ERROR);
+    } else if (!this->nm->states->filamentPresent &&
+               this->nm->attr->firmwareVersion.GetMajor() >= 3 &&
+               this->nm->attr->firmwareVersion.GetMinor() >= 5) {
+        wxMessageBox(
+            _L("Please put the filament through the material sensor first."),
+            _L("Filament not present"), wxICON_ERROR);
+    } else if (!this->nm->attr->isLite &&
+               !case_insensitive_compare(this->nm->attr->nozzle,
+                                         archive.get_info(
+                                             "nozzle_diameter"))) {
+        wxMessageBox(
+            _L("Currently installed nozzle on device doesn't match with this "
+               "slice. Please reslice with the correct nozzle."),
+            _L("Wrong nozzle type"), wxICON_ERROR);
+    } else {
+        std::thread t([&]() {
+            if (this->nm->attr->isLite) {
+                this->nm->upload(
+                    wxGetApp().plater()->get_gcode_path().c_str(),
+                    translate_chars(
+                        wxGetApp().plater()->get_filename().ToStdString())
+                        .c_str());
+            } else
+                this->nm->upload(
+                    wxGetApp().plater()->get_zaxe_code_path().c_str());
+        });
+        t.detach(); // crusial. otherwise blocks main thread.
+        return true;
+    }
+    return false;
 }
 
 void Device::confirm(function<void()> cb)

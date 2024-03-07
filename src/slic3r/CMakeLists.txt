@@ -291,6 +291,8 @@ set(SLIC3R_GUI_SOURCES
     GUI/Device.cpp
     GUI/CustomIPDialog.cpp
     GUI/CustomIPDialog.hpp
+    GUI/PressureAdvanceCalibrationDialog.cpp
+    GUI/PressureAdvanceCalibrationDialog.hpp
     Utils/AppUpdater.cpp
     Utils/AppUpdater.hpp
     Utils/Http.cpp

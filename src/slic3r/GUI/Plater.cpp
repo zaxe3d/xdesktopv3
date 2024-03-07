@@ -1076,13 +1076,13 @@ Sidebar::Sidebar(Plater *parent)
     p->btn_reslice->Bind(wxEVT_BUTTON, [this](wxCommandEvent&)
     {
         if (p->plater->canvas3D()->get_gizmos_manager().is_in_editing_mode(true))
-            return;
+             return;
 
         const bool export_gcode_after_slicing = wxGetKeyState(WXK_SHIFT);
         if (export_gcode_after_slicing)
             p->plater->export_gcode(true);
         else
-            p->plater->reslice();
+             p->plater->reslice();
         p->plater->select_view_3D("Preview");
     });
 
@@ -1718,6 +1718,8 @@ void Sidebar::update_mode()
     p->object_list->unselect_objects();
     p->object_list->update_selections();
 
+    machine_manager()->onModeChanged();
+
     refresh_splitter_window();
     Layout();
 }
@@ -2183,7 +2185,7 @@ struct Plater::priv
     bool                        inside_snapshot_capture() { return m_prevent_snapshots != 0; }
 	bool                        process_completed_with_error { false };
     bool                        bed_level_active { true };
-   
+
 private:
     bool layers_height_allowed() const;
 
@@ -5570,16 +5572,22 @@ void Plater::load_project(const wxString& filename)
     }
 }
 
-void Plater::add_model(bool imperial_units/* = false*/)
+void Plater::add_model(bool imperial_units/* = false*/, std::string fname/* = ""*/)
 {
     wxArrayString input_files;
-    wxGetApp().import_model(this, input_files);
-    if (input_files.empty())
-        return;
-
+    
     std::vector<fs::path> paths;
-    for (const auto &file : input_files)
-        paths.emplace_back(into_path(file));
+    if (fname.empty()) {
+        wxGetApp().import_model(this, input_files);
+        if (input_files.empty())
+            return;
+
+        for (const auto &file : input_files)
+            paths.emplace_back(into_path(file));
+    }
+    else {
+        paths.emplace_back(fname);
+    }
 
     wxString snapshot_label;
     assert(! paths.empty());
@@ -5899,6 +5907,20 @@ void Plater::refresh_print()
 void Plater::reset_print()
 {
     p->background_process.reset();
+}
+
+void Plater::calib_pa(const Calib_Params &params)
+{
+    new_project();
+    add_model(false, Slic3r::resources_dir() +
+                         "/calib/pressure_advance/pressure_advance_test.stl");
+    p->background_process.fff_print()->set_calib_params(params);
+}
+
+bool Plater::is_ready_for_printing()
+{
+    return !p->background_process.empty() &&
+                 !p->background_process.running();
 }
 
 std::vector<size_t> Plater::load_files(const std::vector<fs::path>& input_files, bool load_model, bool load_config, bool imperial_units /*= false*/) { return p->load_files(input_files, load_model, load_config, imperial_units); }

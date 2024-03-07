@@ -1244,6 +1244,19 @@ void PrintConfigDef::init_fff_params()
     def->min = 0;
     def->set_default_value(new ConfigOptionFloats { 0. });
 
+    def = this->add("enable_pressure_advance", coBool);
+    def->label = L("Enable pressure advance");
+    def->tooltip = L("Enable pressure advance");
+    def->mode = comAdvanced;
+    def->set_default_value(new ConfigOptionBool{ false });
+
+    def = this->add("pressure_advance", coFloat);
+    def->label = L("Pressure Advance");
+    def->tooltip = L("Pressure Advance");
+    def->min = 0.f;
+    def->mode = comAdvanced;
+    def->set_default_value(new ConfigOptionFloat { 0.f });
+
     def = this->add("filament_settings_id", coStrings);
     def->set_default_value(new ConfigOptionStrings { "" });
     def->cli = ConfigOptionDef::nocli;
@@ -4324,7 +4337,7 @@ static std::set<std::string> PrintConfigDef_ignore = {
     "standby_temperature", "scale", "rotate", "duplicate", "duplicate_grid",
     "start_perimeters_at_concave_points", "start_perimeters_at_non_overhang", "randomize_start",
     "seal_position", "vibration_limit", "bed_size",
-    "print_center", "g0", "threads", "pressure_advance", "wipe_tower_per_color_wipe",
+    "print_center", "g0", "threads", "wipe_tower_per_color_wipe",
     "serial_port", "serial_speed",
     // Introduced in some XDesktop 2.3.1 alpha, later renamed or removed.
     "fuzzy_skin_perimeter_mode", "fuzzy_skin_shape",

@@ -118,6 +118,8 @@ bool Print::invalidate_state_by_config_options(const ConfigOptionResolver & /* n
         "filament_notes",
         "filament_cost",
         "filament_spool_weight",
+        "enable_pressure_advance",
+        "pressure_advance",
         "first_layer_acceleration",
         "first_layer_acceleration_over_raft",
         "first_layer_bed_temperature",
@@ -811,6 +813,11 @@ std::string Print::validate(std::vector<std::string>* warnings) const
     }
 
     return std::string();
+}
+
+void Print::set_calib_params(const Calib_Params &params)
+{
+    m_calib_params = params;
 }
 
 #if 0

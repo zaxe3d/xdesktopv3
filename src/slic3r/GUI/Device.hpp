@@ -9,6 +9,7 @@
 #include <mutex>
 
 #include "../Utils/NetworkMachine.hpp"
+#include "PressureAdvanceCalibrationDialog.hpp"
 
 namespace Slic3r {
 namespace GUI {
@@ -73,6 +74,10 @@ public:
     void enablePrintNowButton(bool enable);
 
     void onTimer(wxTimerEvent& event);
+    void onModeChanged();
+    
+    bool print();
+
 private:
     wxTimer* m_timer; // elapsed timer.
     void confirm(std::function<void()> cb);
@@ -90,6 +95,7 @@ private:
     wxBitmapButton* m_btnCancel; // cancel button.
     wxBitmapButton* m_btnExpandCollapse; // expand/collapse button.
     wxButton* m_btnUnload; // unload filament button.
+    wxButton* m_btnPressureAdvanceCalibration;
     wxButton* m_btnPrintNow; // print now button.
     wxStaticText* m_txtStatus; // status text.
     wxStaticText* m_txtProgress; // progress text.
@@ -103,6 +109,7 @@ private:
     wxStaticText* m_txtBedOccupiedMessage; // bed occuppied message under status text.
     wxStaticText* m_txtErrorMessage; // bed occuppied message under status text.
     wxStaticText* m_txtFWVersion; // firmware version at the very bottom.
+    PressureAdvanceCalibrationDialog* m_dlgPressureAdvanceCalibration;
 
     RoundedPanel* m_avatar;
 
@@ -119,6 +126,8 @@ private:
     bool m_deviceNameTxtCtrlShown;
     void applyDeviceName();
     void toggleDeviceNameWidgets();
+
+    void refreshCalibButton();
 };
 } // namespace GUI
 } // namespace Slic3r

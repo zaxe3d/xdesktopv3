@@ -154,5 +154,12 @@ NetworkMachineManager::~NetworkMachineManager()
     delete m_broadcastReceiver;
     delete m_networkMContainer;
 }
+
+void NetworkMachineManager::onModeChanged()
+{
+    std::for_each(m_deviceMap.begin(), m_deviceMap.end(), [](auto &d) {
+        if (d.second) d.second->onModeChanged();
+    });
+}
 } // namespace GUI
 } // namespace Slic3r

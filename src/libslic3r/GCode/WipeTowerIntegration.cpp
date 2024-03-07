@@ -96,6 +96,9 @@ std::string WipeTowerIntegration::append_tcr(GCodeGenerator &gcodegen, const Wip
     unescape_string_cstyle(tcr_rotated_gcode, tcr_gcode);
     gcode += tcr_gcode;
 
+    if (gcodegen.config().enable_pressure_advance.getBool())
+            gcode += gcodegen.writer().set_pressure_advance(gcodegen.config().pressure_advance.getFloat());
+
     // A phony move to the end position at the wipe tower.
     gcodegen.writer().travel_to_xy(end_pos.cast<double>());
     gcodegen.set_last_pos(wipe_tower_point_to_object_point(gcodegen, end_pos));

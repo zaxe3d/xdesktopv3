@@ -181,6 +181,24 @@ std::string GCodeWriter::set_bed_temperature(unsigned int temperature, bool wait
     return gcode.str();
 }
 
+std::string GCodeWriter::set_pressure_advance(double pa) const
+{
+    std::ostringstream gcode;
+    if (pa < 0) return gcode.str();
+    if (false) { // todo: bbl printer
+        // OrcaSlicer: set L1000 to use linear model
+        gcode << "M900 K" << std::setprecision(4) << pa << " L1000 M10 ; Override pressure advance value\n";
+    } else {
+        if (this->config.gcode_flavor == gcfKlipper)
+            gcode << "SET_PRESSURE_ADVANCE ADVANCE=" << std::setprecision(4) << pa << "; Override pressure advance value\n";
+        else if (this->config.gcode_flavor == gcfRepRapFirmware)
+            gcode << ("M572 D0 S") << std::setprecision(4) << pa << "; Override pressure advance value\n";
+        else
+            gcode << "M900 K" << std::setprecision(4) << pa << "; Override pressure advance value\n";
+    }
+    return gcode.str();
+}
+
 std::string GCodeWriter::set_acceleration_internal(Acceleration type, unsigned int acceleration)
 {
     // Clamp the acceleration to the allowed maximum.

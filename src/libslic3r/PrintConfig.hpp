@@ -715,6 +715,8 @@ PRINT_CONFIG_CLASS_DEFINE(
     ((ConfigOptionBools,               filament_soluble))
     ((ConfigOptionFloats,              filament_cost))
     ((ConfigOptionFloats,              filament_spool_weight))
+    ((ConfigOptionBool,                enable_pressure_advance))
+    ((ConfigOptionFloat,               pressure_advance))
     ((ConfigOptionFloats,              filament_max_volumetric_speed))
     ((ConfigOptionFloats,              filament_loading_speed))
     ((ConfigOptionFloats,              filament_loading_speed_start))

@@ -187,7 +187,7 @@ public:
     void new_project();
     void load_project();
     void load_project(const wxString& filename);
-    void add_model(bool imperial_units = false);
+    void add_model(bool imperial_units = false, std::string fname = "");
     void import_zip_archive();
     void import_sl1_archive();
     void extract_config_from_project();
@@ -198,6 +198,8 @@ public:
     void convert_gcode_to_binary();
     void refresh_print();
     void reset_print();
+    void calib_pa(const Calib_Params &params);
+    bool is_ready_for_printing();
 
     std::vector<size_t> load_files(const std::vector<boost::filesystem::path>& input_files, bool load_model = true, bool load_config = true, bool imperial_units = false);
     // To be called when providing a list of files to the GUI slic3r on command line.

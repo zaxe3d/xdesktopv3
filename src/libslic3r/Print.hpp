@@ -46,6 +46,7 @@
 #include <optional>
 #include <set>
 #include <tcbspan/span.hpp>
+#include "Calib.hpp"
 
 namespace Slic3r {
 
@@ -669,6 +670,11 @@ public:
     const Polygons& get_sequential_print_clearance_contours() const { return m_sequential_print_clearance_contours; }
     static bool sequential_print_horizontal_clearance_valid(const Print& print, Polygons* polygons = nullptr);
 
+    CalibMode          &calib_mode() { return m_calib_params.mode; }
+    const CalibMode    &calib_mode() const { return m_calib_params.mode; }
+    void                set_calib_params(const Calib_Params &params);
+    const Calib_Params &calib_params() const { return m_calib_params; }
+
 protected:
     // Invalidates the step, and its depending steps in Print.
     bool                invalidate_step(PrintStep step);
@@ -727,6 +733,8 @@ private:
     friend class PrintObject;
 
     ConflictResultOpt m_conflict_result;
+
+    Calib_Params m_calib_params;
 };
 
 } /* slic3r_Print_hpp_ */
