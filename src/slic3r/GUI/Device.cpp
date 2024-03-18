@@ -67,7 +67,7 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_bitCollapsed->LoadFile(Slic3r::resources_dir() + "/icons/device/expand.png", wxBITMAP_TYPE_PNG);
     m_btnExpandCollapse = new wxBitmapButton(this, wxID_ANY, *m_bitCollapsed, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
 
-    m_dlgPressureAdvanceCalibration = new PressureAdvanceCalibrationDialog(this, wxID_ANY);
+    m_dlgPressureAdvanceCalibration = new PressureAdvanceCalibrationDialog(this, wxID_ANY, nm->name);
 
     // Actions
     m_btnSayHi->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &evt) { this->nm->sayHi(); });

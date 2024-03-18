@@ -8,10 +8,9 @@ namespace Slic3r::GUI {
 class PressureAdvanceCalibrationDialog : public wxDialog
 {
 public:
-    PressureAdvanceCalibrationDialog(
-        wxWindow       *parent,
-        wxWindowID      id,
-        const wxString &title = "Pressure Advance Calibration");
+    PressureAdvanceCalibrationDialog(wxWindow       *parent,
+                                     wxWindowID      id,
+                                     const wxString &title);
 
     void checkState();
 

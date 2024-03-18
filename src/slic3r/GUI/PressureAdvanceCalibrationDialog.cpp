@@ -18,7 +18,8 @@ PressureAdvanceCalibrationDialog::PressureAdvanceCalibrationDialog(
     wxWindow *parent, wxWindowID id, const wxString &title)
     : wxDialog(parent,
                id,
-               title,
+               wxString::Format(_L("Pressure Advance Calibration - %s"),
+                                title),
                wxDefaultPosition,
                wxDefaultSize,
                wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
