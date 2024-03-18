@@ -576,6 +576,16 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionFloat(60));
 
+    def = this->add("chamber_temperature", coInts);
+    def->label = L("Chamber temperature");
+    def->full_label = L("Chamber temperature");
+    def->tooltip = L("Chamber temperature");
+    def->sidetext = L("°C");
+    def->min = 0;
+    def->max = 300;
+    def->mode = comAdvanced;
+    def->set_default_value(new ConfigOptionInts{ 0 });
+
     def             = this->add("enable_dynamic_overhang_speeds", coBool);
     def->label      = L("Enable dynamic overhang speeds");
     def->category   = L("Speed");

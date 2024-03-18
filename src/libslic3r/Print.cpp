@@ -120,6 +120,7 @@ bool Print::invalidate_state_by_config_options(const ConfigOptionResolver & /* n
         "filament_spool_weight",
         "enable_pressure_advance",
         "pressure_advance",
+        "chamber_temperature",
         "first_layer_acceleration",
         "first_layer_acceleration_over_raft",
         "first_layer_bed_temperature",
