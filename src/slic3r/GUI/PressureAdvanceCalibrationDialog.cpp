@@ -38,13 +38,13 @@ PressureAdvanceCalibrationDialog::PressureAdvanceCalibrationDialog(
 
 void PressureAdvanceCalibrationDialog::createInputSection()
 {
-    auto fromKValueText = new wxStaticText(this, wxID_ANY, "From K Value",
+    auto fromKValueText = new wxStaticText(this, wxID_ANY, _L("From K Value"),
                                            wxDefaultPosition, wxSize(-1, 18),
                                            wxTE_LEFT);
-    auto toKValueText   = new wxStaticText(this, wxID_ANY, "To K Value",
+    auto toKValueText   = new wxStaticText(this, wxID_ANY, _L("To K Value"),
                                            wxDefaultPosition, wxSize(-1, 18),
                                            wxTE_LEFT);
-    auto stepValueText  = new wxStaticText(this, wxID_ANY, "Step Value",
+    auto stepValueText  = new wxStaticText(this, wxID_ANY, _L("Step Value"),
                                            wxDefaultPosition, wxSize(-1, 18),
                                            wxTE_LEFT);
 
@@ -96,7 +96,7 @@ void PressureAdvanceCalibrationDialog::createInputSection()
     auto deviceAvailableRuleSizer =
         createRuleIndicator(&deviceAvailableRuleIcon,
                             &deviceAvailableRuleText,
-                            "Printer should be available");
+                            _L("Printer must be available"));
 
     auto stepNullValueRuleSizer =
         createRuleIndicator(&stepNullValueRuleIcon, &stepNullValueRuleText,
@@ -159,11 +159,11 @@ void PressureAdvanceCalibrationDialog::createInfoSection()
     };
 
     auto wrappedInputInfoText = createWrappedText(
-        "After calibration print is done, determine the best matching "
-        "K-Factor.\n"
-        "Click 'Go to Settings' button and modify 'Filament Settings -> "
-        "Pressure Advance' field with\n"
-        "K-Factor and do not forget to enable pressure advance.");
+        _L("After calibration print is done, determine the best matching "
+           "K-Factor.\n"
+           "Click 'Go to Settings' button and modify 'Filament Settings -> "
+           "Pressure Advance' field with\n"
+           "K-Factor and do not forget to enable pressure advance."));
 
     sizer->Add(wrappedInputInfoText, 0, wxEXPAND | wxALL, 10);
 }
@@ -172,7 +172,7 @@ void PressureAdvanceCalibrationDialog::createActionSection()
 {
     spinner     = new wxActivityIndicator(this, wxID_ANY, wxDefaultPosition,
                                           wxSize(-1, 18), wxALIGN_CENTER);
-    spinnerText = new wxStaticText(this, wxID_ANY, "Calibration started",
+    spinnerText = new wxStaticText(this, wxID_ANY, _L("Calibration started"),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxALIGN_CENTER);
 
@@ -354,7 +354,7 @@ void PressureAdvanceCalibrationDialog::refreshCalibSummary(double from,
         std::llround(std::ceil((to - from) / step)) + 1);
 
     calibSummaryText->SetLabel(
-        wxString::Format(wxT("%d line will be generated"), line_count));
+        wxString::Format(_L("%d lines will be generated"), line_count));
 }
 
 } // namespace Slic3r::GUI

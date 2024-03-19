@@ -117,6 +117,7 @@ src/slic3r/GUI/WifiConfigDialog.cpp
 src/slic3r/GUI/WipeTowerDialog.cpp
 src/slic3r/GUI/wxExtensions.cpp
 src/slic3r/GUI/NetworkMachineManager.cpp
+src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp
 src/slic3r/Utils/AppUpdater.cpp
 src/slic3r/Utils/AstroBox.cpp
 src/slic3r/Utils/Duet.cpp
