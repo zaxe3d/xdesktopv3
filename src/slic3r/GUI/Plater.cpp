@@ -1650,6 +1650,8 @@ void Sidebar::update_sliced_info_sizer()
     }
 
     Layout();
+    splitter_window()->GetWindow2()->Layout();
+    splitter_window()->GetWindow2()->Refresh();
 }
 
 void Sidebar::show_sliced_info_sizer(const bool show)
@@ -1661,7 +1663,8 @@ void Sidebar::show_sliced_info_sizer(const bool show)
         update_sliced_info_sizer();
 
     Layout();
-    p->scrolled->Refresh();
+    splitter_window()->GetWindow2()->Layout();
+    splitter_window()->GetWindow2()->Refresh();
 }
 
 void Sidebar::enable_buttons(bool enable)
@@ -6550,6 +6553,9 @@ bool Plater::load_files(const wxArrayString& filenames, bool delete_after_load/*
     }
     Plater::TakeSnapshot snapshot(this, snapshot_label);
     load_files(paths);
+
+    sidebar().splitter_window()->GetWindow2()->Layout();
+    sidebar().splitter_window()->GetWindow2()->Refresh();
 
     return true;
 }
