@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-20 10:06+0300\n"
+"POT-Creation-Date: 2024-03-20 10:57+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -10655,7 +10655,7 @@ msgstr ""
 msgid "Remove Selection"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:27 src/slic3r/GUI/Device.cpp:461
+#: src/slic3r/GUI/Device.cpp:27 src/slic3r/GUI/Device.cpp:466
 msgid "Nozzle: "
 msgstr ""
 
@@ -10671,7 +10671,7 @@ msgstr ""
 msgid "Device is in error state!"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:31 src/slic3r/GUI/Device.cpp:488
+#: src/slic3r/GUI/Device.cpp:31 src/slic3r/GUI/Device.cpp:493
 msgid "Elapsed / Estimated time: "
 msgstr ""
 
@@ -10715,63 +10715,63 @@ msgstr ""
 msgid "Calibrating..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:444
+#: src/slic3r/GUI/Device.cpp:449
 msgid "Material: - (Not installed)"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:445
+#: src/slic3r/GUI/Device.cpp:450
 msgid "Material: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:526
+#: src/slic3r/GUI/Device.cpp:531
 msgid "Device model does NOT match. Please reslice with the correct model."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:528
+#: src/slic3r/GUI/Device.cpp:533
 msgid "Wrong device model"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:533
+#: src/slic3r/GUI/Device.cpp:538
 msgid ""
 "Materials don't match with this device. Please reslice with the correct "
 "material."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:535
+#: src/slic3r/GUI/Device.cpp:540
 msgid "Wrong material type"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:540
+#: src/slic3r/GUI/Device.cpp:545
 msgid "Please put the filament through the material sensor first."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:541
+#: src/slic3r/GUI/Device.cpp:546
 msgid "Filament not present"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:547
+#: src/slic3r/GUI/Device.cpp:552
 msgid ""
 "Currently installed nozzle on device doesn't match with this slice. Please "
 "reslice with the correct nozzle."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:549
+#: src/slic3r/GUI/Device.cpp:554
 msgid "Wrong nozzle type"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:570
+#: src/slic3r/GUI/Device.cpp:575
 msgid "Are you sure?"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:570
+#: src/slic3r/GUI/Device.cpp:575
 msgid "XDesktop: Confirmation"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:571
+#: src/slic3r/GUI/Device.cpp:576
 msgid "Yes"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:571
+#: src/slic3r/GUI/Device.cpp:576
 msgid "No"
 msgstr ""
 
@@ -17499,7 +17499,11 @@ msgctxt "Mode"
 msgid "Advanced"
 msgstr ""
 
-#: src/slic3r/GUI/NetworkMachineManager.cpp:36
+#: src/slic3r/GUI/NetworkMachineManager.cpp:24
+msgid "Search Printer"
+msgstr ""
+
+#: src/slic3r/GUI/NetworkMachineManager.cpp:70
 msgid "Can not find a Zaxe on the network"
 msgstr ""
 

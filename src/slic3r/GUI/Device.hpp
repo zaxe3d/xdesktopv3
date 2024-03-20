@@ -61,6 +61,7 @@ public:
     NetworkMachine* nm; // network machine.
 
     void setName(const string &name);
+    wxString getName() const;
     void setMaterialLabel(const string &material_label);
     void setFilamentPresent(const bool present);
     void setNozzle(const string &nozzle);
