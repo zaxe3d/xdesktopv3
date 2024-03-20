@@ -2172,9 +2172,11 @@ void TabFilament::build()
         optgroup->append_single_option_line("filament_density");
         optgroup->append_single_option_line("filament_cost");
         optgroup->append_single_option_line("filament_spool_weight");
-        optgroup->append_single_option_line("enable_pressure_advance");
-        optgroup->append_single_option_line("pressure_advance");
         optgroup->append_single_option_line("chamber_temperature");
+        Line line = { "PA", "" };
+        line.append_option(optgroup->get_option("pressure_advance"));
+        line.append_option(optgroup->get_option("enable_pressure_advance"));
+        optgroup->append_line(line);
 
         optgroup->m_on_change = [this](t_config_option_key opt_key, boost::any value)
         {
@@ -2192,7 +2194,7 @@ void TabFilament::build()
 
         create_line_with_near_label_widget(optgroup, "idle_temperature");
 
-        Line line = { L("Nozzle"), "" };
+        line = { L("Nozzle"), "" };
         line.append_option(optgroup->get_option("first_layer_temperature"));
         line.append_option(optgroup->get_option("temperature"));
         optgroup->append_line(line);

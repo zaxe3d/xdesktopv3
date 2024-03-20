@@ -3747,7 +3747,10 @@ std::string GCodeGenerator::set_extruder(unsigned int extruder_id, double print_
         }
 
         if (m_config.enable_pressure_advance.getBool())
-            gcode += m_writer.set_pressure_advance(m_config.pressure_advance.getFloat());
+            gcode += m_writer.set_pressure_advance(
+                m_config.pressure_advance.getFloat());
+        else
+            gcode += m_writer.set_pressure_advance(0.f);
 
         gcode += m_writer.toolchange(extruder_id);
         return gcode;
@@ -3834,7 +3837,10 @@ std::string GCodeGenerator::set_extruder(unsigned int extruder_id, double print_
     this->m_last_pos_defined = false;
 
     if (m_config.enable_pressure_advance.getBool())
-            gcode += m_writer.set_pressure_advance(m_config.pressure_advance.getFloat());
+        gcode += m_writer.set_pressure_advance(
+            m_config.pressure_advance.getFloat());
+    else
+        gcode += m_writer.set_pressure_advance(0.f);
 
     return gcode;
 }
