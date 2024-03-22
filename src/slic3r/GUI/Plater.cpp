@@ -723,10 +723,13 @@ struct Sidebar::priv
     bool                is_collapsed {false};
     Search::OptionsSearcher     searcher;
 
+    double splitterWindowProportion{0.5f};
+
     priv(Plater *plater) : plater(plater) {}
     ~priv();
 
     void show_preset_comboboxes();
+    void setSplitterWindowProportions();
 
 #ifdef _WIN32
     wxString btn_reslice_tip;
@@ -758,6 +761,13 @@ void Sidebar::priv::show_preset_comboboxes()
 
     scrolled->GetParent()->Layout();
     scrolled->Refresh();
+}
+
+void Sidebar::priv::setSplitterWindowProportions()
+{
+    auto size         = splitter->GetSize().GetHeight();
+    int  sashPosition = static_cast<int>(splitterWindowProportion * size);
+    splitter->SetSashPosition(sashPosition);
 }
 
 #ifdef _WIN32
@@ -1046,20 +1056,20 @@ Sidebar::Sidebar(Plater *parent)
     bottom_sizer->Add(p->scrolled, 1, wxEXPAND);
     bottom_panel->SetSizer(bottom_sizer);
 
-    double      sash_gravity{0.5f};
-    std::string config_section{"machine_carousel"};
-    std::string sash_gravity_key{"sash_gravity"};
+    std::string sash_opt_key{"sidebar_sash_pos"};
     auto        app_cfg = get_app_config();
-    if (app_cfg->has(config_section, sash_gravity_key)) {
+    if (app_cfg->has(sash_opt_key)) {
+        auto oldLocale = std::setlocale(LC_NUMERIC, nullptr);
+        std::setlocale(LC_NUMERIC, "C");
         try {
-            sash_gravity = std::stod(
-                app_cfg->get(config_section, sash_gravity_key));
+            p->splitterWindowProportion = std::stod(
+                app_cfg->get(sash_opt_key));
         } catch (...) {
             BOOST_LOG_TRIVIAL(warning)
-                << "Cannot read " << config_section
-                << "::" << sash_gravity_key
+                << "Cannot read " << sash_opt_key
                 << " from config, default value will be used...";
         }
+        std::setlocale(LC_NUMERIC, oldLocale);
     }
 
     auto *sizer = new wxBoxSizer(wxVERTICAL);
@@ -1069,7 +1079,7 @@ Sidebar::Sidebar(Plater *parent)
 
     p->splitter->SplitHorizontally(top_panel, bottom_panel);
     p->splitter->SetMinimumPaneSize(20);
-    p->splitter->SetSashGravity(sash_gravity);
+    p->setSplitterWindowProportions();
 
     // Events
     p->btn_export_gcode->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { p->plater->export_gcode(false); });
@@ -1099,42 +1109,39 @@ Sidebar::Sidebar(Plater *parent)
 
     p->btn_send_gcode->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { p->plater->send_gcode(); });
 //    p->btn_eject_device->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { p->plater->eject_drive(); });
-	p->btn_export_gcode_removable->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { p->plater->export_gcode(true); });
+	p->btn_export_gcode_removable->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { p->plater->export_gcode(true); });   
+
+    p->splitter->Bind(wxEVT_SIZE, [&](auto &evt) {
+        p->setSplitterWindowProportions();
+        evt.Skip();
+    });
 
     p->splitter->Bind(wxEVT_SPLITTER_SASH_POS_CHANGING, [&](auto &evt) {
         p->sash_pos_editing = true;
         evt.Skip();
     });
 
-    p->splitter
-        ->Bind(wxEVT_SPLITTER_SASH_POS_CHANGED,
-               [&, _section = config_section,
-                _key = sash_gravity_key](auto &evt) {
-                   if (!p->sash_pos_editing) return;
-                   p->sash_pos_editing = false;
+    p->splitter->Bind(wxEVT_SPLITTER_SASH_POS_CHANGED,
+                      [&, _key = sash_opt_key](auto &evt) {
+                          if (!p->sash_pos_editing) return;
+                          p->sash_pos_editing = false;
 
-                   auto new_win1_height =
-                       p->splitter->GetWindow1()->GetSize().GetHeight();
-                   auto new_win2_height =
-                       p->splitter->GetWindow2()->GetSize().GetHeight();
-                   if (new_win1_height < p->splitter->GetMinimumPaneSize() ||
-                       new_win2_height < p->splitter->GetMinimumPaneSize())
-                       return;
+                          auto size = p->splitter->GetSize().GetHeight();
 
-                   double new_gravity = static_cast<double>(new_win1_height) /
-                                        static_cast<double>(new_win1_height +
-                                                            new_win2_height);
+                          int sashPosition = p->splitter->GetSashPosition();
 
-                   std::stringstream stream;
-                   stream << std::fixed << std::setprecision(2)
-                          << new_gravity;
-                   std::string gravity_str = stream.str();
-                   BOOST_LOG_TRIVIAL(info)
-                       << _section << "::" << _key << " " << gravity_str;
-                   get_app_config()->set(_section, _key, gravity_str);
-                   get_app_config()->save();
-                   evt.Skip();
-               });
+                          p->splitterWindowProportion = static_cast<double>(
+                                                            sashPosition) /
+                                                        size;
+
+                          std::stringstream stream;
+                          stream << std::fixed << std::setprecision(2)
+                                 << p->splitterWindowProportion;
+                          std::string sash_val_str = stream.str();
+                          get_app_config()->set(_key, sash_val_str);
+                          get_app_config()->save();
+                          evt.Skip();
+                      });
 }
 
 Sidebar::~Sidebar() {}
