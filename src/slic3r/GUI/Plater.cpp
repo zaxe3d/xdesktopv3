@@ -980,12 +980,12 @@ Sidebar::Sidebar(Plater *parent)
         wxGetApp().SetWindowVariantForButton((*btn));
 
 #ifdef _WIN32
-        (*btn)->Bind(wxEVT_ENTER_WINDOW, [tooltip, btn, &](wxMouseEvent& event) {
-            p->show_rich_tip(tooltip, *btn);
+        (*btn)->Bind(wxEVT_ENTER_WINDOW, [tooltip, btn, this](wxMouseEvent& event) {
+            this->p->show_rich_tip(tooltip, *btn);
             event.Skip();
         });
-        (*btn)->Bind(wxEVT_LEAVE_WINDOW, [btn, &](wxMouseEvent& event) {
-            p->hide_rich_tip(*btn);
+        (*btn)->Bind(wxEVT_LEAVE_WINDOW, [btn, this](wxMouseEvent& event) {
+            this->p->hide_rich_tip(*btn);
             event.Skip();
         });
 #else
@@ -1060,6 +1060,9 @@ Sidebar::Sidebar(Plater *parent)
     auto        app_cfg = get_app_config();
     if (app_cfg->has(sash_opt_key)) {
         auto oldLocale = std::setlocale(LC_NUMERIC, nullptr);
+#ifdef _WIN32
+        _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
+#endif
         std::setlocale(LC_NUMERIC, "C");
         try {
             p->splitterWindowProportion = std::stod(
