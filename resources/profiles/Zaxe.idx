@@ -1,5 +1,6 @@
-min_slic3r_version = 2.6.0-alpha4
+min_slic3r_version = 3.0.1
 1.1.3 Diamondback nozzle update.
+min_slic3r_version = 2.6.0-alpha4
 1.1.2 Flex filament profile and fan speed optimization.
 1.1.1 X3 and Z3 speed improvements.
 1.1.0 Material update.
