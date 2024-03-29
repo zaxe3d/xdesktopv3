@@ -506,13 +506,29 @@ wxMenu* MenuFactory::append_submenu_add_generic(wxMenu* menu, ModelVolumeType ty
                 [type, item](wxCommandEvent&) { obj_list()->load_generic_subobject(item, type); }, "", menu);
         }
 
-    append_menu_item_add_text(sub_menu, type);
-    append_menu_item_add_svg(sub_menu, type);
+        append_menu_item(
+            sub_menu, wxID_ANY, _L("Helper Disk"), "",
+            [](wxCommandEvent &) {
+                namespace fs = boost::filesystem;
+                fs::path path = fs::absolute(fs::path(sys_shapes_dir()));
+                path /= "helper_disk.stl";
+                wxArrayString as;
+                as.Add(path.string());
+                plater()->sidebar().obj_list()->load_shape_object_from_gallery(as);
+            },
+            "", menu);
 
-    if (mode >= comAdvanced) {
-        sub_menu->AppendSeparator();
-        append_menu_item(sub_menu, wxID_ANY, _L("Gallery"), "",
-            [type](wxCommandEvent&) { obj_list()->load_subobject(type, true); }, "", menu);
+        append_menu_item_add_text(sub_menu, type);
+        append_menu_item_add_svg(sub_menu, type);
+
+        if (mode >= comAdvanced) {
+            sub_menu->AppendSeparator();
+            append_menu_item(
+                sub_menu, wxID_ANY, _L("Gallery"), "",
+                [type](wxCommandEvent &) {
+                    obj_list()->load_subobject(type, true);
+                },
+                "", menu);
     }
 
     return sub_menu;
