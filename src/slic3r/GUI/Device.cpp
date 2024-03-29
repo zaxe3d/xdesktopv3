@@ -445,9 +445,14 @@ wxString Device::getName() const
 
 void Device::setMaterialLabel(const string &material_label)
 {
-    if (this->nm->attr->firmwareVersion.GetMajor() >= 3 && this->nm->attr->firmwareVersion.GetMinor() >= 5 && !nm->states->filamentPresent) {
+    if (this->nm->attr->firmwareVersion.GetMajor() >= 3 &&
+        this->nm->attr->firmwareVersion.GetMinor() >= 5 &&
+        !nm->states->filamentPresent) {
         m_txtDeviceMaterial->SetLabel(_L("Material: - (Not installed)"));
-    } else m_txtDeviceMaterial->SetLabel(_L("Material: ") + material_label);
+    } else {
+        m_txtDeviceMaterial->SetLabel(
+            _L("Material: ") + wxString(material_label.c_str(), wxConvUTF8));
+    }
     m_expansionSizer->Layout();
 }
 

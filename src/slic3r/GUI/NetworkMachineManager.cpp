@@ -28,8 +28,31 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
     m_searchSizer->Add(m_searchTextCtrl, 11, wxALL | wxALIGN_CENTRE, 5);
     m_searchSizer->AddStretchSpacer(1);
 
+    wxStaticText *noDeviceFoundText(
+        new wxStaticText(this, wxID_ANY,
+                         _L("Can not find a Zaxe on the network"),
+                         wxDefaultPosition, wxDefaultSize));
+    wxGetApp().UpdateDarkUI(noDeviceFoundText);
+    wxFont label_font = wxGetApp().normal_font();
+    label_font.SetPointSize(14);
+    noDeviceFoundText->SetFont(label_font);
+
+    wxBitmap        warningBitmap(Slic3r::resources_dir() +
+                                      "/icons/no-connection.png",
+                                  wxBITMAP_TYPE_PNG);
+    wxStaticBitmap *warningIcon = new wxStaticBitmap(this, wxID_ANY,
+                                                     warningBitmap,
+                                                     wxDefaultPosition,
+                                                     wxSize(35, 35));
+
+    m_warningSizer = new wxBoxSizer(wxHORIZONTAL);
+    m_warningSizer->Add(warningIcon, 0, wxALIGN_CENTER | wxALL, 5);
+    m_warningSizer->Add(noDeviceFoundText, 0, wxALIGN_CENTER | wxALL, 1);
+    m_warningSizer->Show(m_deviceMap.empty());
+
     m_mainSizer->Add(m_searchSizer, 0, wxEXPAND | wxALL, 5);
     m_mainSizer->Add(m_deviceListSizer, 1, wxEXPAND | wxALL, 5);
+    m_mainSizer->Add(m_warningSizer, 0, wxALIGN_CENTER);
 
     SetSizer(m_mainSizer);
 
@@ -64,30 +87,6 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
     auto ips = wxGetApp().app_config->get_custom_ips();
     for (int i = 0; i < ips.size(); i++)
         addMachine(ips[i], 9294, "Zaxe (m.)");
-
-    wxStaticText *noDeviceFoundText(
-        new wxStaticText(this, wxID_ANY,
-                         _L("Can not find a Zaxe on the network"),
-                         wxDefaultPosition, wxDefaultSize));
-    wxGetApp().UpdateDarkUI(noDeviceFoundText);
-    wxFont label_font = wxGetApp().normal_font();
-    label_font.SetPointSize(14);
-    noDeviceFoundText->SetFont(label_font);
-
-    wxBitmap        warningBitmap(Slic3r::resources_dir() +
-                                      "/icons/no-connection.png",
-                                  wxBITMAP_TYPE_PNG);
-    wxStaticBitmap *warningIcon = new wxStaticBitmap(this, wxID_ANY,
-                                                     warningBitmap,
-                                                     wxDefaultPosition,
-                                                     wxSize(35, 35));
-
-    m_warningSizer = new wxBoxSizer(wxHORIZONTAL);
-    m_warningSizer->Add(warningIcon, 0, wxALIGN_CENTER | wxALL, 5);
-    m_warningSizer->Add(noDeviceFoundText, 0, wxALIGN_CENTER | wxALL, 1);
-    m_warningSizer->Show(m_deviceMap.empty());
-
-    m_mainSizer->Add(m_warningSizer, 0, wxALIGN_CENTER);
 }
 
 void NetworkMachineManager::enablePrintNowButton(bool enable)
