@@ -288,7 +288,8 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
 
     updateStates();
 
-    m_mainSizer->Layout();
+    GetParent()->Layout();
+    GetParent()->FitInside();
 }
 
 void Device::avatarReady()
