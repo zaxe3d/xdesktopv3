@@ -37,8 +37,7 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
     label_font.SetPointSize(14);
     noDeviceFoundText->SetFont(label_font);
 
-    wxBitmap        warningBitmap(Slic3r::resources_dir() +
-                                      "/icons/no-connection.png",
+    wxBitmap        warningBitmap(Slic3r::var("no-connection.png"),
                                   wxBITMAP_TYPE_PNG);
     wxStaticBitmap *warningIcon = new wxStaticBitmap(this, wxID_ANY,
                                                      warningBitmap,
