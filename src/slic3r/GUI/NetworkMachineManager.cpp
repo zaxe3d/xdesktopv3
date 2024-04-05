@@ -28,10 +28,10 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
     m_searchSizer->Add(m_searchTextCtrl, 11, wxALL | wxALIGN_CENTRE, 5);
     m_searchSizer->AddStretchSpacer(1);
 
-    wxStaticText *noDeviceFoundText(
+    wxStaticText *noDeviceFoundText =
         new wxStaticText(this, wxID_ANY,
                          _L("Can not find a Zaxe on the network"),
-                         wxDefaultPosition, wxDefaultSize));
+                         wxDefaultPosition, wxDefaultSize);
     wxGetApp().UpdateDarkUI(noDeviceFoundText);
     wxFont label_font = wxGetApp().normal_font();
     label_font.SetPointSize(14);
@@ -133,7 +133,7 @@ void NetworkMachineManager::onMachineOpen(MachineEvent &event)
     m_deviceMap[event.nm->ip] = d;
     m_warningSizer->Show(m_deviceMap.empty());
     m_deviceListSizer->Add(d.get());
-    m_deviceListSizer->Layout();
+    m_mainSizer->Layout();
     FitInside();
     Refresh();
 }
@@ -145,7 +145,7 @@ void NetworkMachineManager::onMachineClose(MachineEvent &event)
     BOOST_LOG_TRIVIAL(info) << boost::format("NetworkMachineManager - Closing machine: [%1% - %2%].") % event.nm->name % event.nm->ip;
     this->m_networkMContainer->removeMachine(event.nm->ip);
     m_warningSizer->Show(m_deviceMap.empty());
-    m_deviceListSizer->Layout();
+    m_mainSizer->Layout();
     FitInside();
     Refresh();
 }

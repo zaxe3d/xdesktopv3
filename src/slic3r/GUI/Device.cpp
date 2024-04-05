@@ -246,7 +246,7 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
             SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT));
             m_expansionSizer->ShowItems(false);
         } else {
-            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 115 : 75)));
+            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT + getDeviceExtraHeight()));
             m_expansionSizer->ShowItems(true);
             if (!this->nm->states->printing) {
                 // hide m_txtFileName and duration and their bottom borders.
@@ -272,8 +272,8 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_expansionSizer->Add(m_txtFileTime, 0, wxBOTTOM);
     m_filamentSizer->Add(m_txtDeviceMaterial, 0, wxLEFT);
     m_filamentSizer->Add(m_btnUnload, 0, wxLEFT, 10);
-    m_filamentSizer->Add(m_btnPressureAdvanceCalibration, 0, wxLEFT, 10);
     m_expansionSizer->Add(m_filamentSizer, 0, wxTOP);
+    m_expansionSizer->Add(m_btnPressureAdvanceCalibration, 0, wxLEFT);
     m_expansionSizer->Add(m_txtDeviceNozzleDiameter, 0, wxBOTTOM);
     m_expansionSizer->Add(m_txtDeviceIP, 0, wxBOTTOM);
     m_expansionSizer->Add(m_txtFWVersion, 0, wxEXPAND | wxRIGHT, 25);
@@ -411,7 +411,7 @@ void Device::updateStates()
     }
 
     if (m_isExpanded) {
-        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT +  (this->nm->states->printing ? 115 : 75)));
+        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT + getDeviceExtraHeight()));
         m_expansionSizer->Layout();
         GetParent()->Layout();
         GetParent()->FitInside();
@@ -506,7 +506,9 @@ void Device::onTimer(wxTimerEvent& event)
 
 void Device::onModeChanged() {
     if(m_isExpanded) {
-        refreshCalibButton(); 
+        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT + getDeviceExtraHeight()));
+        refreshCalibButton();
+        m_expansionSizer->Layout();
         GetParent()->Layout();
         GetParent()->FitInside();
     }
@@ -517,6 +519,17 @@ void Device::refreshCalibButton()
     m_btnPressureAdvanceCalibration->Show(
         is_there(this->nm->attr->deviceModel, {"z"}) &&
         wxGetApp().get_mode() >= comAdvanced);
+}
+
+int Device::getDeviceExtraHeight() const
+{
+    int extra{0};
+
+    if (wxGetApp().get_mode() >= comAdvanced) { extra += 20; }
+
+    extra += nm->states->printing ? 115 : 75;
+
+    return extra;
 }
 
 bool Device::print()

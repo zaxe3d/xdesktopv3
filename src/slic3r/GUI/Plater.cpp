@@ -1097,6 +1097,9 @@ Sidebar::Sidebar(Plater *parent)
         else
              p->plater->reslice();
         p->plater->select_view_3D("Preview");
+
+        splitter_window()->GetWindow2()->Layout();
+        splitter_window()->GetWindow2()->Refresh();
     });
 
 #ifdef _WIN32
@@ -1466,6 +1469,8 @@ void Sidebar::show_info_sizer()
         (selection.is_single_full_object() && objects[obj_idx]->instances.size()> 1) ||
         !(selection.is_single_full_instance() || selection.is_single_volume())) {
         p->object_info->Show(false);
+        splitter_window()->GetWindow2()->Layout();
+        splitter_window()->GetWindow2()->Refresh();
         return;
     }
 
@@ -1518,6 +1523,9 @@ void Sidebar::show_info_sizer()
         for (auto item: p->object_info->sla_hidden_items)
             item->Show(false);
     }
+
+    splitter_window()->GetWindow2()->Layout();
+    splitter_window()->GetWindow2()->Refresh();
 }
 
 void Sidebar::update_sliced_info_sizer()
@@ -1733,8 +1741,9 @@ void Sidebar::update_mode()
 
     machine_manager()->onModeChanged();
 
-    refresh_splitter_window();
     Layout();
+    splitter_window()->GetWindow2()->Layout();
+    splitter_window()->GetWindow2()->Refresh();
 }
 
 bool Sidebar::is_collapsed() { return p->is_collapsed; }
@@ -6563,9 +6572,6 @@ bool Plater::load_files(const wxArrayString& filenames, bool delete_after_load/*
     }
     Plater::TakeSnapshot snapshot(this, snapshot_label);
     load_files(paths);
-
-    sidebar().splitter_window()->GetWindow2()->Layout();
-    sidebar().splitter_window()->GetWindow2()->Refresh();
 
     return true;
 }

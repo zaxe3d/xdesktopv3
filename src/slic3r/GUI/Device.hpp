@@ -129,6 +129,7 @@ private:
     void toggleDeviceNameWidgets();
 
     void refreshCalibButton();
+    int getDeviceExtraHeight() const;
 };
 } // namespace GUI
 } // namespace Slic3r
