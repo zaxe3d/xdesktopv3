@@ -1,4 +1,5 @@
 min_slic3r_version = 3.0.1
+1.2.2 Optimize print profiles.
 1.2.1 Print optimization, material update, and bug fixes.
 1.2.0 Diamondback and Nozzle X nozzles added and bug fixes.
 min_slic3r_version = 2.6.0-alpha4
