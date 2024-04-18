@@ -30,22 +30,25 @@ PressureAdvanceCalibrationDialog::PressureAdvanceCalibrationDialog(
     createInfoSection();
     createActionSection();
 
-    SetSizerAndFit(sizer);
-
     checkInputs();
     checkState();
+
+    SetSizer(sizer);
+    Layout();
+    Refresh();
+    Fit();
 }
 
 void PressureAdvanceCalibrationDialog::createInputSection()
 {
     auto fromKValueText = new wxStaticText(this, wxID_ANY, _L("From K Value"),
-                                           wxDefaultPosition, wxSize(-1, 18),
+                                           wxDefaultPosition, wxDefaultSize,
                                            wxTE_LEFT);
     auto toKValueText   = new wxStaticText(this, wxID_ANY, _L("To K Value"),
-                                           wxDefaultPosition, wxSize(-1, 18),
+                                           wxDefaultPosition, wxDefaultSize,
                                            wxTE_LEFT);
     auto stepValueText  = new wxStaticText(this, wxID_ANY, _L("Step Value"),
-                                           wxDefaultPosition, wxSize(-1, 18),
+                                           wxDefaultPosition, wxDefaultSize,
                                            wxTE_LEFT);
 
     int validatorPrecision{3};
@@ -55,15 +58,15 @@ void PressureAdvanceCalibrationDialog::createInputSection()
 
     fromKValueTextCtrl = new wxTextCtrl(this, wxID_ANY,
                                         wxString::Format(wxT("%.0f"), 0),
-                                        wxDefaultPosition, wxSize(-1, 20),
+                                        wxDefaultPosition, wxDefaultSize,
                                         wxTE_LEFT | wxBORDER, validator);
     toKValueTextCtrl   = new wxTextCtrl(this, wxID_ANY,
                                         wxString::Format(wxT("%.2f"), 0.05),
-                                        wxDefaultPosition, wxSize(-1, 20),
+                                        wxDefaultPosition, wxDefaultSize,
                                         wxTE_LEFT | wxBORDER, validator);
     stepValueTextCtrl  = new wxTextCtrl(this, wxID_ANY,
                                         wxString::Format(wxT("%.3f"), 0.005),
-                                        wxDefaultPosition, wxSize(-1, 20),
+                                        wxDefaultPosition, wxDefaultSize,
                                         wxTE_LEFT | wxBORDER, validator);
 
     auto createRuleIndicator =
@@ -107,20 +110,19 @@ void PressureAdvanceCalibrationDialog::createInputSection()
                                                   &calibSummaryText, "",
                                                   wxART_INFORMATION);
 
-    auto kValueSizer = new wxGridSizer(4, 3, 5, 5);
-    int  border{2};
-    kValueSizer->Add(fromKValueText, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(toKValueText, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(stepValueText, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(fromKValueTextCtrl, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(toKValueTextCtrl, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(stepValueTextCtrl, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(fromValueRuleSizer, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(toValueRuleSizer, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(stepValueRuleSizer, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(deviceAvailableRuleSizer, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(stepNullValueRuleSizer, 0, wxEXPAND | wxALL, border);
-    kValueSizer->Add(numberOfLinesSizer, 0, wxEXPAND | wxALL, border);
+    auto kValueSizer = new wxGridSizer(4, 3, 1, 10);
+    kValueSizer->Add(fromKValueText, 0, wxEXPAND);
+    kValueSizer->Add(toKValueText, 0, wxEXPAND);
+    kValueSizer->Add(stepValueText, 0, wxEXPAND);
+    kValueSizer->Add(fromKValueTextCtrl, 0, wxEXPAND);
+    kValueSizer->Add(toKValueTextCtrl, 0, wxEXPAND);
+    kValueSizer->Add(stepValueTextCtrl, 0, wxEXPAND);
+    kValueSizer->Add(fromValueRuleSizer, 0, wxEXPAND);
+    kValueSizer->Add(toValueRuleSizer, 0, wxEXPAND);
+    kValueSizer->Add(stepValueRuleSizer, 0, wxEXPAND);
+    kValueSizer->Add(deviceAvailableRuleSizer, 0, wxEXPAND);
+    kValueSizer->Add(stepNullValueRuleSizer, 0, wxEXPAND);
+    kValueSizer->Add(numberOfLinesSizer, 0, wxEXPAND);
 
     sizer->Add(kValueSizer, 0, wxEXPAND | wxALL, 15);
 
@@ -144,15 +146,17 @@ void PressureAdvanceCalibrationDialog::createInfoSection()
 {
     auto createWrappedText = [&](const wxString &text) {
         auto _bg    = wxColour(255, 246, 233);
+        auto _fg    = wxColour(0, 0, 0);
         auto _panel = new wxPanel(this);
         _panel->SetBackgroundColour(_bg);
 
         auto _widget = new wxStaticText(_panel, wxID_ANY, text,
                                         wxDefaultPosition, wxDefaultSize,
                                         wxALIGN_CENTER | wxTE_MULTILINE);
+        _widget->SetForegroundColour(_fg);
 
         auto _sizer = new wxBoxSizer(wxVERTICAL);
-        _sizer->Add(_widget, 0, wxEXPAND | wxALIGN_CENTER | wxALL, 10);
+        _sizer->Add(_widget, 1, wxEXPAND | wxALIGN_CENTER | wxALL, 10);
 
         _panel->SetSizerAndFit(_sizer);
         return _panel;
@@ -228,7 +232,7 @@ void PressureAdvanceCalibrationDialog::createActionSection()
 
         std::thread t([&]() {
             auto step_ms{200};
-            auto duration_ms{10'000};
+            auto duration_ms{180'000};
             auto step    = duration_ms / step_ms;
             auto _plater = wxGetApp().plater();
             bool ready{false};
@@ -317,7 +321,6 @@ void PressureAdvanceCalibrationDialog::checkInputs()
 
     Layout();
     Refresh();
-    FitInside();
 }
 
 void PressureAdvanceCalibrationDialog::checkState()
@@ -343,7 +346,6 @@ void PressureAdvanceCalibrationDialog::checkState()
 
     Layout();
     Refresh();
-    FitInside();
 }
 
 void PressureAdvanceCalibrationDialog::refreshCalibSummary(double from,

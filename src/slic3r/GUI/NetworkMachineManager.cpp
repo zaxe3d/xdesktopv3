@@ -127,11 +127,15 @@ void NetworkMachineManager::onMachineOpen(MachineEvent &event)
     // Now we can add this to UI.
     if (!event.nm || m_deviceMap.find(event.nm->ip) != m_deviceMap.end()) return;
     BOOST_LOG_TRIVIAL(info) << boost::format("NetworkMachineManager - Connected to machine: [%1% - %2%].") % event.nm->name % event.nm->ip;
+
+    Freeze();
     shared_ptr<Device> d = make_shared<Device>(event.nm, this);
     d->enablePrintNowButton(m_printNowButtonEnabled);
     m_deviceMap[event.nm->ip] = d;
     m_warningSizer->Show(m_deviceMap.empty());
     m_deviceListSizer->Add(d.get());
+    Thaw();
+
     m_mainSizer->Layout();
     FitInside();
     Refresh();
