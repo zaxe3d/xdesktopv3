@@ -317,7 +317,14 @@ void PressureAdvanceCalibrationDialog::checkInputs()
 
     startCalibrationButton->Enable(ready);
 
-    refreshCalibSummary(from, to, step);
+    if (ready) {
+        refreshCalibSummary(from, to, step);
+        calibSummaryIcon->Show();
+        calibSummaryText->Show();
+    } else {
+        calibSummaryIcon->Hide();
+        calibSummaryText->Hide();
+    }
 
     Layout();
     Refresh();
