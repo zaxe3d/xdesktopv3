@@ -2045,6 +2045,35 @@ bool GUI_App::switch_language()
     }
 }
 
+bool remove_dir(const wxString &path)
+{
+    wxDir dir(path);
+
+    if (!dir.IsOpened()) { return false; }
+
+    wxString filename;
+    bool     cont = dir.GetFirst(&filename, wxEmptyString,
+                                 wxDIR_FILES | wxDIR_DIRS);
+
+    while (cont) {
+        wxString fullPath = path + wxFileName::GetPathSeparator() + filename;
+
+        if (wxDir::Exists(fullPath)) {
+            if (!remove_dir(fullPath)) return false;
+        } else {
+            wxRemoveFile(fullPath);
+        }
+
+        cont = dir.GetNext(&filename);
+    }
+
+    dir.Close();
+
+    if (!wxRmdir(path)) return false;
+
+    return true;
+}
+
 #ifdef __linux__
 static const wxLanguageInfo* linux_get_existing_locale_language(const wxLanguageInfo* language,
                                                                 const wxLanguageInfo* system_language)
@@ -2458,6 +2487,9 @@ void GUI_App::add_config_menu(wxMenuBar *menu)
     }
     local_menu->Append(config_id_base + ConfigMenuWifiConfigFile, _L("Wi-Fi Configuration File"), _L("Generate a file to be loaded by a Prusa printer to configure its Wi-Fi connection."));
 
+    local_menu->AppendSeparator();
+    local_menu->Append(config_id_base + ConfigRemoveDataDir, _L("Reset to default configurations"));
+
     local_menu->Bind(wxEVT_MENU, [this, config_id_base](wxEvent &event) {
         switch (event.GetId() - config_id_base) {
         case ConfigMenuWizard:
@@ -2573,12 +2605,30 @@ void GUI_App::add_config_menu(wxMenuBar *menu)
             }
             */
         }
-        break;
+        case ConfigRemoveDataDir: {
+            {
+                wxString title = is_editor() ? wxString(SLIC3R_APP_NAME) :
+                                               wxString(GCODEVIEWER_APP_NAME);
+                title += " - " + _L("Reset to default configurations");
+                MessageDialog
+                    dialog(nullptr,
+                           _L("Resetting to default configurations will "
+                              "cause the application to exit.\n"
+                              "You will lose content of the plater.") +
+                               "\n\n" + _L("Do you want to proceed?"),
+                           title, wxICON_QUESTION | wxOK | wxCANCEL);
+                if (dialog.ShowModal() == wxID_CANCEL) return;
+            }
+
+            remove_dir(data_dir());
+            std::exit(EXIT_SUCCESS);
+            break;
+        } break;
         default:
             break;
         }
     });
-    
+
     using std::placeholders::_1;
 
     if (mode_menu != nullptr) {

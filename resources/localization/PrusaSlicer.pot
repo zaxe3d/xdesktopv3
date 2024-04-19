@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-05 11:11+0300\n"
+"POT-Creation-Date: 2024-04-19 10:41+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6631,12 +6631,12 @@ msgstr ""
 msgid "Default palette for mode markers"
 msgstr ""
 
-#: src/slic3r/GUI/ButtonsDescription.cpp:167 src/slic3r/GUI/GUI_App.cpp:2441
+#: src/slic3r/GUI/ButtonsDescription.cpp:167 src/slic3r/GUI/GUI_App.cpp:2470
 #: src/slic3r/GUI/wxExtensions.cpp:724
 msgid "Simple"
 msgstr ""
 
-#: src/slic3r/GUI/ButtonsDescription.cpp:167 src/slic3r/GUI/GUI_App.cpp:2444
+#: src/slic3r/GUI/ButtonsDescription.cpp:167 src/slic3r/GUI/GUI_App.cpp:2473
 #: src/slic3r/GUI/wxExtensions.cpp:724
 msgid "Expert"
 msgstr ""
@@ -6935,7 +6935,7 @@ msgstr ""
 #: src/slic3r/GUI/ConfigWizard.cpp:1277 src/slic3r/GUI/ConfigWizard.cpp:2748
 #: src/slic3r/GUI/ConfigWizard.cpp:2882 src/slic3r/GUI/DoubleSlider.cpp:2595
 #: src/slic3r/GUI/DoubleSlider.cpp:2616 src/slic3r/GUI/GUI.cpp:253
-#: src/slic3r/GUI/GUI_App.cpp:3496 src/slic3r/GUI/Plater.cpp:5808
+#: src/slic3r/GUI/GUI_App.cpp:3546 src/slic3r/GUI/Plater.cpp:5808
 #: src/slic3r/GUI/Plater.cpp:5886 src/slic3r/GUI/UpdateDialogs.cpp:209
 #: src/slic3r/GUI/UpdateDialogs.cpp:217 src/slic3r/GUI/UpdateDialogs.cpp:222
 #: src/slic3r/GUI/UpdateDialogs.cpp:227 src/slic3r/GUI/UpdateDialogs.cpp:234
@@ -7419,7 +7419,7 @@ msgid ""
 msgstr ""
 
 #: src/slic3r/GUI/DesktopIntegrationDialog.cpp:631
-#: src/slic3r/GUI/GUI_App.cpp:2426
+#: src/slic3r/GUI/GUI_App.cpp:2455
 msgid "Desktop Integration"
 msgstr ""
 
@@ -8579,7 +8579,7 @@ msgstr ""
 msgid "Move cut plane"
 msgstr ""
 
-#: src/slic3r/GUI/Gizmos/GLGizmoCut.cpp:522 src/slic3r/GUI/GUI_App.cpp:2449
+#: src/slic3r/GUI/Gizmos/GLGizmoCut.cpp:522 src/slic3r/GUI/GUI_App.cpp:2478
 msgid "Mode"
 msgstr ""
 
@@ -10655,7 +10655,7 @@ msgstr ""
 msgid "Remove Selection"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:27 src/slic3r/GUI/Device.cpp:471
+#: src/slic3r/GUI/Device.cpp:27 src/slic3r/GUI/Device.cpp:472
 msgid "Nozzle: "
 msgstr ""
 
@@ -10671,7 +10671,7 @@ msgstr ""
 msgid "Device is in error state!"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:31 src/slic3r/GUI/Device.cpp:498
+#: src/slic3r/GUI/Device.cpp:31 src/slic3r/GUI/Device.cpp:499
 msgid "Elapsed / Estimated time: "
 msgstr ""
 
@@ -10691,87 +10691,87 @@ msgstr ""
 msgid "Print Now!"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:304
+#: src/slic3r/GUI/Device.cpp:305
 msgid "Bed is occupied..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:306
+#: src/slic3r/GUI/Device.cpp:307
 msgid "Heating..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:309
+#: src/slic3r/GUI/Device.cpp:310
 msgid "Paused..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:312
+#: src/slic3r/GUI/Device.cpp:313
 msgid "Printing..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:317
+#: src/slic3r/GUI/Device.cpp:318
 msgid "Uploading..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:320
+#: src/slic3r/GUI/Device.cpp:321
 msgid "Calibrating..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:451
+#: src/slic3r/GUI/Device.cpp:452
 msgid "Material: - (Not installed)"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:454
+#: src/slic3r/GUI/Device.cpp:455
 msgid "Material: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:549
+#: src/slic3r/GUI/Device.cpp:550
 msgid "Device model does NOT match. Please reslice with the correct model."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:551
+#: src/slic3r/GUI/Device.cpp:552
 msgid "Wrong device model"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:556
+#: src/slic3r/GUI/Device.cpp:557
 msgid ""
 "Materials don't match with this device. Please reslice with the correct "
 "material."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:558
+#: src/slic3r/GUI/Device.cpp:559
 msgid "Wrong material type"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:563
+#: src/slic3r/GUI/Device.cpp:564
 msgid "Please put the filament through the material sensor first."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:564
+#: src/slic3r/GUI/Device.cpp:565
 msgid "Filament not present"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:570
+#: src/slic3r/GUI/Device.cpp:571
 msgid ""
 "Currently installed nozzle on device doesn't match with this slice. Please "
 "reslice with the correct nozzle."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:572
+#: src/slic3r/GUI/Device.cpp:573
 msgid "Wrong nozzle type"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:593
+#: src/slic3r/GUI/Device.cpp:594
 msgid "Are you sure?"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:593
+#: src/slic3r/GUI/Device.cpp:594
 msgid "XDesktop: Confirmation"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:594
+#: src/slic3r/GUI/Device.cpp:595
 msgid "Yes"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:594
+#: src/slic3r/GUI/Device.cpp:595
 msgid "No"
 msgstr ""
 
@@ -10957,7 +10957,7 @@ msgid ""
 "Do you want to continue?"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:1153 src/slic3r/GUI/GUI_App.cpp:3332
+#: src/slic3r/GUI/GUI_App.cpp:1153 src/slic3r/GUI/GUI_App.cpp:3382
 #: src/slic3r/GUI/Plater.cpp:1964 src/slic3r/GUI/UnsavedChangesDialog.cpp:920
 msgid "Remember my choice"
 msgstr ""
@@ -11065,224 +11065,234 @@ msgstr ""
 msgid "Changing of an application language"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2185
+#: src/slic3r/GUI/GUI_App.cpp:2214
 msgid "Select the language"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2185
+#: src/slic3r/GUI/GUI_App.cpp:2214
 msgid "Language"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2342
+#: src/slic3r/GUI/GUI_App.cpp:2371
 msgid "modified"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2381
+#: src/slic3r/GUI/GUI_App.cpp:2410
 msgid ""
 "Simple mode supports manipulation with single-part object(s)\n"
 "or object(s) with support modifiers only."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2383
+#: src/slic3r/GUI/GUI_App.cpp:2412
 msgid "Please check your object list before mode changing."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2384
+#: src/slic3r/GUI/GUI_App.cpp:2413
 msgid "Change application mode"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2415
+#: src/slic3r/GUI/GUI_App.cpp:2444
 #, possible-c-format, possible-boost-format
 msgid "Run %s"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2419
+#: src/slic3r/GUI/GUI_App.cpp:2448
 msgid "Custom &IP Configuration"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2419
+#: src/slic3r/GUI/GUI_App.cpp:2448
 msgid "Add / Remove manual devices by IP to machine carousel"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2420
+#: src/slic3r/GUI/GUI_App.cpp:2449
 msgid "&Configuration Snapshots"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2420
+#: src/slic3r/GUI/GUI_App.cpp:2449
 msgid "Inspect / activate configuration snapshots"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2421
+#: src/slic3r/GUI/GUI_App.cpp:2450
 msgid "Take Configuration &Snapshot"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2421
+#: src/slic3r/GUI/GUI_App.cpp:2450
 msgid "Capture a configuration snapshot"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2422
+#: src/slic3r/GUI/GUI_App.cpp:2451
 msgid "Check for Configuration Updates"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2422
+#: src/slic3r/GUI/GUI_App.cpp:2451
 msgid "Check for configuration updates"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2423
+#: src/slic3r/GUI/GUI_App.cpp:2452
 msgid "Check for Application Updates"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2423
+#: src/slic3r/GUI/GUI_App.cpp:2452
 msgid "Check for new version of application"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2430
+#: src/slic3r/GUI/GUI_App.cpp:2459
 msgid "&Preferences"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2436
+#: src/slic3r/GUI/GUI_App.cpp:2465
 msgid "Application preferences"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2441
+#: src/slic3r/GUI/GUI_App.cpp:2470
 msgid "Simple View Mode"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2443
+#: src/slic3r/GUI/GUI_App.cpp:2472
 msgid "Advanced View Mode"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2444
+#: src/slic3r/GUI/GUI_App.cpp:2473
 msgid "Expert View Mode"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2449
+#: src/slic3r/GUI/GUI_App.cpp:2478
 #, possible-c-format, possible-boost-format
 msgid "%s View Mode"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2452
+#: src/slic3r/GUI/GUI_App.cpp:2481
 msgid "&Language"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2455
+#: src/slic3r/GUI/GUI_App.cpp:2484
 msgid "Flash Printer &Firmware"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2455
+#: src/slic3r/GUI/GUI_App.cpp:2484
 msgid "Upload a firmware image into an Arduino based printer"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2459
+#: src/slic3r/GUI/GUI_App.cpp:2488
 msgid "Wi-Fi Configuration File"
 msgstr ""
 
 #. TRN Wifi config dialog explanation line 1.
-#: src/slic3r/GUI/GUI_App.cpp:2459 src/slic3r/GUI/WifiConfigDialog.cpp:37
+#: src/slic3r/GUI/GUI_App.cpp:2488 src/slic3r/GUI/WifiConfigDialog.cpp:37
 msgid ""
 "Generate a file to be loaded by a Prusa printer to configure its Wi-Fi "
 "connection."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2479
+#: src/slic3r/GUI/GUI_App.cpp:2491 src/slic3r/GUI/GUI_App.cpp:2612
+msgid "Reset to default configurations"
+msgstr ""
+
+#: src/slic3r/GUI/GUI_App.cpp:2511
 msgid "Taking a configuration snapshot"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2480
+#: src/slic3r/GUI/GUI_App.cpp:2512
 msgid ""
 "Some presets are modified and the unsaved changes will not be captured by "
 "the configuration snapshot."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2481
+#: src/slic3r/GUI/GUI_App.cpp:2513
 msgid "Snapshot name"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2497
+#: src/slic3r/GUI/GUI_App.cpp:2529
 msgid "Loading a configuration snapshot"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2506
+#: src/slic3r/GUI/GUI_App.cpp:2538
 #, possible-boost-format
 msgid "Continue to activate a configuration snapshot %1%?"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2520
+#: src/slic3r/GUI/GUI_App.cpp:2552
 msgid "Failed to activate configuration snapshot."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2546
+#: src/slic3r/GUI/GUI_App.cpp:2578
 msgid "Language selection"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2549
+#: src/slic3r/GUI/GUI_App.cpp:2581
 msgid ""
 "Switching the language will trigger application restart.\n"
 "You will lose content of the plater."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2551 src/slic3r/GUI/Preferences.cpp:776
-#: src/slic3r/GUI/Selection.cpp:1489
+#: src/slic3r/GUI/GUI_App.cpp:2583 src/slic3r/GUI/GUI_App.cpp:2618
+#: src/slic3r/GUI/Preferences.cpp:776 src/slic3r/GUI/Selection.cpp:1489
 msgid "Do you want to proceed?"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2591
+#: src/slic3r/GUI/GUI_App.cpp:2615
+msgid ""
+"Resetting to default configurations will cause the application to exit.\n"
+"You will lose content of the plater."
+msgstr ""
+
+#: src/slic3r/GUI/GUI_App.cpp:2641
 msgid "&Configuration"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2599
+#: src/slic3r/GUI/GUI_App.cpp:2649
 msgid "Restart application"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2767
+#: src/slic3r/GUI/GUI_App.cpp:2817
 msgid "For new project all modifications will be reseted"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2805
+#: src/slic3r/GUI/GUI_App.cpp:2855
 msgid "Loading a new project while the current project is modified."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2808
+#: src/slic3r/GUI/GUI_App.cpp:2858
 msgid "Project is loading"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2808
+#: src/slic3r/GUI/GUI_App.cpp:2858
 msgid "Opening new project while some presets are unsaved."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2827
+#: src/slic3r/GUI/GUI_App.cpp:2877
 msgid "The uploads are still ongoing"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2827
+#: src/slic3r/GUI/GUI_App.cpp:2877
 msgid "Stop them and continue anyway?"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:2831
+#: src/slic3r/GUI/GUI_App.cpp:2881
 msgid "Ongoing uploads"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3071
+#: src/slic3r/GUI/GUI_App.cpp:3121
 msgid ""
 "It's impossible to print object(s) which contains parameter modifiers with "
 "SLA technology."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3072 src/slic3r/GUI/Jobs/SLAImportJob.cpp:153
+#: src/slic3r/GUI/GUI_App.cpp:3122 src/slic3r/GUI/Jobs/SLAImportJob.cpp:153
 #: src/slic3r/GUI/Plater.cpp:2755
 msgid "Please check your object list before preset changing."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3106
+#: src/slic3r/GUI/GUI_App.cpp:3156
 msgid "Configuration is editing from ConfigWizard"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3124
+#: src/slic3r/GUI/GUI_App.cpp:3174
 #, possible-boost-format
 msgid "Welcome to %1% version %2%."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3126
+#: src/slic3r/GUI/GUI_App.cpp:3176
 #, possible-boost-format
 msgid ""
 "Do you wish to register downloads from <b>Printables.com</b>\n"
@@ -11291,79 +11301,79 @@ msgid ""
 "Downloads can be registered for only 1 executable at time."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3154
+#: src/slic3r/GUI/GUI_App.cpp:3204
 msgid "Select a gcode file:"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3331 src/slic3r/GUI/GUI_App.cpp:3354
+#: src/slic3r/GUI/GUI_App.cpp:3381 src/slic3r/GUI/GUI_App.cpp:3404
 msgid "Open hyperlink in default browser?"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3331 src/slic3r/GUI/GUI_App.cpp:3354
+#: src/slic3r/GUI/GUI_App.cpp:3381 src/slic3r/GUI/GUI_App.cpp:3404
 msgid "XDesktop: Open hyperlink"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3336 src/slic3r/GUI/Preferences.cpp:638
+#: src/slic3r/GUI/GUI_App.cpp:3386 src/slic3r/GUI/Preferences.cpp:638
 msgid "Suppress to open hyperlink in browser"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3338 src/slic3r/GUI/Plater.cpp:1970
+#: src/slic3r/GUI/GUI_App.cpp:3388 src/slic3r/GUI/Plater.cpp:1970
 msgid "XDesktop will remember your choice."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3339
+#: src/slic3r/GUI/GUI_App.cpp:3389
 msgid "You will not be asked about it again on hyperlinks hovering."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3340 src/slic3r/GUI/Plater.cpp:1974
+#: src/slic3r/GUI/GUI_App.cpp:3390 src/slic3r/GUI/Plater.cpp:1974
 #, possible-boost-format
 msgid ""
 "Visit \"Preferences\" and check \"%1%\"\n"
 "to changes your choice."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3342 src/slic3r/GUI/Plater.cpp:1976
+#: src/slic3r/GUI/GUI_App.cpp:3392 src/slic3r/GUI/Plater.cpp:1976
 #: src/slic3r/GUI/UnsavedChangesDialog.cpp:937
 msgid "XDesktop: Don't ask me again"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3421
+#: src/slic3r/GUI/GUI_App.cpp:3471
 msgid "Check for application update has failed."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3422
+#: src/slic3r/GUI/GUI_App.cpp:3472
 #, possible-boost-format
 msgid "You are currently running the latest released version %1%."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3425
+#: src/slic3r/GUI/GUI_App.cpp:3475
 #, possible-boost-format
 msgid ""
 "There are no new released versions online. The latest release version is %1%."
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3486
+#: src/slic3r/GUI/GUI_App.cpp:3536
 #, possible-boost-format
 msgid "Downloading %1%"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3496
+#: src/slic3r/GUI/GUI_App.cpp:3546
 msgid "Downloading of the new version is in progress. Do you want to continue?"
 msgstr ""
 
-#: src/slic3r/GUI/GUI_App.cpp:3514
+#: src/slic3r/GUI/GUI_App.cpp:3564
 msgid ""
 "Could not start URL download. Destination folder is not set. Please choose "
 "destination folder in Configuration Wizard."
 msgstr ""
 
 #. TRN Text of notification when Slicer starts and usb stick with printer settings ini file is present
-#: src/slic3r/GUI/GUI_App.cpp:3536 src/slic3r/GUI/Plater.cpp:2468
+#: src/slic3r/GUI/GUI_App.cpp:3586 src/slic3r/GUI/Plater.cpp:2468
 msgid "Printer configuration file detected on removable media."
 msgstr ""
 
 #. TRN Text of hypertext of notification when Slicer starts and usb stick with printer settings ini file is present
-#: src/slic3r/GUI/GUI_App.cpp:3538 src/slic3r/GUI/Plater.cpp:2470
+#: src/slic3r/GUI/GUI_App.cpp:3588 src/slic3r/GUI/Plater.cpp:2470
 msgid "Write Wi-Fi credentials."
 msgstr ""
 
@@ -17503,11 +17513,11 @@ msgctxt "Mode"
 msgid "Advanced"
 msgstr ""
 
-#: src/slic3r/GUI/NetworkMachineManager.cpp:24
+#: src/slic3r/GUI/NetworkMachineManager.cpp:26
 msgid "Search Printer"
 msgstr ""
 
-#: src/slic3r/GUI/NetworkMachineManager.cpp:33
+#: src/slic3r/GUI/NetworkMachineManager.cpp:35
 msgid "Can not find a Zaxe on the network"
 msgstr ""
 
@@ -17516,42 +17526,42 @@ msgstr ""
 msgid "Pressure Advance Calibration - %s"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:41
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:44
 msgid "From K Value"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:44
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:47
 msgid "To K Value"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:47
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:50
 msgid "Step Value"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:84
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:87
 #, possible-c-format, possible-boost-format
 msgid "Start value >= %.3f"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:89
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:92
 #, possible-c-format, possible-boost-format
 msgid "End value <= %.3f"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:94
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:97
 msgid "Start + Step <= End"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:99
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:102
 msgid "Printer must be available"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:103
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:106
 #, possible-c-format, possible-boost-format
 msgid "Step >= %.3f"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:162
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:166
 msgid ""
 "After calibration print is done, determine the best matching K-Factor.\n"
 "Click 'Go to Settings' button and modify 'Filament Settings -> Pressure "
@@ -17559,27 +17569,27 @@ msgid ""
 "K-Factor and do not forget to enable pressure advance."
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:175
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:179
 msgid "Calibration started"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:184
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:188
 msgid "Go to Settings"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:190
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:194
 msgid "Start Calibration"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:247
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:251
 msgid "Calibration is cancelled due to timeout!"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:248
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:252
 msgid "Slicing timeout"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:357
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:366
 #, possible-c-format, possible-boost-format
 msgid "%d lines will be generated"
 msgstr ""
