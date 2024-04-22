@@ -24,6 +24,8 @@ PressureAdvanceCalibrationDialog::PressureAdvanceCalibrationDialog(
                wxDefaultSize,
                wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 {
+    wxGetApp().UpdateDarkUI(this);
+
     sizer = new wxBoxSizer(wxVERTICAL);
 
     createInputSection();
@@ -110,6 +112,23 @@ void PressureAdvanceCalibrationDialog::createInputSection()
                                                   &calibSummaryText, "",
                                                   wxART_INFORMATION);
 
+    wxGetApp().UpdateDarkUI(fromKValueText);
+    wxGetApp().UpdateDarkUI(toKValueText);
+    wxGetApp().UpdateDarkUI(stepValueText);
+    wxGetApp().UpdateDarkUI(fromKValueTextCtrl);
+    wxGetApp().UpdateDarkUI(toKValueTextCtrl);
+    wxGetApp().UpdateDarkUI(stepValueTextCtrl);
+    wxGetApp().UpdateDarkUI(fromValueRuleIcon);
+    wxGetApp().UpdateDarkUI(fromValueRuleText);
+    wxGetApp().UpdateDarkUI(toValueRuleIcon);
+    wxGetApp().UpdateDarkUI(toValueRuleText);
+    wxGetApp().UpdateDarkUI(deviceAvailableRuleIcon);
+    wxGetApp().UpdateDarkUI(deviceAvailableRuleText);
+    wxGetApp().UpdateDarkUI(stepNullValueRuleIcon);
+    wxGetApp().UpdateDarkUI(stepNullValueRuleText);
+    wxGetApp().UpdateDarkUI(calibSummaryIcon);
+    wxGetApp().UpdateDarkUI(calibSummaryText);
+
     auto kValueSizer = new wxGridSizer(4, 3, 1, 10);
     kValueSizer->Add(fromKValueText, 0, wxEXPAND);
     kValueSizer->Add(toKValueText, 0, wxEXPAND);
@@ -194,6 +213,11 @@ void PressureAdvanceCalibrationDialog::createActionSection()
                                           _L("Start Calibration"),
                                           wxDefaultPosition, wxDefaultSize,
                                           wxCENTER | wxCentreY);
+
+    wxGetApp().UpdateDarkUI(spinner);
+    wxGetApp().UpdateDarkUI(spinnerText);
+    wxGetApp().UpdateDarkUI(redirectToFilamentSettingsButton);
+    wxGetApp().UpdateDarkUI(startCalibrationButton);
 
     auto buttonSizer = new wxBoxSizer(wxHORIZONTAL);
     buttonSizer->Add(spinner, 0, wxALIGN_LEFT | wxALL, 5);
