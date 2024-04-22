@@ -2620,7 +2620,7 @@ void GUI_App::add_config_menu(wxMenuBar *menu)
                 if (dialog.ShowModal() == wxID_CANCEL) return;
             }
 
-            remove_dir(data_dir());
+            remove_dir(wxStandardPaths::Get().GetUserDataDir());
             std::exit(EXIT_SUCCESS);
             break;
         } break;
