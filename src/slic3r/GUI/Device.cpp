@@ -579,9 +579,10 @@ bool Device::print()
                     translate_chars(
                         wxGetApp().plater()->get_filename().ToStdString())
                         .c_str());
-            } else
+            } else {
                 this->nm->upload(
                     wxGetApp().plater()->get_zaxe_code_path().c_str());
+            }
         });
         t.detach(); // crusial. otherwise blocks main thread.
         return true;

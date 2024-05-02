@@ -37,6 +37,7 @@ private:
     wxStaticText        *spinnerText;
 
     bool isCalibStarted{false};
+    bool isBusy{false};
 
     void createInputSection();
     void createInfoSection();

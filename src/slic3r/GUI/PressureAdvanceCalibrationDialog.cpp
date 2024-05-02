@@ -339,7 +339,7 @@ void PressureAdvanceCalibrationDialog::checkInputs()
                       [&]() { return step >= MIN_PA_K_VALUE_STEP * 0.9; }) &&
             ready;
 
-    startCalibrationButton->Enable(ready);
+    if (!isCalibStarted && !isBusy) { startCalibrationButton->Enable(ready); }
 
     if (ready) {
         refreshCalibSummary(from, to, step);
@@ -359,13 +359,16 @@ void PressureAdvanceCalibrationDialog::checkState()
     auto device = dynamic_cast<Device *>(GetParent());
     if (!device) { return; }
 
-    bool isBusy = device->nm->isBusy() || device->nm->states->bedOccupied ||
+    isBusy = device->nm->isBusy() || device->nm->states->bedOccupied ||
                   device->nm->states->hasError ||
                   device->nm->states->updating;
-
+    
+    /* commented out because of the error: IMKClient Stall detected, *please Report* your user scenario attaching a spindump (or sysdiagnose) that captures the problem - (invocationInterruptXPCReply) block performed very slowly (5.00 secs).
     fromKValueTextCtrl->Enable(!isBusy);
     toKValueTextCtrl->Enable(!isBusy);
     stepValueTextCtrl->Enable(!isBusy);
+    */
+
     startCalibrationButton->Enable(!isBusy);
     spinner->Show(isBusy && isCalibStarted);
     spinnerText->Show(isBusy && isCalibStarted);
