@@ -1,4 +1,5 @@
 min_slic3r_version = 3.0.1
+1.2.5 Support material coontact distance update.
 1.2.4 Overhang speed and ABS material update.
 1.2.3 Bug fixes.
 1.2.2 Optimize print profiles.

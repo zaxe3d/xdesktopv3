@@ -273,9 +273,9 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_filamentSizer->Add(m_txtDeviceMaterial, 0, wxLEFT);
     m_filamentSizer->Add(m_btnUnload, 0, wxLEFT, 10);
     m_expansionSizer->Add(m_filamentSizer, 0, wxTOP);
-    m_expansionSizer->Add(m_btnPressureAdvanceCalibration, 0, wxLEFT);
     m_expansionSizer->Add(m_txtDeviceNozzleDiameter, 0, wxBOTTOM);
     m_expansionSizer->Add(m_txtDeviceIP, 0, wxBOTTOM);
+    m_expansionSizer->Add(m_btnPressureAdvanceCalibration, 0, wxLEFT);
     m_expansionSizer->Add(m_txtFWVersion, 0, wxEXPAND | wxRIGHT, 25);
     m_expansionSizer->ShowItems(false);
     m_mainSizer->Add(m_expansionSizer, 0, wxEXPAND | wxLEFT, m_avatar->GetSize().GetWidth() + 14); // only expand horizontally in vertical sizer.
