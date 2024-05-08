@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 10:41+0300\n"
+"POT-Creation-Date: 2024-05-08 17:08+0300\n"
 "PO-Revision-Date: 2024-01-12 12:12+0300\n"
 "Last-Translator: Mehmet Sutas <msutas@gmail.com>\n"
 "Language-Team: \n"
@@ -11682,17 +11682,17 @@ msgstr "Materyal: - (Yüklü değil)"
 msgid "Material: "
 msgstr "Materyal: "
 
-#: src/slic3r/GUI/Device.cpp:550
+#: src/slic3r/GUI/Device.cpp:551
 msgid "Device model does NOT match. Please reslice with the correct model."
 msgstr ""
 "Cihaz modeli eşleşmiyor. Lütfen doğru cihaz modelini seçip tekrar "
 "dilimleyiniz."
 
-#: src/slic3r/GUI/Device.cpp:552
+#: src/slic3r/GUI/Device.cpp:553
 msgid "Wrong device model"
 msgstr "Hatalı cihaz modeli"
 
-#: src/slic3r/GUI/Device.cpp:557
+#: src/slic3r/GUI/Device.cpp:558
 msgid ""
 "Materials don't match with this device. Please reslice with the correct "
 "material."
@@ -11700,19 +11700,15 @@ msgstr ""
 "Cihazdaki materyal ile baskıda ki materyal uyuşmuyor. Lütfen cihazdaki "
 "materyal ile tekrar dilimleyiniz."
 
-#: src/slic3r/GUI/Device.cpp:559
+#: src/slic3r/GUI/Device.cpp:560
 msgid "Wrong material type"
 msgstr "Yanlış materyal"
 
 #: src/slic3r/GUI/Device.cpp:564
-msgid "Please put the filament through the material sensor first."
-msgstr "Lütfen önce filamenti, filament sensörünün içinden geçiriniz."
+msgid "No filament sensed. Do you really want to continue printing?"
+msgstr "Filament algılanamadı. Yine de baskıya devam etmek ister misiniz?"
 
-#: src/slic3r/GUI/Device.cpp:565
-msgid "Filament not present"
-msgstr "Filament takılı değil"
-
-#: src/slic3r/GUI/Device.cpp:571
+#: src/slic3r/GUI/Device.cpp:570
 msgid ""
 "Currently installed nozzle on device doesn't match with this slice. Please "
 "reslice with the correct nozzle."
@@ -11720,23 +11716,19 @@ msgstr ""
 "Cihazdaki nozül ile baskıda ki nozül uyuşmuyor. Lütfen cihazdaki nozül ile "
 "tekrar dilimleyiniz."
 
-#: src/slic3r/GUI/Device.cpp:573
+#: src/slic3r/GUI/Device.cpp:572
 msgid "Wrong nozzle type"
 msgstr "Yanlış nozül tipi"
 
-#: src/slic3r/GUI/Device.cpp:594
-msgid "Are you sure?"
-msgstr "Emin misiniz?"
-
-#: src/slic3r/GUI/Device.cpp:594
+#: src/slic3r/GUI/Device.cpp:593
 msgid "XDesktop: Confirmation"
 msgstr "XDesktop: Konfirmasyon"
 
-#: src/slic3r/GUI/Device.cpp:595
+#: src/slic3r/GUI/Device.cpp:594
 msgid "Yes"
 msgstr "Evet"
 
-#: src/slic3r/GUI/Device.cpp:595
+#: src/slic3r/GUI/Device.cpp:594
 msgid "No"
 msgstr "Hayır"
 
@@ -12247,7 +12239,8 @@ msgid ""
 "Resetting to default configurations will cause the application to exit.\n"
 "You will lose content of the plater."
 msgstr ""
-"Varsayılan yapılandırmalara sıfırlama, uygulamanın kapanmasına neden olacaktır.\n"
+"Varsayılan yapılandırmalara sıfırlama, uygulamanın kapanmasına neden "
+"olacaktır.\n"
 "Tabla içeriğini kaybedeceksiniz."
 
 #: src/slic3r/GUI/GUI_App.cpp:2641
@@ -18927,42 +18920,42 @@ msgstr "Ağa bağlı bir Zaxe bulunamadı"
 msgid "Pressure Advance Calibration - %s"
 msgstr "Filament Basın Ayarı Kalibrasyonu - %s"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:44
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:46
 msgid "From K Value"
 msgstr "Başlangıç K değeri"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:47
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:49
 msgid "To K Value"
 msgstr "Bitiş K değeri"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:50
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:52
 msgid "Step Value"
 msgstr "Adım"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:87
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:89
 #, c-format, boost-format
 msgid "Start value >= %.3f"
 msgstr "Başlangıç K değeri >= %.3f"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:92
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:94
 #, c-format, boost-format
 msgid "End value <= %.3f"
 msgstr "Bitiş K değeri <= %.3f"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:97
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:99
 msgid "Start + Step <= End"
 msgstr "Başlangıç + Adım <= Bitiş"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:102
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:104
 msgid "Printer must be available"
 msgstr "Yazıcı müsait olmalıdır"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:106
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:108
 #, c-format, boost-format
 msgid "Step >= %.3f"
 msgstr "Adım >= %.3f"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:166
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:185
 msgid ""
 "After calibration print is done, determine the best matching K-Factor.\n"
 "Click 'Go to Settings' button and modify 'Filament Settings -> Pressure "
@@ -18975,27 +18968,27 @@ msgstr ""
 "K-Faktörü ile güncelleyin ve Filament Basınç Ayarını etkinleştirmeyi "
 "unutmayın."
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:179
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:198
 msgid "Calibration started"
 msgstr "Kalibrasyon başladı"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:188
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:207
 msgid "Go to Settings"
 msgstr "Ayarlar'a git"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:194
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:213
 msgid "Start Calibration"
 msgstr "Kalibrasyonu Başlat"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:251
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:275
 msgid "Calibration is cancelled due to timeout!"
 msgstr "Kalibrasyon zaman aşımı nedeniyle iptal edildi!"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:252
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:276
 msgid "Slicing timeout"
 msgstr "Dilimleme zaman aşımı"
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:366
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:393
 #, c-format, boost-format
 msgid "%d lines will be generated"
 msgstr "%d çizgi oluşturulacaktır"

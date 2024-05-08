@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 10:41+0300\n"
+"POT-Creation-Date: 2024-05-08 17:08+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -10723,55 +10723,47 @@ msgstr ""
 msgid "Material: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:550
+#: src/slic3r/GUI/Device.cpp:551
 msgid "Device model does NOT match. Please reslice with the correct model."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:552
+#: src/slic3r/GUI/Device.cpp:553
 msgid "Wrong device model"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:557
+#: src/slic3r/GUI/Device.cpp:558
 msgid ""
 "Materials don't match with this device. Please reslice with the correct "
 "material."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:559
+#: src/slic3r/GUI/Device.cpp:560
 msgid "Wrong material type"
 msgstr ""
 
 #: src/slic3r/GUI/Device.cpp:564
-msgid "Please put the filament through the material sensor first."
+msgid "No filament sensed. Do you really want to continue printing?"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:565
-msgid "Filament not present"
-msgstr ""
-
-#: src/slic3r/GUI/Device.cpp:571
+#: src/slic3r/GUI/Device.cpp:570
 msgid ""
 "Currently installed nozzle on device doesn't match with this slice. Please "
 "reslice with the correct nozzle."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:573
+#: src/slic3r/GUI/Device.cpp:572
 msgid "Wrong nozzle type"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:594
-msgid "Are you sure?"
-msgstr ""
-
-#: src/slic3r/GUI/Device.cpp:594
+#: src/slic3r/GUI/Device.cpp:593
 msgid "XDesktop: Confirmation"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:595
+#: src/slic3r/GUI/Device.cpp:594
 msgid "Yes"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:595
+#: src/slic3r/GUI/Device.cpp:594
 msgid "No"
 msgstr ""
 
@@ -17526,42 +17518,42 @@ msgstr ""
 msgid "Pressure Advance Calibration - %s"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:44
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:46
 msgid "From K Value"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:47
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:49
 msgid "To K Value"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:50
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:52
 msgid "Step Value"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:87
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:89
 #, possible-c-format, possible-boost-format
 msgid "Start value >= %.3f"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:92
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:94
 #, possible-c-format, possible-boost-format
 msgid "End value <= %.3f"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:97
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:99
 msgid "Start + Step <= End"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:102
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:104
 msgid "Printer must be available"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:106
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:108
 #, possible-c-format, possible-boost-format
 msgid "Step >= %.3f"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:166
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:185
 msgid ""
 "After calibration print is done, determine the best matching K-Factor.\n"
 "Click 'Go to Settings' button and modify 'Filament Settings -> Pressure "
@@ -17569,27 +17561,27 @@ msgid ""
 "K-Factor and do not forget to enable pressure advance."
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:179
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:198
 msgid "Calibration started"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:188
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:207
 msgid "Go to Settings"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:194
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:213
 msgid "Start Calibration"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:251
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:275
 msgid "Calibration is cancelled due to timeout!"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:252
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:276
 msgid "Slicing timeout"
 msgstr ""
 
-#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:366
+#: src/slic3r/GUI/PressureAdvanceCalibrationDialog.cpp:393
 #, possible-c-format, possible-boost-format
 msgid "%d lines will be generated"
 msgstr ""

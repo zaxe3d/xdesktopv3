@@ -10,6 +10,7 @@
 
 #include "../Utils/NetworkMachine.hpp"
 #include "PressureAdvanceCalibrationDialog.hpp"
+#include "I18N.hpp"
 
 namespace Slic3r {
 namespace GUI {
@@ -81,7 +82,7 @@ public:
 
 private:
     wxTimer* m_timer; // elapsed timer.
-    void confirm(std::function<void()> cb);
+    void confirm(std::function<void()> cb, const wxString& question=_L("Are you sure?"));
     wxSizer* m_mainSizer; // vertical sizer (device sizer - horizontal line (seperator).
     wxSizer* m_deviceSizer; // horizontal sizer (avatar | right pane)).
     wxSizer* m_expansionSizer; // vertical sizer (filament | printing time etc.)

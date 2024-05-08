@@ -535,6 +535,7 @@ int Device::getDeviceExtraHeight() const
 
 bool Device::print()
 {
+    bool               ready   = false;
     const ZaxeArchive &archive = wxGetApp().plater()->get_zaxe_archive();
 
     vector<string> sPV;
@@ -550,7 +551,7 @@ bool Device::print()
         wxMessageBox(_L("Device model does NOT match. Please reslice with "
                         "the correct model."),
                      _L("Wrong device model"), wxOK | wxICON_ERROR);
-    } else if (!this->nm->attr->isLite &&
+    } else if (!this->nm->attr->isLite && this->nm->states->filamentPresent &&
                this->nm->attr->material != "custom" &&
                this->nm->attr->material.compare(
                    archive.get_info("material")) != 0) {
@@ -560,9 +561,7 @@ bool Device::print()
     } else if (!this->nm->states->filamentPresent &&
                this->nm->attr->firmwareVersion.GetMajor() >= 3 &&
                this->nm->attr->firmwareVersion.GetMinor() >= 5) {
-        wxMessageBox(
-            _L("Please put the filament through the material sensor first."),
-            _L("Filament not present"), wxICON_ERROR);
+        confirm([&] { ready = true; }, _L("No filament sensed. Do you really want to continue printing?"));
     } else if (!this->nm->attr->isLite &&
                !case_insensitive_compare(this->nm->attr->nozzle,
                                          archive.get_info(
@@ -572,17 +571,16 @@ bool Device::print()
                "slice. Please reslice with the correct nozzle."),
             _L("Wrong nozzle type"), wxICON_ERROR);
     } else {
+        ready = true;
+    }
+    
+    if (ready) {
         std::thread t([&]() {
             if (this->nm->attr->isLite) {
-                this->nm->upload(
-                    wxGetApp().plater()->get_gcode_path().c_str(),
-                    translate_chars(
-                        wxGetApp().plater()->get_filename().ToStdString())
-                        .c_str());
-            } else {
-                this->nm->upload(
-                    wxGetApp().plater()->get_zaxe_code_path().c_str());
-            }
+                this->nm->upload(wxGetApp().plater()->get_gcode_path().c_str(),
+                                 translate_chars(wxGetApp().plater()->get_filename().ToStdString()).c_str());
+            } else
+                this->nm->upload(wxGetApp().plater()->get_zaxe_code_path().c_str());
         });
         t.detach(); // crusial. otherwise blocks main thread.
         return true;
@@ -590,9 +588,9 @@ bool Device::print()
     return false;
 }
 
-void Device::confirm(function<void()> cb)
+void Device::confirm(function<void()> cb, const wxString& question)
 {
-    RichMessageDialog dialog(GetParent(), wxString(_L("Are you sure?")), _L("XDesktop: Confirmation"), wxICON_QUESTION | wxYES_NO);
+    RichMessageDialog dialog(GetParent(), question, _L("XDesktop: Confirmation"), wxICON_QUESTION | wxYES_NO);
     dialog.SetYesNoLabels(_L("Yes"), _L("No"));
     int res = dialog.ShowModal();
     if (res == wxID_YES) cb();
