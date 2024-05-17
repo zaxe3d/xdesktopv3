@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-08 17:08+0300\n"
+"POT-Creation-Date: 2024-05-17 10:33+0300\n"
 "PO-Revision-Date: 2024-01-12 12:12+0300\n"
 "Last-Translator: Mehmet Sutas <msutas@gmail.com>\n"
 "Language-Team: \n"
@@ -12322,7 +12322,7 @@ msgstr "Bir gcode dosyası seçin:"
 
 #: src/slic3r/GUI/GUI_App.cpp:3381 src/slic3r/GUI/GUI_App.cpp:3404
 msgid "Open hyperlink in default browser?"
-msgstr "Köprüyü varsayılan tarayıcıda mı açılsın?"
+msgstr "Bağlantı varsayılan tarayıcıda mı açılsın?"
 
 #: src/slic3r/GUI/GUI_App.cpp:3381 src/slic3r/GUI/GUI_App.cpp:3404
 msgid "XDesktop: Open hyperlink"
@@ -12330,7 +12330,7 @@ msgstr ""
 
 #: src/slic3r/GUI/GUI_App.cpp:3386 src/slic3r/GUI/Preferences.cpp:638
 msgid "Suppress to open hyperlink in browser"
-msgstr "Tarayıcıda köprü açmayı bastır"
+msgstr "Tarayıcıda bağlantı açmayı bastır"
 
 #: src/slic3r/GUI/GUI_App.cpp:3388 src/slic3r/GUI/Plater.cpp:1970
 msgid "XDesktop will remember your choice."
