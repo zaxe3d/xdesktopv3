@@ -24,6 +24,7 @@ public:
     void enablePrintNowButton(bool enable);
     void addMachine(std::string ip, int port, std::string id);
     void onModeChanged();
+    void filter(const wxString& text);
 
 private:
     // slots
@@ -39,11 +40,10 @@ private:
     // UI
     wxSizer    *m_mainSizer;
     wxBoxSizer *m_warningSizer;
-    wxSizer    *m_searchSizer;
     wxSizer    *m_deviceListSizer;
-    wxTextCtrl *m_searchTextCtrl;
 
     boost::unordered_map<std::string, shared_ptr<Device>> m_deviceMap;
+    wxString filter_text{""};
 
     bool m_printNowButtonEnabled = false;
 };

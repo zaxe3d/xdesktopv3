@@ -712,6 +712,7 @@ struct Sidebar::priv
     ObjectLayers        *object_layers{ nullptr };
     ObjectInfo *object_info;
     SlicedInfo *sliced_info;
+    wxTextCtrl *search_text_ctrl{ nullptr };
     NetworkMachineManager *machine_manager{ nullptr };
 
     wxButton *btn_export_gcode;
@@ -1042,12 +1043,19 @@ Sidebar::Sidebar(Plater *parent)
     wxFont label_font = wxGetApp().bold_font();
     label_font.SetPointSize(14);
     mm_label->SetFont(label_font);
+
+    p->search_text_ctrl = new wxTextCtrl(top_panel, wxID_ANY);
+    p->search_text_ctrl->SetHint(_L("Search printer"));
+    p->search_text_ctrl->SetFont(wxGetApp().normal_font());
+    wxGetApp().UpdateDarkUI(p->search_text_ctrl);
+
     p->machine_manager = new NetworkMachineManager(top_panel,
                                                    wxSize(GetSize().GetWidth(),
                                                           -1));
 
     auto *top_sizer = new wxBoxSizer(wxVERTICAL);
-    top_sizer->Add(p->machine_manager, wxEXPAND);
+    top_sizer->Add(p->search_text_ctrl, 0, wxEXPAND | wxALL, 15);
+    top_sizer->Add(p->machine_manager, 1, wxEXPAND);
     top_panel->SetSizer(top_sizer);
 
     auto *bottom_sizer = new wxBoxSizer(wxVERTICAL);
@@ -1148,6 +1156,12 @@ Sidebar::Sidebar(Plater *parent)
                           get_app_config()->save();
                           evt.Skip();
                       });
+
+    p->search_text_ctrl->Bind(wxEVT_TEXT, [&](auto &evt) {
+        auto searchText = p->search_text_ctrl->GetValue();
+        p->machine_manager->filter(searchText);
+        evt.Skip();
+    });
 }
 
 Sidebar::~Sidebar() {}

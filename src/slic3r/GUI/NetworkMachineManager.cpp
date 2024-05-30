@@ -12,9 +12,7 @@ namespace GUI {
 NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
     wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxSize(size)),
     m_mainSizer(new wxBoxSizer(wxVERTICAL)),
-    m_searchSizer(new wxBoxSizer(wxHORIZONTAL)),
     m_deviceListSizer(new wxBoxSizer(wxVERTICAL)),
-    m_searchTextCtrl(new wxTextCtrl(this, wxID_ANY)),
     m_broadcastReceiver(new BroadcastReceiver()),
     m_networkMContainer(new NetworkMachineContainer()),
     m_printNowButtonEnabled(false)
@@ -22,13 +20,6 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
 #ifdef __WINDOWS__
     SetDoubleBuffered(true);
 #endif
-
-    m_searchTextCtrl->SetHint(_L("Search Printer"));
-    m_searchTextCtrl->SetFont(wxGetApp().normal_font());
-    wxGetApp().UpdateDarkUI(m_searchTextCtrl);
-
-    m_searchSizer->Add(m_searchTextCtrl, 11, wxALL | wxALIGN_CENTRE, 5);
-    m_searchSizer->AddStretchSpacer(1);
 
     wxStaticText *noDeviceFoundText =
         new wxStaticText(this, wxID_ANY,
@@ -49,7 +40,6 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
     m_warningSizer->Add(noDeviceFoundText, 0, wxALIGN_CENTER | wxALL, 1);
     m_warningSizer->Show(m_deviceMap.empty());
 
-    m_mainSizer->Add(m_searchSizer, 0, wxEXPAND | wxALL, 5);
     m_mainSizer->Add(m_deviceListSizer, 1, wxEXPAND | wxALL, 5);
     m_mainSizer->Add(m_warningSizer, 0, wxALIGN_CENTER);
 
@@ -63,24 +53,6 @@ NetworkMachineManager::NetworkMachineManager(wxWindow* parent, wxSize size) :
 
     // start listenting for devices here on the network.
     m_broadcastReceiver->Bind(EVT_BROADCAST_RECEIVED, &NetworkMachineManager::onBroadcastReceived, this);
-
-    m_searchTextCtrl->Bind(wxEVT_TEXT, [&](auto &evt) {
-        auto searchText = m_searchTextCtrl->GetValue();
-
-        for (auto &[ip, dev] : m_deviceMap) {
-            if (dev->getName().Lower().Find(searchText.Lower()) ==
-                wxNOT_FOUND) {
-                dev->Hide();
-            } else {
-                dev->Show();
-            }
-        }
-
-        m_mainSizer->Layout();
-        Refresh();
-        FitInside();
-        evt.Skip();
-    });
 
     // add custom ips here.
     auto ips = wxGetApp().app_config->get_custom_ips();
@@ -131,8 +103,8 @@ void NetworkMachineManager::onMachineOpen(MachineEvent &event)
     Freeze();
     shared_ptr<Device> d = make_shared<Device>(event.nm, this);
     d->enablePrintNowButton(m_printNowButtonEnabled);
-    auto searchText = m_searchTextCtrl->GetValue();
-    if (d->getName().Lower().Find(searchText.Lower()) == wxNOT_FOUND) {
+
+    if (!filter_text.empty() && d->getName().Lower().Find(filter_text.Lower()) == wxNOT_FOUND) {
         d->Hide();
     }
     m_deviceMap[event.nm->ip] = d;
@@ -200,6 +172,22 @@ void NetworkMachineManager::onModeChanged()
     std::for_each(m_deviceMap.begin(), m_deviceMap.end(), [](auto &d) {
         if (d.second) d.second->onModeChanged();
     });
+}
+
+void NetworkMachineManager::filter(const wxString &text)
+{
+    filter_text = text;
+    for (auto &[ip, dev] : m_deviceMap) {
+        if (dev->getName().Lower().Find(filter_text.Lower()) == wxNOT_FOUND) {
+            dev->Hide();
+        } else {
+            dev->Show();
+        }
+    }
+
+    m_mainSizer->Layout();
+    Refresh();
+    FitInside();
 }
 } // namespace GUI
 } // namespace Slic3r
