@@ -1,4 +1,5 @@
 min_slic3r_version = 3.0.1
+1.2.8 Zaxe material improvements.
 1.2.7 Top solid layer and pc-abs material improvements.
 1.2.6 Bug fixes.
 1.2.5 Support material coontact distance update.
