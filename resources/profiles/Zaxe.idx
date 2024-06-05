@@ -1,4 +1,5 @@
 min_slic3r_version = 3.0.1
+1.2.10 Support settings improvements.
 1.2.9 Support angle improvements.
 1.2.8 Zaxe material improvements.
 1.2.7 Top solid layer and pc-abs material improvements.
