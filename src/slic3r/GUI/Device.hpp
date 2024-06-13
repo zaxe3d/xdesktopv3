@@ -77,6 +77,7 @@ public:
 
     void onTimer(wxTimerEvent& event);
     void onModeChanged();
+    void onUploadDone();
     
     bool print();
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-30 18:03+0300\n"
+"POT-Creation-Date: 2024-06-13 16:57+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -10655,116 +10655,135 @@ msgstr ""
 msgid "Remove Selection"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:27 src/slic3r/GUI/Device.cpp:472
+#: src/slic3r/GUI/Device.cpp:28 src/slic3r/GUI/Device.cpp:473
 msgid "Nozzle: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:28
+#: src/slic3r/GUI/Device.cpp:29
 msgid "IP Address: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:29
+#: src/slic3r/GUI/Device.cpp:30
 msgid "Please take your print!"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:30
+#: src/slic3r/GUI/Device.cpp:31
 msgid "Device is in error state!"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:31 src/slic3r/GUI/Device.cpp:499
+#: src/slic3r/GUI/Device.cpp:32 src/slic3r/GUI/Device.cpp:500
 msgid "Elapsed / Estimated time: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:32
+#: src/slic3r/GUI/Device.cpp:33
 msgid "File: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:34
+#: src/slic3r/GUI/Device.cpp:35
 msgid "Unload"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:35
+#: src/slic3r/GUI/Device.cpp:36
 msgid "PA Calibration"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:36
+#: src/slic3r/GUI/Device.cpp:37
 msgid "Print Now!"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:305
+#: src/slic3r/GUI/Device.cpp:306
 msgid "Bed is occupied..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:307
+#: src/slic3r/GUI/Device.cpp:308
 msgid "Heating..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:310
+#: src/slic3r/GUI/Device.cpp:311
 msgid "Paused..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:313
+#: src/slic3r/GUI/Device.cpp:314
 msgid "Printing..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:318
+#: src/slic3r/GUI/Device.cpp:319
 msgid "Uploading..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:321
+#: src/slic3r/GUI/Device.cpp:322
 msgid "Calibrating..."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:452
+#: src/slic3r/GUI/Device.cpp:453
 msgid "Material: - (Not installed)"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:455
+#: src/slic3r/GUI/Device.cpp:456
 msgid "Material: "
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:551
-msgid "Device model does NOT match. Please reslice with the correct model."
+#: src/slic3r/GUI/Device.cpp:552
+msgid "Please insert a usb stick before start printing."
 msgstr ""
 
 #: src/slic3r/GUI/Device.cpp:553
-msgid "Wrong device model"
+msgid "USB stick not found"
 msgstr ""
 
 #: src/slic3r/GUI/Device.cpp:558
+msgid "Device model does NOT match. Please reslice with the correct model."
+msgstr ""
+
+#: src/slic3r/GUI/Device.cpp:560
+msgid "Wrong device model"
+msgstr ""
+
+#: src/slic3r/GUI/Device.cpp:567
 msgid ""
 "Materials don't match with this device. Please reslice with the correct "
 "material."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:560
+#: src/slic3r/GUI/Device.cpp:569
 msgid "Wrong material type"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:564
+#: src/slic3r/GUI/Device.cpp:578
 msgid "No filament sensed. Do you really want to continue printing?"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:570
+#: src/slic3r/GUI/Device.cpp:587
 msgid ""
 "Currently installed nozzle on device doesn't match with this slice. Please "
 "reslice with the correct nozzle."
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:572
+#: src/slic3r/GUI/Device.cpp:589
 msgid "Wrong nozzle type"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:593
+#: src/slic3r/GUI/Device.cpp:596
+msgid ""
+"Bed might not be ready for the next print. Please be sure its clean before "
+"pressing YES!"
+msgstr ""
+
+#: src/slic3r/GUI/Device.cpp:619
 msgid "XDesktop: Confirmation"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:594
+#: src/slic3r/GUI/Device.cpp:620
 msgid "Yes"
 msgstr ""
 
-#: src/slic3r/GUI/Device.cpp:594
+#: src/slic3r/GUI/Device.cpp:620
 msgid "No"
+msgstr ""
+
+#: src/slic3r/GUI/Device.cpp:746
+msgid ""
+"Your print job has been sent to the device. Printing will start shortly."
 msgstr ""
 
 #: src/slic3r/GUI/GUI.cpp:295
