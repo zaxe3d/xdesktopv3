@@ -96,6 +96,7 @@ private:
     wxBitmapButton* m_btnPause; // pause button.
     wxBitmapButton* m_btnResume; // resume button.
     wxBitmapButton* m_btnCancel; // cancel button.
+    wxBitmapButton* m_btnCam; // cam button.
     wxBitmapButton* m_btnExpandCollapse; // expand/collapse button.
     wxButton* m_btnUnload; // unload filament button.
     wxButton* m_btnPressureAdvanceCalibration;

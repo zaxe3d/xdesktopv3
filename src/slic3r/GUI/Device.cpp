@@ -64,6 +64,9 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     wxBitmap bitCancel(Slic3r::resources_dir() + "/icons/device/stop.png", wxBITMAP_TYPE_PNG);
     m_btnCancel = new wxBitmapButton(this, wxID_ANY, bitCancel, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
 
+    wxBitmap bitCam(Slic3r::resources_dir() + "/icons/device/video.png", wxBITMAP_TYPE_PNG);
+    m_btnCam = new wxBitmapButton(this, wxID_ANY, bitCam, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+
     m_bitExpanded->LoadFile(Slic3r::resources_dir() + "/icons/device/collapse.png", wxBITMAP_TYPE_PNG);
     m_bitCollapsed->LoadFile(Slic3r::resources_dir() + "/icons/device/expand.png", wxBITMAP_TYPE_PNG);
     m_btnExpandCollapse = new wxBitmapButton(this, wxID_ANY, *m_bitCollapsed, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
@@ -140,24 +143,46 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_avatar->SetText(dMWx);
     m_deviceSizer->Add(m_avatar, wxSizerFlags().Border(wxALL, 7));
     if (is_there(this->nm->attr->deviceModel, {"z2", "z3"})) {
-        m_avatar->Bind(wxEVT_LEFT_DCLICK, [this](const wxMouseEvent &evt) {
-            BOOST_LOG_TRIVIAL(info) << "Clicked on avatar trying to open stream on: " << this->nm->name;
-            if (this->nm->attr->firmwareVersion.GetMinor() >= 4 || (this->nm->attr->firmwareVersion.GetMinor() >= 3 && this->nm->attr->firmwareVersion.GetMicro() >= 80)) {
+        auto cam_cb = [this]() {
+            BOOST_LOG_TRIVIAL(info)
+                << "Clicked on avatar trying to open stream on: "
+                << this->nm->name;
+            if (this->nm->attr->firmwareVersion.GetMinor() >= 4 ||
+                (this->nm->attr->firmwareVersion.GetMinor() >= 3 &&
+                 this->nm->attr->firmwareVersion.GetMicro() >= 80)) {
                 wxFileName ffplay(wxStandardPaths::Get().GetExecutablePath());
-                wxString curExecPath(ffplay.GetPath());
+                wxString   curExecPath(ffplay.GetPath());
                 wxExecute(
 #ifdef _WIN32
-                    "cmd.exe /c ffplay tcp://" + this->nm->ip + ":5002 -window_title \"Zaxe " + to_upper_copy(this->nm->attr->deviceModel) + ": " + this->nm->name + "\" -x 720",
+                    "cmd.exe /c ffplay tcp://" + this->nm->ip +
+                        ":5002 -window_title \"Zaxe " +
+                        to_upper_copy(this->nm->attr->deviceModel) + ": " +
+                        this->nm->name + "\" -x 720",
                     wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE
 #else
-                    curExecPath + "/ffplay tcp://" + this->nm->ip + ":5002 -window_title \"Zaxe " + to_upper_copy(this->nm->attr->deviceModel) + ": " + this->nm->name + "\" -x 720",
+                    curExecPath + "/ffplay tcp://" + this->nm->ip +
+                        ":5002 -window_title \"Zaxe " +
+                        to_upper_copy(this->nm->attr->deviceModel) + ": " +
+                        this->nm->name + "\" -x 720",
                     wxEXEC_ASYNC
 #endif
                 );
             } else {
-                wxMessageBox("Need device firmware version at least v3.3.80 to comply.", "Need firmware update for this feautre.", wxICON_INFORMATION);
+                wxMessageBox("Need device firmware version at least v3.3.80 "
+                             "to comply.",
+                             "Need firmware update for this feautre.",
+                             wxICON_INFORMATION);
             }
-        });
+        };
+        m_avatar->Bind(wxEVT_LEFT_DCLICK,
+                       [this, cam_cb](const wxMouseEvent &evt) { cam_cb(); });
+
+        m_btnCam->Bind(wxEVT_BUTTON,
+                       [this, cam_cb](const wxCommandEvent &evt) {
+                           cam_cb();
+                       });
+    } else {
+        m_btnCam->Hide();
     }
     // End of Device model.
 
@@ -183,6 +208,7 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     actionBtnsSizer->Add(m_btnPause);
     actionBtnsSizer->Add(m_btnResume);
     actionBtnsSizer->Add(m_btnCancel);
+    actionBtnsSizer->Add(m_btnCam);
     actionBtnsSizer->Add(m_btnExpandCollapse);
     dnaabp->Add(m_txtDeviceName, expandFlag.Left());
     dnaabp->Add(m_txtCtrlDeviceName, expandFlag.Left());
