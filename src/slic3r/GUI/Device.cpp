@@ -330,6 +330,9 @@ void Device::updateStatus()
     wxString statusTxt = "";
     if (nm->states->bedOccupied) {
         statusTxt = _L("Bed is occupied...");
+    } else if (nm->states->calibrating) {
+        statusTxt = _L("Calibrating...");
+        m_progressBar->SetColour(DEVICE_COLOR_ORANGE);
     } else if (nm->states->heating) {
         statusTxt = _L("Heating...");
         m_progressBar->SetColour(DEVICE_COLOR_DANGER);
@@ -344,9 +347,6 @@ void Device::updateStatus()
     } else if (nm->states->uploading) {
         statusTxt = _L("Uploading...");
         m_progressBar->SetColour(DEVICE_COLOR_UPLOADING);
-    } else if (nm->states->calibrating) {
-        statusTxt = _L("Calibrating...");
-        m_progressBar->SetColour(DEVICE_COLOR_ORANGE);
     }
     m_txtStatus->SetLabel(statusTxt);
 
