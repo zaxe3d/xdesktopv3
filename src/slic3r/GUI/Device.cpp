@@ -175,10 +175,10 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
             }
         };
         m_avatar->Bind(wxEVT_LEFT_DCLICK,
-                       [this, cam_cb](const wxMouseEvent &evt) { cam_cb(); });
+                       [cam_cb](const wxMouseEvent &evt) { cam_cb(); });
 
         m_btnCam->Bind(wxEVT_BUTTON,
-                       [this, cam_cb](const wxCommandEvent &evt) {
+                       [cam_cb](const wxCommandEvent &evt) {
                            cam_cb();
                        });
     } else {
@@ -570,8 +570,8 @@ bool Device::print()
           is_any_of("-"));
     string pN = sPV[0]; // ie: Zaxe Z3S - 0.6mm nozzle -> Zaxe Z3S
     string dM = to_upper_copy(this->nm->attr->deviceModel);
-    auto   s  = pN.find(dM);
     boost::replace_all(dM, "PLUS", "+");
+    auto   s  = pN.find(dM);    
     trim(pN);
 
     if (is_there(nm->attr->deviceModel, {"x3"}) && !nm->states->usbPresent) {
