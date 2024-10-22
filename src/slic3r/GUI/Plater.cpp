@@ -1036,8 +1036,8 @@ Sidebar::Sidebar(Plater *parent)
 
     btns_sizer->Add(p->btn_reslice, 1, wxEXPAND | wxTOP | wxBOTTOM, margin_5);
     btns_sizer->Add(complect_btns_sizer, 1, wxEXPAND | wxTOP | wxBOTTOM, margin_5);
-    auto *mm_label = new wxStaticText(this, wxID_ANY, "..::" + _L("Zaxe Machine Carousel") + "::..",
-                                      wxDefaultPosition, wxSize(-1, 30), wxTE_CENTER);
+    auto mm_label = new wxStaticText(this, wxID_ANY, "..::" + _L("Zaxe Machine Carousel") + "::..",
+                                      wxDefaultPosition, wxDefaultSize, wxTE_CENTER);
     wxGetApp().UpdateDarkUI(mm_label);
 
     wxFont label_font = wxGetApp().bold_font();

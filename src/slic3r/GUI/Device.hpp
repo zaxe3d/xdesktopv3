@@ -19,7 +19,7 @@
 namespace Slic3r {
 namespace GUI {
 
-#define DEVICE_HEIGHT 80
+#define DEVICE_HEIGHT 8 // * em
 #define DEVICE_FILENAME_MAX_NUM_CHARS 40
 #define DEVICE_COLOR_ZAXE_BLUE wxColor(0, 155, 223)
 #define DEVICE_COLOR_ORANGE wxColor(255, 165, 0)
@@ -136,7 +136,7 @@ private:
     void toggleDeviceNameWidgets();
 
     void refreshCalibButton();
-    int getDeviceExtraHeight() const;
+    float getDeviceExtraHeight() const;
 };
 } // namespace GUI
 } // namespace Slic3r

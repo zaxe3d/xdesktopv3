@@ -16,30 +16,30 @@ namespace Slic3r {
 namespace GUI {
 
 Device::Device(NetworkMachine* _nm, wxWindow* parent) :
-    wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(parent->GetSize().GetWidth(), DEVICE_HEIGHT)),
+    wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(parent->GetSize().GetWidth() - wxGetApp().em_unit(), DEVICE_HEIGHT * wxGetApp().em_unit())),
     nm(_nm),
     m_mainSizer(new wxBoxSizer(wxVERTICAL)), // vertical sizer (device sizer - horizontal line (seperator).
     m_deviceSizer(new wxBoxSizer(wxHORIZONTAL)), // horizontal sizer (avatar | right pane).)
     m_filamentSizer(new wxBoxSizer(wxHORIZONTAL)), // horizontal sizer (filament | unload filament button).
     m_expansionSizer(new wxBoxSizer(wxVERTICAL)), // vertical sizer (filament | printing time etc.)
     m_rightSizer(new wxBoxSizer(wxVERTICAL)), // vertical right pane. (name - status - progress bar).
-    m_progressBar(new CustomProgressBar(this, wxID_ANY, wxSize(-1, 5))),
-    m_txtStatus(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_LEFT)),
-    m_txtProgress(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
-    m_txtDeviceName(new wxStaticText(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtCtrlDeviceName(new wxTextCtrl(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT | wxSIMPLE_BORDER | wxTE_PROCESS_ENTER)),
-    m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "-" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtBedOccupiedMessage(new wxStaticText(this, wxID_ANY, _L("Please take your print!"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtErrorMessage(new wxStaticText(this, wxID_ANY, _L("Device is in error state!"), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtFileTime(new wxStaticText(this, wxID_ANY, _L("Elapsed / Estimated time: ") + get_time_hms(std::to_string(nm->attr->startTime)) + " / " + nm->attr->estimatedTime, wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + wxString(nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS).c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 20), wxTE_LEFT)),
-    m_txtFWVersion(new wxStaticText(this, wxID_ANY, nm->attr->firmwareVersion.GetVersionString(), wxDefaultPosition, wxSize(-1, 18), wxTE_RIGHT)),
-    m_btnUnload(new wxButton(this, wxID_ANY, _L("Unload"), wxDefaultPosition, wxSize(-1, 18), wxCENTER | wxCentreY)),
-    m_btnPressureAdvanceCalibration(new wxButton(this, wxID_ANY, _L("PA Calibration"), wxDefaultPosition, wxSize(-1, 18), wxCENTER | wxCentreY)),
+    m_progressBar(new CustomProgressBar(this, wxID_ANY, wxSize(-1, 0.5f * wxGetApp().em_unit()))),
+    m_txtStatus(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 1.8f * wxGetApp().em_unit()), wxTE_LEFT)),
+    m_txtProgress(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 1.8f * wxGetApp().em_unit()), wxTE_RIGHT)),
+    m_txtDeviceName(new wxStaticText(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 2.f * wxGetApp().em_unit()), wxTE_LEFT)),
+    m_txtCtrlDeviceName(new wxTextCtrl(this, wxID_ANY, wxString(nm->name.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 2.f * wxGetApp().em_unit()), wxTE_LEFT | wxSIMPLE_BORDER | wxTE_PROCESS_ENTER)),
+    m_txtDeviceMaterial(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 2.f * wxGetApp().em_unit()), wxTE_LEFT)),
+    m_txtDeviceNozzleDiameter(new wxStaticText(this, wxID_ANY, _L("Nozzle: ") + (nm->attr->isLite ? "-" : nm->attr->nozzle + "mm"), wxDefaultPosition, wxSize(-1, 2.f * wxGetApp().em_unit()), wxTE_LEFT)),
+    m_txtDeviceIP(new wxStaticText(this, wxID_ANY, _L("IP Address: ") + nm->ip, wxDefaultPosition, wxSize(-1, 2.f * wxGetApp().em_unit()), wxTE_LEFT)),
+    m_txtBedOccupiedMessage(new wxStaticText(this, wxID_ANY, _L("Please take your print!"), wxDefaultPosition, wxSize(-1, 2.f * wxGetApp().em_unit()), wxTE_LEFT)),
+    m_txtErrorMessage(new wxStaticText(this, wxID_ANY, _L("Device is in error state!"), wxDefaultPosition, wxSize(-1, 2.f * wxGetApp().em_unit()), wxTE_LEFT)),
+    m_txtFileTime(new wxStaticText(this, wxID_ANY, _L("Elapsed / Estimated time: ") + get_time_hms(std::to_string(nm->attr->startTime)) + " / " + nm->attr->estimatedTime, wxDefaultPosition, wxSize(-1, 2.f * wxGetApp().em_unit()), wxTE_LEFT)),
+    m_txtFileName(new wxStaticText(this, wxID_ANY, _L("File: ") + wxString(nm->attr->printingFile.substr(0, DEVICE_FILENAME_MAX_NUM_CHARS).c_str(), wxConvUTF8), wxDefaultPosition, wxSize(-1, 2.f * wxGetApp().em_unit()), wxTE_LEFT)),
+    m_txtFWVersion(new wxStaticText(this, wxID_ANY, nm->attr->firmwareVersion.GetVersionString(), wxDefaultPosition, wxSize(-1, 1.8f * wxGetApp().em_unit()), wxTE_RIGHT)),
+    m_btnUnload(new wxButton(this, wxID_ANY, _L("Unload"), wxDefaultPosition, wxSize(-1, 1.8f * wxGetApp().em_unit()), wxCENTER | wxCentreY)),
+    m_btnPressureAdvanceCalibration(new wxButton(this, wxID_ANY, _L("PA Calibration"), wxDefaultPosition, wxSize(-1, 1.8f * wxGetApp().em_unit()), wxCENTER | wxCentreY)),
     m_btnPrintNow(new wxButton(this, wxID_ANY, _L("Print Now!"))),
-    m_avatar(new RoundedPanel(this, wxID_ANY, "", wxSize(60, 60), wxColour(169, 169, 169), wxColour("WHITE"))),
+    m_avatar(new RoundedPanel(this, wxID_ANY, "", wxSize(6.f * wxGetApp().em_unit(), 6.f * wxGetApp().em_unit()), wxColour(169, 169, 169), wxColour("WHITE"))),
     m_bitPreheatActive(new wxBitmap()),
     m_bitPreheatDeactive(new wxBitmap()),
     m_bitCollapsed(new wxBitmap()),
@@ -53,27 +53,27 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
 
     // action buttons with bitmaps.
     wxBitmap bitSayHi(Slic3r::resources_dir() + "/icons/device/hi.png", wxBITMAP_TYPE_PNG);
-    m_btnSayHi = new wxBitmapButton(this, wxID_ANY, bitSayHi, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+    m_btnSayHi = new wxBitmapButton(this, wxID_ANY, bitSayHi, wxDefaultPosition, wxSize(3.2f * wxGetApp().em_unit(), 2.f * wxGetApp().em_unit()), wxTE_RIGHT);
     
     m_bitPreheatActive->LoadFile(Slic3r::resources_dir() + "/icons/device/preheat_active.png", wxBITMAP_TYPE_PNG);
     m_bitPreheatDeactive->LoadFile(Slic3r::resources_dir() + "/icons/device/preheat.png", wxBITMAP_TYPE_PNG);
-    m_btnPreheat = new wxBitmapButton(this, wxID_ANY, *m_bitPreheatDeactive, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+    m_btnPreheat = new wxBitmapButton(this, wxID_ANY, *m_bitPreheatDeactive, wxDefaultPosition, wxSize(3.2f * wxGetApp().em_unit(), 2.f * wxGetApp().em_unit()), wxTE_RIGHT);
 
     wxBitmap bitPause(Slic3r::resources_dir() + "/icons/device/pause.png", wxBITMAP_TYPE_PNG);
-    m_btnPause = new wxBitmapButton(this, wxID_ANY, bitPause, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+    m_btnPause = new wxBitmapButton(this, wxID_ANY, bitPause, wxDefaultPosition, wxSize(3.2f * wxGetApp().em_unit(), 2.f * wxGetApp().em_unit()), wxTE_RIGHT);
 
     wxBitmap bitResume(Slic3r::resources_dir() + "/icons/device/resume.png", wxBITMAP_TYPE_PNG);
-    m_btnResume = new wxBitmapButton(this, wxID_ANY, bitResume, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+    m_btnResume = new wxBitmapButton(this, wxID_ANY, bitResume, wxDefaultPosition, wxSize(3.2f * wxGetApp().em_unit(), 2.f * wxGetApp().em_unit()), wxTE_RIGHT);
 
     wxBitmap bitCancel(Slic3r::resources_dir() + "/icons/device/stop.png", wxBITMAP_TYPE_PNG);
-    m_btnCancel = new wxBitmapButton(this, wxID_ANY, bitCancel, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+    m_btnCancel = new wxBitmapButton(this, wxID_ANY, bitCancel, wxDefaultPosition, wxSize(3.2f * wxGetApp().em_unit(), 2.f * wxGetApp().em_unit()), wxTE_RIGHT);
 
     wxBitmap bitCam(Slic3r::resources_dir() + "/icons/device/video.png", wxBITMAP_TYPE_PNG);
-    m_btnCam = new wxBitmapButton(this, wxID_ANY, bitCam, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+    m_btnCam = new wxBitmapButton(this, wxID_ANY, bitCam, wxDefaultPosition, wxSize(3.2f * wxGetApp().em_unit(), 2.f * wxGetApp().em_unit()), wxTE_RIGHT);
 
     m_bitExpanded->LoadFile(Slic3r::resources_dir() + "/icons/device/collapse.png", wxBITMAP_TYPE_PNG);
     m_bitCollapsed->LoadFile(Slic3r::resources_dir() + "/icons/device/expand.png", wxBITMAP_TYPE_PNG);
-    m_btnExpandCollapse = new wxBitmapButton(this, wxID_ANY, *m_bitCollapsed, wxDefaultPosition, wxSize(32, 20), wxTE_RIGHT);
+    m_btnExpandCollapse = new wxBitmapButton(this, wxID_ANY, *m_bitCollapsed, wxDefaultPosition, wxSize(3.2f * wxGetApp().em_unit(), 2.f * wxGetApp().em_unit()), wxTE_RIGHT);
 
     m_dlgPressureAdvanceCalibration = new PressureAdvanceCalibrationDialog(this, wxID_ANY, nm->name);
 
@@ -145,7 +145,7 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_avatar->SetFont(boldFont);
     wxString dMWx(dM);
     m_avatar->SetText(dMWx);
-    m_deviceSizer->Add(m_avatar, wxSizerFlags().Border(wxALL, 7));
+    m_deviceSizer->Add(m_avatar, wxSizerFlags().Border(wxALL, 0.7 * wxGetApp().em_unit()));
     if (is_there(this->nm->attr->deviceModel, {"z2", "z3"})) {
         auto cam_cb = [this]() {
             BOOST_LOG_TRIVIAL(info)
@@ -197,7 +197,7 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     wxBoxSizer* dnaabp = new wxBoxSizer(wxHORIZONTAL); // device name and action buttons
     m_txtDeviceName->SetFont(boldSmallFont);
     wxGetApp().UpdateDarkUI(m_txtDeviceName);
-    m_txtCtrlDeviceName->SetMaxLength(15);
+    m_txtCtrlDeviceName->SetMaxLength(1.5f * wxGetApp().em_unit());
     m_txtCtrlDeviceName->Hide();
     m_deviceNameTxtCtrlShown = false;
     wxGetApp().UpdateDarkUI(m_txtCtrlDeviceName);
@@ -274,10 +274,10 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     // Print now button end.
     m_btnExpandCollapse->Bind(wxEVT_BUTTON, [&](const wxCommandEvent &evt) {
         if (m_isExpanded) {
-            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT));
+            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT  * wxGetApp().em_unit()));
             m_expansionSizer->ShowItems(false);
         } else {
-            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT + getDeviceExtraHeight()));
+            SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), (DEVICE_HEIGHT + getDeviceExtraHeight()) * wxGetApp().em_unit()));
             m_expansionSizer->ShowItems(true);
             if (!this->nm->states->printing) {
                 // hide m_txtFileName and duration and their bottom borders.
@@ -302,20 +302,20 @@ Device::Device(NetworkMachine* _nm, wxWindow* parent) :
     m_expansionSizer->Add(m_txtFileName, 0, wxBOTTOM);
     m_expansionSizer->Add(m_txtFileTime, 0, wxBOTTOM);
     m_filamentSizer->Add(m_txtDeviceMaterial, 0, wxLEFT);
-    m_filamentSizer->Add(m_btnUnload, 0, wxLEFT, 10);
+    m_filamentSizer->Add(m_btnUnload, 0, wxLEFT, 1.f * wxGetApp().em_unit());
     m_expansionSizer->Add(m_filamentSizer, 0, wxTOP);
     m_expansionSizer->Add(m_txtDeviceNozzleDiameter, 0, wxBOTTOM);
     m_expansionSizer->Add(m_txtDeviceIP, 0, wxBOTTOM);
     m_expansionSizer->Add(m_btnPressureAdvanceCalibration, 0, wxLEFT);
-    m_expansionSizer->Add(m_txtFWVersion, 0, wxEXPAND | wxRIGHT, 25);
+    m_expansionSizer->Add(m_txtFWVersion, 0, wxEXPAND | wxRIGHT, 2.5f * wxGetApp().em_unit());
     m_expansionSizer->ShowItems(false);
-    m_mainSizer->Add(m_expansionSizer, 0, wxEXPAND | wxLEFT, m_avatar->GetSize().GetWidth() + 14); // only expand horizontally in vertical sizer.
+    m_mainSizer->Add(m_expansionSizer, 0, wxEXPAND | wxLEFT, m_avatar->GetSize().GetWidth() + 1.4f * wxGetApp().em_unit()); // only expand horizontally in vertical sizer.
     // end of expansion panel contents.
 
     // Bottom line. (separator)
-    wxStaticLine* bl = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxHORIZONTAL);
+    wxStaticLine* bl = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 0.1f * wxGetApp().em_unit()), wxHORIZONTAL);
     wxGetApp().UpdateDarkUI(bl);
-    m_mainSizer->Add(bl, 0, wxRIGHT | wxEXPAND, 20);
+    m_mainSizer->Add(bl, 0, wxRIGHT | wxEXPAND, 2.f * wxGetApp().em_unit());
 
     updateStates();
 
@@ -443,7 +443,7 @@ void Device::updateStates()
     }
 
     if (m_isExpanded) {
-        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT + getDeviceExtraHeight()));
+        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), (DEVICE_HEIGHT + getDeviceExtraHeight()) * wxGetApp().em_unit()));
         m_expansionSizer->Layout();
         GetParent()->Layout();
         GetParent()->FitInside();
@@ -538,7 +538,7 @@ void Device::onTimer(wxTimerEvent& event)
 
 void Device::onModeChanged() {
     if(m_isExpanded) {
-        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), DEVICE_HEIGHT + getDeviceExtraHeight()));
+        SetMinSize(wxSize(GetParent()->GetSize().GetWidth(), (DEVICE_HEIGHT + getDeviceExtraHeight()) * wxGetApp().em_unit()));
         refreshCalibButton();
         m_expansionSizer->Layout();
         GetParent()->Layout();
@@ -553,13 +553,13 @@ void Device::refreshCalibButton()
         wxGetApp().get_mode() >= comAdvanced);
 }
 
-int Device::getDeviceExtraHeight() const
+float Device::getDeviceExtraHeight() const
 {
-    int extra{0};
+    float extra{0.f};
 
-    if (wxGetApp().get_mode() >= comAdvanced) { extra += 20; }
+    if (wxGetApp().get_mode() >= comAdvanced) { extra += 2.f; }
 
-    extra += nm->states->printing ? 115 : 75;
+    extra += nm->states->printing ? 11.5f : 7.5f;
 
     return extra;
 }
