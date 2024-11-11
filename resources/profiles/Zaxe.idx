@@ -1,4 +1,5 @@
 min_slic3r_version = 3.0.1
+1.2.16 Modify accelerations and travel speed of Z3 and Z3S
 1.2.15 Fix POLYMAKER PolySonic PLA
 1.2.14 Update Polymaker Polylite PLA and Colorfabb LW-ASA profiles
 1.2.13 Update Basf (PA, PLA) and Colorfabb (PLA, ASA) profiles
